@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { authApi, session } from './api';
+import { authApi } from './api';
 import type { User } from '@/types';
 
 interface AuthState {
@@ -21,11 +21,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = session.getToken();
-    const storedUser = session.getUser<User>();
+    const storedToken = localStorage.getItem('accessToken');
+    const storedUser = localStorage.getItem('user');
     if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(storedUser);
+      try {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      } catch {}
     }
     setIsLoading(false);
   }, []);
@@ -33,15 +35,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     const res = await authApi.login(email, password);
     const { accessToken, user: userData } = res.data;
-    session.save(accessToken, userData);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('user', JSON.stringify(userData));
     setToken(accessToken);
     setUser(userData);
   };
 
-  const logout = async () => {
-    // Tell the server first, while the token is still attached; the redirect below ends the page anyway.
-    try { await authApi.logout(); } catch { /* signing out locally is what matters */ }
-    session.clear();
+  const logout = () => {
+    authApi.logout().catch(() => {});
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
     setToken(null);
     setUser(null);
     window.location.href = '/login';

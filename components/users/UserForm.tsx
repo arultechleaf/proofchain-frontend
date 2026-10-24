@@ -48,7 +48,7 @@ export function UserForm({
   const role = watch('role');
 
   return (
-    <form method="post" onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <Grid cols={2}>
         <Field label="Full name" required error={errors.name?.message}>
           <input className="form-input" {...register('name', { required: 'Name is required' })} />
