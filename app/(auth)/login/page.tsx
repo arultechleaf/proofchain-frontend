@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, Mail, Eye, EyeOff, Loader2, AlertCircle, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { apiError } from '@/lib/utils';
 
 interface LoginForm {
   email: string;
@@ -64,7 +65,7 @@ export default function LoginPage() {
       await login(data.email, data.password);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Invalid email or password');
+      setError(apiError(err, 'Could not sign in'));
     } finally {
       setLoading(false);
     }
@@ -151,7 +152,7 @@ export default function LoginPage() {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <form method="post" onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
             {/* Email */}
             <div>

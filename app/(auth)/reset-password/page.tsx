@@ -59,7 +59,7 @@ function ResetPassword() {
   return (
     <AuthShell title="Choose a new password">
       {error && <Notice kind="error">{error} <Link href="/forgot-password" style={{ color: '#60a5fa' }}>Request a new link</Link></Notice>}
-      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <form method="post" onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <Field label="New password" required error={errors.password?.message} hint="At least 8 characters">
           <input type="password" className="form-input" autoComplete="new-password"
             {...register('password', { required: 'Password is required', minLength: { value: 8, message: 'At least 8 characters' } })} />

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { KeyRound, UserRound } from 'lucide-react';
-import { authApi } from '@/lib/api';
+import { authApi, session } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { apiError, roleLabel } from '@/lib/utils';
 import { Card, Field, KeyValue, Notice, Page, PageHeader, SubmitButton } from '@/components/ui';
@@ -33,7 +33,7 @@ export default function ProfilePage() {
     try {
       const res = await authApi.updateProfile(name.trim());
       // Keep the cached profile (sidebar, top bar) in sync with the server.
-      localStorage.setItem('user', JSON.stringify({ ...user, name: res.data.name }));
+      session.saveUser({ ...user, name: res.data.name });
       setNameMsg({ kind: 'success', text: 'Profile updated. Your new name shows everywhere after the next page load.' });
     } catch (err) {
       setNameMsg({ kind: 'error', text: apiError(err, 'Could not update profile') });
@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
       <Card title="Change password" icon={KeyRound}>
         {pwMsg && <Notice kind={pwMsg.kind}>{pwMsg.text}</Notice>}
-        <form onSubmit={handleSubmit(changePassword)} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <form method="post" onSubmit={handleSubmit(changePassword)} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <Field label="Current password" required error={errors.currentPassword?.message}>
             <input type="password" className="form-input" autoComplete="current-password"
               {...register('currentPassword', { required: 'Enter your current password' })} />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/lib/auth';
-import { razorpayApi } from '@/lib/api';
+import { API_URL, razorpayApi } from '@/lib/api';
 import { useAsync } from '@/components/ui';
 import { Shield, Server, ExternalLink, Key, CreditCard } from 'lucide-react';
 
@@ -38,7 +38,7 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 
 export default function SettingsPage() {
   const { user } = useAuth();
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+  const apiUrl = API_URL;
   const razorpay = useAsync<{ enabled: boolean; mode: 'test' | 'live'; webhookConfigured: boolean }>(
     async () => (await razorpayApi.config()).data.data,
     [],
@@ -92,7 +92,7 @@ export default function SettingsPage() {
       {/* Platform config */}
       <div style={card}>
         <SectionTitle icon={Server} title="Platform Configuration" />
-        <InfoRow label="API URL"         value={<span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#60a5fa' }}>{apiUrl}</span>} />
+        <InfoRow label="API URL"         value={<span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#60a5fa' }}>{apiUrl || 'Same origin (/api)'}</span>} />
         <InfoRow label="Environment"     value={<span style={{ color: '#fbbf24', fontWeight: 600 }}>Development</span>} />
         <InfoRow label="Blockchain Mode" value={
           <span style={{ padding: '2px 10px', borderRadius: 9999, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#fbbf24', fontSize: 11, fontWeight: 600 }}>

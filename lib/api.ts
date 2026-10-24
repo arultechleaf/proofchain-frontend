@@ -1,6 +1,41 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+/**
+ * Where API calls go. Empty (the default) means same origin: the browser calls /api/... on the
+ * frontend's own address and next.config.ts forwards it to the backend (BACKEND_URL).
+ * Set NEXT_PUBLIC_API_URL only to point the browser straight at a backend on another origin.
+ */
+export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/+$/, '');
+
+const TOKEN_KEY = 'accessToken';
+const USER_KEY = 'user';
+
+/** The signed-in session kept in localStorage. Everything that touches it goes through here. */
+export const session = {
+  getToken(): string | null {
+    return typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_KEY);
+  },
+  getUser<T>(): T | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      return raw ? (JSON.parse(raw) as T) : null;
+    } catch {
+      return null;
+    }
+  },
+  save(token: string, user: unknown) {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  },
+  saveUser(user: unknown) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  },
+  clear() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  },
+};
 
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -12,10 +47,8 @@ const PUBLIC_PATHS = ['/login', '/register', '/forgot-password', '/reset-passwor
 
 // ── Request interceptor — attach JWT ──────────────────────────────────────────
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('accessToken');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-  }
+  const token = session.getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -27,8 +60,7 @@ api.interceptors.response.use(
     // redirecting would reload the page and throw the error message away.
     const onPublicPage = typeof window !== 'undefined' && PUBLIC_PATHS.includes(window.location.pathname);
     if (err.response?.status === 401 && typeof window !== 'undefined' && !onPublicPage) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
+      session.clear();
       window.location.href = '/login';
     }
     return Promise.reject(err);
@@ -49,6 +81,11 @@ export const authApi = {
   changePassword: (currentPassword: string, newPassword: string) =>
     api.post('/auth/change-password', { currentPassword, newPassword }),
   updateProfile: (name: string) => api.patch('/auth/me', { name }),
+};
+
+export const emailOtpApi = {
+  send: (email: string) => api.post('/email-otp/send', { email }),
+  verify: (email: string, otp: string) => api.post('/email-otp/verify', { email, otp }),
 };
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
