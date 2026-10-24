@@ -1,0 +1,106 @@
+'use client';
+
+import { useForm } from 'react-hook-form';
+import { Field, Grid, SubmitButton } from '@/components/ui';
+import type { Item } from '@/types';
+
+export interface ItemFormValues {
+  name: string;
+  sku: string;
+  unit: string;
+  salePrice: number;
+  purchasePrice: number;
+  taxRate: number;
+  stock: number;
+  lowStockLevel: number;
+  description: string;
+}
+
+export function itemToForm(i?: Item): ItemFormValues {
+  return {
+    name: i?.name ?? '',
+    sku: i?.sku ?? '',
+    unit: i?.unit ?? 'pcs',
+    salePrice: i?.salePrice ?? 0,
+    purchasePrice: i?.purchasePrice ?? 0,
+    taxRate: i?.taxRate ?? 0,
+    stock: i?.stock ?? 0,
+    lowStockLevel: i?.lowStockLevel ?? 0,
+    description: i?.description ?? '',
+  };
+}
+
+export function formToItemPayload(v: ItemFormValues, includeStock: boolean) {
+  const opt = (s: string) => (s.trim() ? s.trim() : undefined);
+  return {
+    name: v.name.trim(),
+    sku: opt(v.sku),
+    unit: opt(v.unit) ?? 'pcs',
+    salePrice: Number(v.salePrice) || 0,
+    purchasePrice: Number(v.purchasePrice) || 0,
+    taxRate: Number(v.taxRate) || 0,
+    lowStockLevel: Number(v.lowStockLevel) || 0,
+    description: opt(v.description),
+    ...(includeStock ? { stock: Number(v.stock) || 0 } : {}),
+  };
+}
+
+export function ItemForm({
+  defaultValues, onSubmit, loading, submitLabel = 'Save', readOnly, isNew,
+}: {
+  defaultValues: ItemFormValues;
+  onSubmit: (v: ItemFormValues) => void | Promise<void>;
+  loading?: boolean;
+  submitLabel?: string;
+  readOnly?: boolean;
+  /** New items can set opening stock; existing items change stock through adjustments. */
+  isNew?: boolean;
+}) {
+  const { register, handleSubmit, formState: { errors } } = useForm<ItemFormValues>({ defaultValues });
+  const num = { valueAsNumber: true, min: { value: 0, message: 'Cannot be negative' } };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <Grid cols="2fr 1fr 1fr">
+          <Field label="Item name" required error={errors.name?.message}>
+            <input className="form-input" placeholder="Temperature Sensor"
+              {...register('name', { required: 'Name is required' })} />
+          </Field>
+          <Field label="SKU / code">
+            <input className="form-input" placeholder="SEN-001" {...register('sku')} />
+          </Field>
+          <Field label="Unit">
+            <input className="form-input" placeholder="pcs" {...register('unit')} />
+          </Field>
+        </Grid>
+        <Grid cols={3}>
+          <Field label="Sale price" error={errors.salePrice?.message}>
+            <input type="number" step="0.01" className="form-input" {...register('salePrice', num)} />
+          </Field>
+          <Field label="Purchase price" error={errors.purchasePrice?.message}>
+            <input type="number" step="0.01" className="form-input" {...register('purchasePrice', num)} />
+          </Field>
+          <Field label="Tax rate (%)" error={errors.taxRate?.message}>
+            <input type="number" step="0.01" className="form-input"
+              {...register('taxRate', { ...num, max: { value: 100, message: 'Max 100' } })} />
+          </Field>
+        </Grid>
+        <Grid cols={2}>
+          {isNew && (
+            <Field label="Opening stock" error={errors.stock?.message}>
+              <input type="number" step="any" className="form-input" {...register('stock', num)} />
+            </Field>
+          )}
+          <Field label="Low-stock alert at" hint="Flagged when stock falls to this level" error={errors.lowStockLevel?.message}>
+            <input type="number" step="any" className="form-input" {...register('lowStockLevel', num)} />
+          </Field>
+        </Grid>
+        <Field label="Description">
+          <textarea className="form-input" rows={2} style={{ resize: 'none' }} {...register('description')} />
+        </Field>
+      </fieldset>
+      {!readOnly && <div><SubmitButton loading={loading}>{submitLabel}</SubmitButton></div>}
+    </form>
+  );
+}
