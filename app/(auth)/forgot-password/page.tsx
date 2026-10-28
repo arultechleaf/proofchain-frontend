@@ -31,27 +31,27 @@ export default function ForgotPasswordPage() {
       {error && <Notice kind="error">{error}</Notice>}
 
       {result ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="auth-form">
           <Notice kind="success">{result.message}</Notice>
           {result.resetToken && (
             <Notice kind="info">
               Email delivery is not set up yet, so the link is shown here (development only).{' '}
-              <Link href={`/reset-password?token=${result.resetToken}`} style={{ color: '#60a5fa', textDecoration: 'underline' }}>
+              <Link href={`/reset-password?token=${result.resetToken}`} className="auth-link auth-link-underline">
                 Choose a new password
               </Link>
             </Notice>
           )}
-          <Link href="/login" className="btn btn-secondary" style={{ justifyContent: 'center' }}>Back to sign in</Link>
+          <Link href="/login" className="btn btn-secondary btn-block">Back to sign in</Link>
         </div>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
           <Field label="Email address" required error={errors.email?.message}>
             <input type="email" className="form-input" autoComplete="email" placeholder="you@example.com"
               {...register('email', { required: 'Email is required', pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email' } })} />
           </Field>
           <SubmitButton loading={loading}>Send reset link</SubmitButton>
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#64748b' }}>
-            <Link href="/login" style={{ color: '#60a5fa' }}>Back to sign in</Link>
+          <p className="auth-footnote">
+            <Link href="/login" className="auth-link">Back to sign in</Link>
           </p>
         </form>
       )}

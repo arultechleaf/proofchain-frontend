@@ -107,9 +107,20 @@ export function todayIso(): string {
 
 /** Message from an API error response, falling back to a default. */
 export function apiError(err: unknown, fallback = 'Something went wrong'): string {
-  const msg = (err as any)?.response?.data?.message;
+  const res = (err as any)?.response;
+  // No response at all: the request never reached a working server (backend down, wrong address, offline).
+  if (!res) {
+    const code = (err as any)?.code;
+    return code === 'ECONNABORTED'
+      ? 'The server took too long to answer. Try again.'
+      : 'Cannot reach the server. Check that the backend is running and that you are online.';
+  }
+  const msg = res.data?.message;
   if (Array.isArray(msg)) return msg.join(', ');
-  return msg ?? fallback;
+  if (typeof msg === 'string' && msg) return msg;
+  // The proxy answered but the backend behind it did not (it returns an HTML/empty error page).
+  if (res.status >= 500) return `The server had a problem (HTTP ${res.status}). Check that the backend is running.`;
+  return fallback;
 }
 
 export function downloadBlob(blob: Blob, filename: string) {

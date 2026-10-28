@@ -2,11 +2,12 @@
 
 import { useForm } from 'react-hook-form';
 import { Field, Grid, SubmitButton } from '@/components/ui';
-import type { Item } from '@/types';
+import type { Item } from '@/models';
 
 export interface ItemFormValues {
   name: string;
   sku: string;
+  hsnCode: string;
   unit: string;
   salePrice: number;
   purchasePrice: number;
@@ -20,6 +21,7 @@ export function itemToForm(i?: Item): ItemFormValues {
   return {
     name: i?.name ?? '',
     sku: i?.sku ?? '',
+    hsnCode: i?.hsnCode ?? '',
     unit: i?.unit ?? 'pcs',
     salePrice: i?.salePrice ?? 0,
     purchasePrice: i?.purchasePrice ?? 0,
@@ -35,6 +37,7 @@ export function formToItemPayload(v: ItemFormValues, includeStock: boolean) {
   return {
     name: v.name.trim(),
     sku: opt(v.sku),
+    hsnCode: opt(v.hsnCode),
     unit: opt(v.unit) ?? 'pcs',
     salePrice: Number(v.salePrice) || 0,
     purchasePrice: Number(v.purchasePrice) || 0,
@@ -62,13 +65,16 @@ export function ItemForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <Grid cols="2fr 1fr 1fr">
+        <Grid cols="2fr 1fr 1fr 1fr">
           <Field label="Item name" required error={errors.name?.message}>
             <input className="form-input" placeholder="Temperature Sensor"
               {...register('name', { required: 'Name is required' })} />
           </Field>
           <Field label="SKU / code">
             <input className="form-input" placeholder="SEN-001" {...register('sku')} />
+          </Field>
+          <Field label="HSN / SAC code" hint="Printed on GST invoices">
+            <input className="form-input" placeholder="8471" {...register('hsnCode')} />
           </Field>
           <Field label="Unit">
             <input className="form-input" placeholder="pcs" {...register('unit')} />
@@ -81,7 +87,7 @@ export function ItemForm({
           <Field label="Purchase price" error={errors.purchasePrice?.message}>
             <input type="number" step="0.01" className="form-input" {...register('purchasePrice', num)} />
           </Field>
-          <Field label="Tax rate (%)" error={errors.taxRate?.message}>
+          <Field label="GST rate (%)" error={errors.taxRate?.message}>
             <input type="number" step="0.01" className="form-input"
               {...register('taxRate', { ...num, max: { value: 100, message: 'Max 100' } })} />
           </Field>

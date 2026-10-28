@@ -60,10 +60,15 @@ const NAV_ITEMS: NavItem[] = [
 
   // BILLING
   {
+    href: '/billing',
+    icon: CreditCard,
+    label: 'Billing Overview',
+    section: 'Billing',
+  },
+  {
     href: '/sales',
     icon: Receipt,
     label: 'Sales',
-    section: 'Billing',
   },
   {
     href: '/quotations',
@@ -221,20 +226,6 @@ const GROUPED_ITEMS = (() => {
   });
 })();
 
-const ROLE_COLORS: Record<string, string> = {
-  admin: '#a78bfa',
-  company_a: '#60a5fa',
-  company_b: '#22d3ee',
-  auditor: '#fbbf24',
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  admin: 'Administrator',
-  company_a: 'Company A',
-  company_b: 'Company B',
-  auditor: 'Auditor',
-};
-
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
@@ -363,80 +354,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           />
         </button>
       </div>
-
-      {/* User Profile */}
-      {user && (
-        <div
-          style={{
-            padding: collapsed ? '10px 8px' : '10px 12px',
-            borderBottom: '1px solid rgba(59,130,246,0.08)',
-            flexShrink: 0,
-          }}
-        >
-          <Link
-            href="/profile"
-            title="My profile"
-            style={{
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              justifyContent: collapsed ? 'center' : 'flex-start',
-            }}
-          >
-            <div
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 8,
-                flexShrink: 0,
-                background: 'linear-gradient(135deg, #2563eb, #0891b2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#fff',
-                fontSize: 12,
-                fontWeight: 700,
-              }}
-            >
-              {user.name?.[0]?.toUpperCase() ?? 'U'}
-            </div>
-
-            {!collapsed && (
-              <div
-                style={{
-                  minWidth: 0,
-                  flex: 1,
-                  overflow: 'hidden',
-                }}
-              >
-                <p
-                  style={{
-                    color: '#e2e8f0',
-                    fontSize: 11,
-                    fontWeight: 600,
-                    margin: 0,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {user.name}
-                </p>
-                <p
-                  style={{
-                    color: ROLE_COLORS[user.role] ?? '#64748b',
-                    fontSize: 10,
-                    margin: 0,
-                  }}
-                >
-                  {ROLE_LABELS[user.role] ?? user.role}
-                </p>
-              </div>
-            )}
-          </Link>
-        </div>
-      )}
 
       {/* Navigation */}
       <nav

@@ -4,11 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowDownLeft, ArrowUpRight, Plus, Wallet } from 'lucide-react';
 import { paymentsApi } from '@/lib/api';
-import type { Payment } from '@/types';
+import type { Payment } from '@/models';
 import { useAuth } from '@/lib/auth';
-import { formatDay, formatMoney } from '@/lib/utils';
+import { apiError, formatDay, formatMoney } from '@/lib/utils';
 import {
-  Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, StatCard, canWrite, useAsync,
+  Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, actionsColumn, canWrite, useAsync,
 } from '@/components/ui';
 
 const TABS = [
@@ -23,12 +23,26 @@ export default function PaymentsPage() {
   const [page, setPage] = useState(1);
   const limit = 15;
 
-  const { data, loading, error } = useAsync(
+  const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+
+  const { data, loading, error, reload } = useAsync(
     async () => (await paymentsApi.list({ direction: direction || undefined, page, limit })).data,
     [direction, page],
   );
   const rows: Payment[] = data?.data ?? [];
   const total: number = data?.total ?? 0;
+
+  const writable = canWrite(user?.role);
+  const remove = async (p: Payment) => {
+    setMessage(null);
+    try {
+      await paymentsApi.remove(p.id);
+      setMessage({ kind: 'success', text: 'Payment deleted and taken off the invoice' });
+      await reload();
+    } catch (err) {
+      setMessage({ kind: 'error', text: apiError(err, 'Could not delete the payment') });
+    }
+  };
 
   const columns: Column<Payment>[] = [
     { header: 'Date', cell: (p) => formatDay(p.paymentDate) },
@@ -52,6 +66,16 @@ export default function PaymentsPage() {
         </strong>
       ),
     },
+    actionsColumn<Payment>((p) => (
+      <RowActions
+        view={`/parties/${p.partyId}`}
+        remove={writable ? {
+          confirm: `Delete this ${formatMoney(p.amount)} payment? ${p.invoice ? `${p.invoice.invoiceNumber} goes back to unpaid / part-paid.` : ''}`,
+          onConfirm: () => remove(p),
+          disabled: p.method === 'razorpay' ? 'Online payments cannot be deleted' : undefined,
+        } : undefined}
+      />
+    ), 110),
   ];
 
   return (
@@ -79,6 +103,7 @@ export default function PaymentsPage() {
       </div>
 
       {error ? <Notice kind="error">Could not load payments.</Notice> : null}
+      {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
 
       <DataTable
         columns={columns}
@@ -86,6 +111,7 @@ export default function PaymentsPage() {
         loading={loading}
         rowKey={(p) => p.id}
         empty={<EmptyState icon={Wallet} title="No payments recorded" />}
+        startIndex={(page - 1) * limit}
         footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
       />
     </Page>

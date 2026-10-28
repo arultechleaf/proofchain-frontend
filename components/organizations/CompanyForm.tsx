@@ -1,14 +1,15 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Field, Grid, SubmitButton } from '@/components/ui';
-import type { Company } from '@/types';
+import { CheckField, Field, Grid, SubmitButton } from '@/components/ui';
+import type { Company } from '@/models';
 
 export interface CompanyFormValues {
   name: string;
   organizationCode: string;
   organizationType: Company['organizationType'];
   description: string;
+  gstin: string;
   isActive: boolean;
 }
 
@@ -18,6 +19,7 @@ export function companyToForm(c?: Company): CompanyFormValues {
     organizationCode: c?.organizationCode ?? '',
     organizationType: c?.organizationType ?? 'sender',
     description: c?.description ?? '',
+    gstin: c?.gstin ?? '',
     isActive: c?.isActive ?? true,
   };
 }
@@ -57,13 +59,16 @@ export function CompanyForm({
           </select>
         </Field>
       </Grid>
+      <Field label="GSTIN" error={errors.gstin?.message}
+        hint="15 characters. The first two digits are your state, which decides CGST + SGST or IGST on invoices">
+        <input className="form-input uppercase-input" placeholder="29ABCDE1234F1Z5" maxLength={15}
+          {...register('gstin', { pattern: { value: /^([0-9A-Za-z]{15})?$/, message: 'GSTIN must be 15 letters/digits' } })} />
+      </Field>
       <Field label="Description">
         <textarea className="form-input" rows={3} style={{ resize: 'none' }} {...register('description')} />
       </Field>
       {showActive && (
-        <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: '#cbd5e1', cursor: 'pointer' }}>
-          <input type="checkbox" {...register('isActive')} /> Organization is active
-        </label>
+        <CheckField label="Organization is active" {...register('isActive')} />
       )}
       <div><SubmitButton loading={loading}>{submitLabel}</SubmitButton></div>
     </form>

@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, XCircle, MessageSquare, Package, Building2, Hash, Calendar } from 'lucide-react';
+import { SearchInput } from '@/components/ui';
 import { deliveriesApi, approvalsApi } from '@/lib/api';
-import type { Delivery } from '@/types';
+import type { Delivery } from '@/models';
 import { formatRelative, statusLabel } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
 
@@ -129,20 +130,11 @@ export default function ApprovalsPage() {
             {/* Card actions */}
             <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(5,13,26,0.4)' }}>
               {/* Comment input */}
-              <div style={{ position: 'relative', flex: 1 }}>
-                <MessageSquare size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
-                <input
-                  style={{
-                    width: '100%', height: 36, paddingLeft: 30, paddingRight: 12,
-                    background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(51,65,85,0.5)',
-                    borderRadius: 8, color: '#cbd5e1', fontSize: 13, outline: 'none',
-                    boxSizing: 'border-box',
-                  }}
+              <SearchInput small icon={MessageSquare}
                   placeholder="Optional comment..."
                   value={comments[d.id] ?? ''}
                   onChange={e => setComments(prev => ({ ...prev, [d.id]: e.target.value }))}
                 />
-              </div>
 
               {/* Approve */}
               <button

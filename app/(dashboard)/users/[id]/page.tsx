@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { usersApi } from '@/lib/api';
-import type { User } from '@/types';
+import type { User } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDate } from '@/lib/utils';
 import { Card, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, useAsync } from '@/components/ui';

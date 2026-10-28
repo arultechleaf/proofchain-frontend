@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Building2, Pencil, Users } from 'lucide-react';
 import { companiesApi } from '@/lib/api';
-import type { Company, User } from '@/types';
+import type { Company, User } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { formatDate, roleLabel } from '@/lib/utils';
 import {

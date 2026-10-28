@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { AlertCircle, CheckCircle2, Clock, RefreshCw, XCircle } from 'lucide-react';
 import { verificationApi } from '@/lib/api';
-import type { VerificationResult } from '@/types';
+import type { VerificationResult } from '@/models';
 import { formatDate, truncateHash } from '@/lib/utils';
 import { Card, Grid, KeyValue, Notice, Page, PageHeader, Spinner, useAsync } from '@/components/ui';
 

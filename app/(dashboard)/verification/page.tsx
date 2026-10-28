@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Shield, Search, CheckCircle2, XCircle, AlertCircle, Clock, Loader2 } from 'lucide-react';
 import { deliveriesApi, verificationApi } from '@/lib/api';
-import type { VerificationResult, Delivery } from '@/types';
+import type { VerificationResult, Delivery } from '@/models';
 import { formatDate } from '@/lib/utils';
 
 const STATUS_CONFIG: Record<string, { icon: React.ElementType; color: string; bg: string; border: string; label: string }> = {
@@ -53,12 +53,6 @@ export default function VerificationPage() {
 
   const sc = result ? (STATUS_CONFIG[result.status] ?? STATUS_CONFIG.error) : null;
 
-  const inputStyle: React.CSSProperties = {
-    flex: 1, height: 40, padding: '0 14px',
-    background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(51,65,85,0.6)',
-    borderRadius: 8, color: '#e2e8f0', fontSize: 13, outline: 'none',
-  };
-
   return (
     <div style={{ padding: '28px 32px', maxWidth: 780, color: '#e2e8f0' }}>
 
@@ -75,7 +69,7 @@ export default function VerificationPage() {
         </h2>
         <form onSubmit={searchDelivery} style={{ display: 'flex', gap: 10 }}>
           <input
-            style={inputStyle}
+            className="form-input form-input-sm"
             placeholder="Delivery reference (e.g. DEL-2024-001) or ID..."
             value={query}
             onChange={e => setQuery(e.target.value)}

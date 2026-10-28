@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, Search, UserCheck, Users } from 'lucide-react';
+import { Plus, Search, UserCheck, UserX, Users } from 'lucide-react';
 import { usersApi } from '@/lib/api';
-import type { User } from '@/types';
+import type { User } from '@/models';
 import { useAuth } from '@/lib/auth';
-import { formatRelative, roleLabel } from '@/lib/utils';
+import { apiError, formatRelative, roleLabel } from '@/lib/utils';
 import {
-  Column, DataTable, EmptyState, Notice, Page, PageHeader, StatusBadge, useAsync,
+  Column, DataTable, EmptyState, Notice, Page, PageHeader, RowActions, StatusBadge, actionsColumn, useAsync,
 } from '@/components/ui';
 
 export default function UsersPage() {
@@ -17,13 +17,26 @@ export default function UsersPage() {
   const [pendingOnly, setPendingOnly] = useState(false);
   const isAdmin = me?.role === 'admin';
 
-  const { data, loading, error } = useAsync<User[]>(async () => (await usersApi.list()).data.data, []);
+  const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+
+  const { data, loading, error, reload } = useAsync<User[]>(async () => (await usersApi.list()).data.data, []);
   const all = data ?? [];
   const pending = all.filter((u) => !u.isActive).length;
   const needle = search.trim().toLowerCase();
   const rows = all
     .filter((u) => !pendingOnly || !u.isActive)
     .filter((u) => !needle || u.name.toLowerCase().includes(needle) || u.email.toLowerCase().includes(needle));
+
+  const setActive = async (u: User, isActive: boolean) => {
+    setMessage(null);
+    try {
+      await usersApi.update(u.id, { isActive });
+      setMessage({ kind: 'success', text: `${u.name} ${isActive ? 'activated' : 'deactivated'}` });
+      await reload();
+    } catch (err) {
+      setMessage({ kind: 'error', text: apiError(err, 'Could not update the user') });
+    }
+  };
 
   const columns: Column<User>[] = [
     {
@@ -37,6 +50,24 @@ export default function UsersPage() {
     { header: 'Organization', cell: (u) => u.company?.name ?? '—' },
     { header: 'Joined', cell: (u) => formatRelative(u.createdAt) },
     { header: 'Status', cell: (u) => <StatusBadge status={u.isActive ? 'active' : 'inactive'} /> },
+    // Users are deactivated, not deleted, so their history in invoices and the audit log stays intact.
+    actionsColumn<User>((u) => (
+      <RowActions
+        view={isAdmin ? `/users/${u.id}` : undefined}
+        edit={isAdmin ? `/users/${u.id}` : undefined}
+        extra={isAdmin && !u.isActive ? (
+          <button type="button" className="icon-btn icon-view" title="Activate" aria-label="Activate" onClick={() => setActive(u, true)}>
+            <UserCheck size={15} />
+          </button>
+        ) : undefined}
+        remove={isAdmin && u.isActive ? {
+          label: 'Deactivate',
+          confirm: `Deactivate ${u.name}? They will no longer be able to sign in.`,
+          onConfirm: () => setActive(u, false),
+          disabled: u.id === me?.id ? 'You cannot deactivate your own account' : undefined,
+        } : undefined}
+      />
+    )),
   ];
 
   return (
@@ -61,6 +92,7 @@ export default function UsersPage() {
         </Notice>
       )}
       {error ? <Notice kind="error">Could not load users.</Notice> : null}
+      {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
 
       <div style={{ position: 'relative', maxWidth: 420, marginBottom: 16 }}>
         <Search size={14} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#475569' }} />

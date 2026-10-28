@@ -4,11 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { FileText, Plus, Search } from 'lucide-react';
 import { invoicesApi } from '@/lib/api';
-import type { Invoice, InvoiceType } from '@/types';
+import type { Invoice, InvoiceType } from '@/models';
 import { useAuth } from '@/lib/auth';
-import { formatDay, formatMoney } from '@/lib/utils';
+import { apiError, formatDay, formatMoney } from '@/lib/utils';
 import {
-  Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, StatusBadge, canWrite, useAsync,
+  Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, StatusBadge, actionsColumn, canWrite, useAsync,
 } from '@/components/ui';
 
 export const INVOICE_COPY: Record<InvoiceType, { base: string; title: string; noun: string; newLabel: string; party: string }> = {
@@ -25,12 +25,26 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
   const [page, setPage] = useState(1);
   const limit = 15;
 
-  const { data, loading, error } = useAsync(
+  const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+
+  const { data, loading, error, reload } = useAsync(
     async () => (await invoicesApi.list(type, { status: status || undefined, search: query || undefined, page, limit })).data,
     [type, status, query, page],
   );
   const rows: Invoice[] = data?.data ?? [];
   const total: number = data?.total ?? 0;
+
+  const writable = canWrite(user?.role);
+  const cancel = async (i: Invoice) => {
+    setMessage(null);
+    try {
+      await invoicesApi.cancel(i.id);
+      setMessage({ kind: 'success', text: `${i.invoiceNumber} cancelled` });
+      await reload();
+    } catch (err) {
+      setMessage({ kind: 'error', text: apiError(err, 'Could not cancel') });
+    }
+  };
 
   const columns: Column<Invoice>[] = [
     {
@@ -48,13 +62,25 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
     { header: 'Balance', align: 'right', cell: (i) => formatMoney(i.status === 'cancelled' ? 0 : i.total - i.paidAmount) },
     { header: 'Status', cell: (i) => <StatusBadge status={i.status} /> },
     { header: 'Proof', cell: (i) => <StatusBadge status={i.blockchainStatus} /> },
+    // Invoices carry a tamper-proof hash, so they cannot be edited: cancel (which restores stock) instead.
+    actionsColumn<Invoice>((i) => (
+      <RowActions
+        view={`${copy.base}/${i.id}`}
+        remove={writable && i.status !== 'cancelled' ? {
+          label: 'Cancel',
+          confirm: `Cancel ${i.invoiceNumber}? Stock is put back and it no longer counts in reports.`,
+          onConfirm: () => cancel(i),
+          disabled: i.paidAmount > 0 ? 'Has payments, so it cannot be cancelled' : undefined,
+        } : undefined}
+      />
+    )),
   ];
 
   return (
     <Page>
       <PageHeader
         title={copy.title}
-        subtitle={`${total} ${copy.noun}`}
+  //      subtitle={`${total} ${copy.noun}`}
         actions={canWrite(user?.role) && (
           <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={15} /> {copy.newLabel}</Link>
         )}
@@ -78,6 +104,7 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
       </form>
 
       {error ? <Notice kind="error">Could not load {copy.noun}.</Notice> : null}
+      {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
 
       <DataTable
         columns={columns}
@@ -88,6 +115,7 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
           <EmptyState icon={FileText} title={`No ${copy.noun} found`}
             action={canWrite(user?.role) ? <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={14} /> {copy.newLabel}</Link> : undefined} />
         }
+        startIndex={(page - 1) * limit}
         footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
       />
     </Page>

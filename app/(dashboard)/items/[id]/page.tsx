@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Boxes, History } from 'lucide-react';
 import { itemsApi } from '@/lib/api';
-import type { Item, StockMovement } from '@/types';
+import type { Item, StockMovement } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDate, formatMoney } from '@/lib/utils';
 import {

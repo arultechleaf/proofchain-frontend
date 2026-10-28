@@ -2,46 +2,7 @@
 
 import { useForm } from 'react-hook-form';
 import { Field, Grid, SubmitButton } from '@/components/ui';
-import type { Party } from '@/types';
-
-export interface PartyFormValues {
-  name: string;
-  partyType: 'customer' | 'supplier' | 'both';
-  phone: string;
-  email: string;
-  taxId: string;
-  city: string;
-  address: string;
-  openingBalance: number;
-}
-
-export function partyToForm(p?: Party): PartyFormValues {
-  return {
-    name: p?.name ?? '',
-    partyType: p?.partyType ?? 'customer',
-    phone: p?.phone ?? '',
-    email: p?.email ?? '',
-    taxId: p?.taxId ?? '',
-    city: p?.city ?? '',
-    address: p?.address ?? '',
-    openingBalance: p?.openingBalance ?? 0,
-  };
-}
-
-/** Empty optional fields are sent as undefined so the API leaves them unset. */
-export function formToPartyPayload(v: PartyFormValues) {
-  const opt = (s: string) => (s.trim() ? s.trim() : undefined);
-  return {
-    name: v.name.trim(),
-    partyType: v.partyType,
-    phone: opt(v.phone),
-    email: opt(v.email),
-    taxId: opt(v.taxId),
-    city: opt(v.city),
-    address: opt(v.address),
-    openingBalance: Number(v.openingBalance) || 0,
-  };
-}
+import type { PartyFormValues } from '@/models/party';
 
 export function PartyForm({
   defaultValues, onSubmit, loading, submitLabel = 'Save', readOnly,

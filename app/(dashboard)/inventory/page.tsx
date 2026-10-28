@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { AlertTriangle, Boxes, Coins, Package } from 'lucide-react';
 import { itemsApi } from '@/lib/api';
-import type { Item, StockMovement } from '@/types';
+import type { Item, StockMovement } from '@/models';
 import { formatDate, formatMoney } from '@/lib/utils';
 import {
   Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, useAsync,

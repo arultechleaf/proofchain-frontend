@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { ClipboardList, Download, RefreshCw } from 'lucide-react';
 import { auditApi } from '@/lib/api';
-import type { AuditLog } from '@/types';
+import type { AuditLog } from '@/models';
 import { formatDate, downloadBlob } from '@/lib/utils';
+import { Column, DataTable, EmptyState, Pager } from '@/components/ui';
 
 const ACTION_STYLE: Record<string, { color: string; bg: string; border: string }> = {
   CREATE_DELIVERY:    { color: '#60a5fa', bg: 'rgba(37,99,235,0.1)',  border: 'rgba(59,130,246,0.25)' },
@@ -15,18 +16,43 @@ const ACTION_STYLE: Record<string, { color: string; bg: string; border: string }
   LOGOUT:             { color: '#94a3b8', bg: 'rgba(30,41,59,0.4)',  border: 'rgba(51,65,85,0.4)'   },
 };
 
-const TH: React.CSSProperties = {
-  textAlign: 'left', padding: '11px 16px',
-  fontSize: 11, color: '#64748b', fontWeight: 600,
-  textTransform: 'uppercase', letterSpacing: '0.06em',
-  borderBottom: '1px solid rgba(59,130,246,0.1)',
-  background: 'rgba(5,13,26,0.5)', whiteSpace: 'nowrap',
-};
-
 const inputStyle: React.CSSProperties = {
   background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(51,65,85,0.6)',
   borderRadius: 8, color: '#e2e8f0', fontSize: 13, outline: 'none',
 };
+
+const columns: Column<AuditLog>[] = [
+  { header: 'Time', cell: (l) => <span style={{ color: '#64748b' }}>{formatDate(l.createdAt)}</span> },
+  { header: 'Actor', cell: (l) => l.actor?.name ?? (l.actorId ? l.actorId.slice(0, 8) + '…' : 'System') },
+  {
+    header: 'Action',
+    cell: (l) => {
+      const as = ACTION_STYLE[l.action] ?? ACTION_STYLE.LOGOUT;
+      return (
+        <span style={{ ...as, padding: '2px 8px', borderRadius: 9999, border: `1px solid ${as.border}`, fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fontWeight: 600 }}>
+          {l.action}
+        </span>
+      );
+    },
+  },
+  { header: 'Type', cell: (l) => <span style={{ color: '#94a3b8', textTransform: 'capitalize' }}>{l.resourceType}</span> },
+  {
+    header: 'Resource ID',
+    cell: (l) => (
+      <span style={{ fontFamily: 'JetBrains Mono, monospace', color: '#475569', fontSize: 11 }}>
+        {l.resourceId ? l.resourceId.slice(0, 8) + '…' : '—'}
+      </span>
+    ),
+  },
+  {
+    header: 'Details',
+    cell: (l) => (
+      <span style={{ display: 'block', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', color: '#475569' }}>
+        {l.details ? JSON.stringify(l.details).slice(0, 80) : '—'}
+      </span>
+    ),
+  },
+];
 
 export default function AuditPage() {
   const [logs, setLogs]             = useState<AuditLog[]>([]);
@@ -71,9 +97,9 @@ export default function AuditPage() {
         {/* Controls */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <select
+            className="form-input form-input-sm" style={{ width: 140 }}
             value={resourceType}
             onChange={e => { setResourceType(e.target.value); setPage(1); }}
-            style={{ ...inputStyle, height: 36, padding: '0 10px', width: 140, cursor: 'pointer' }}
           >
             <option value="">All Types</option>
             <option value="delivery">Delivery</option>
@@ -89,93 +115,17 @@ export default function AuditPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div style={{ background: 'rgba(8,15,30,0.85)', border: '1px solid rgba(59,130,246,0.12)', borderRadius: 14, overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-            <thead>
-              <tr>
-                {['Time', 'Actor', 'Action', 'Type', 'Resource ID', 'Details'].map(h => (
-                  <th key={h} style={TH}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid rgba(30,41,59,0.5)' }}>
-                    {[140, 110, 150, 70, 80, 180].map((w, j) => (
-                      <td key={j} style={{ padding: '11px 16px' }}>
-                        <div className="skeleton" style={{ height: 12, borderRadius: 4, width: w }} />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : logs.length > 0 ? (
-                logs.map((log) => {
-                  const as = ACTION_STYLE[log.action] ?? ACTION_STYLE.LOGOUT;
-                  return (
-                    <tr key={log.id}
-                      style={{ borderBottom: '1px solid rgba(30,41,59,0.4)', transition: 'background 0.12s' }}
-                      onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(30,41,59,0.3)'}
-                      onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
-                    >
-                      <td style={{ padding: '11px 16px', color: '#64748b', whiteSpace: 'nowrap' }}>{formatDate(log.createdAt)}</td>
-                      <td style={{ padding: '11px 16px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>
-                        {log.actor?.name ?? (log.actorId ? log.actorId.slice(0, 8) + '…' : 'System')}
-                      </td>
-                      <td style={{ padding: '11px 16px', whiteSpace: 'nowrap' }}>
-                        <span style={{
-                          ...as, padding: '2px 8px', borderRadius: 9999,
-                          border: `1px solid ${as.border}`,
-                          fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fontWeight: 600,
-                        }}>
-                          {log.action}
-                        </span>
-                      </td>
-                      <td style={{ padding: '11px 16px', color: '#94a3b8', textTransform: 'capitalize' }}>{log.resourceType}</td>
-                      <td style={{ padding: '11px 16px', fontFamily: 'JetBrains Mono, monospace', color: '#475569', fontSize: 11 }}>
-                        {log.resourceId ? log.resourceId.slice(0, 8) + '…' : '—'}
-                      </td>
-                      <td style={{ padding: '11px 16px', color: '#475569', maxWidth: 260 }}>
-                        <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {log.details ? JSON.stringify(log.details).slice(0, 80) : '—'}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '60px 20px' }}>
-                    <ClipboardList size={40} color="#334155" style={{ margin: '0 auto 12px', display: 'block' }} />
-                    <p style={{ color: '#475569', fontSize: 14, margin: 0 }}>No audit logs found</p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {total > limit && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', borderTop: '1px solid rgba(59,130,246,0.08)' }}>
-            <span style={{ color: '#64748b', fontSize: 12 }}>
-              Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total}
-            </span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {[
-                { label: '← Prev', act: () => setPage(p => Math.max(1, p - 1)), dis: page === 1 },
-                { label: 'Next →', act: () => setPage(p => p + 1),              dis: page * limit >= total },
-              ].map(b => (
-                <button key={b.label} onClick={b.act} disabled={b.dis} style={{ ...btnStyle, opacity: b.dis ? 0.4 : 1, cursor: b.dis ? 'not-allowed' : 'pointer' }}>
-                  {b.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      <DataTable
+        compact
+        columns={columns}
+        rows={logs}
+        loading={loading}
+        skeletonRows={8}
+        rowKey={(l) => l.id}
+        empty={<EmptyState icon={ClipboardList} title="No audit logs found" />}
+        startIndex={(page - 1) * limit}
+        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
+      />
     </div>
   );
 }

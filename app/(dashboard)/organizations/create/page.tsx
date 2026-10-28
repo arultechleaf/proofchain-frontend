@@ -33,6 +33,7 @@ export default function CreateOrganizationPage() {
                 organizationCode: v.organizationCode.trim(),
                 organizationType: v.organizationType,
                 description: v.description.trim() || undefined,
+                gstin: v.gstin.trim().toUpperCase() || undefined,
               });
               router.push(`/organizations/${res.data.data.id}`);
             } catch (err) {

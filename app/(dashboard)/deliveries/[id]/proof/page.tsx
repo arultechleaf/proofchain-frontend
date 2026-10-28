@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Printer, ShieldCheck } from 'lucide-react';
 import { approvalsApi, deliveriesApi } from '@/lib/api';
-import type { Approval, Delivery, ProofRecord } from '@/types';
+import type { Approval, Delivery, ProofRecord } from '@/models';
 import { formatDate, truncateHash } from '@/lib/utils';
 import { Card, Grid, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, useAsync } from '@/components/ui';
 

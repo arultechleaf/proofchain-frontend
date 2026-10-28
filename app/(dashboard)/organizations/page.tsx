@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Building2, Users, Plus } from 'lucide-react';
 import { companiesApi, usersApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import type { Company, User } from '@/types';
+import type { Company, User } from '@/models';
+import { Column, DataTable } from '@/components/ui';
 
 const TYPE_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   sender:   { bg: 'rgba(37,99,235,0.12)',  color: '#60a5fa', border: 'rgba(59,130,246,0.3)'  },
@@ -22,6 +23,39 @@ const ROLE_LABEL: Record<string, string> = {
   admin: 'Administrator', company_a: 'Company A (Sender)', company_b: 'Company B (Receiver)', auditor: 'Auditor',
 };
 
+const userColumns: Column<User>[] = [
+  {
+    header: 'User',
+    cell: (u) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg,#2563eb,#0891b2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+          {u.name[0]?.toUpperCase()}
+        </div>
+        <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{u.name}</span>
+      </div>
+    ),
+  },
+  { header: 'Email', cell: (u) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{u.email}</span> },
+  {
+    header: 'Role',
+    cell: (u) => (
+      <span style={{ color: (ROLE_STYLE[u.role] ?? { color: '#94a3b8' }).color, fontSize: 12, fontWeight: 600 }}>
+        {ROLE_LABEL[u.role] ?? u.role}
+      </span>
+    ),
+  },
+  { header: 'Organization', cell: (u) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{u.company?.name ?? '—'}</span> },
+  {
+    header: 'Status',
+    cell: (u) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: u.isActive ? '#34d399' : '#f87171', display: 'inline-block' }} />
+        <span style={{ fontSize: 11, color: u.isActive ? '#34d399' : '#f87171' }}>{u.isActive ? 'Active' : 'Inactive'}</span>
+      </div>
+    ),
+  },
+];
+
 export default function OrganizationsPage() {
   const { user: me } = useAuth();
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -35,14 +69,6 @@ export default function OrganizationsPage() {
         setUsers(uRes.data.data ?? []);
       }).catch(() => {}).finally(() => setLoading(false));
   }, []);
-
-  const TH: React.CSSProperties = {
-    textAlign: 'left', padding: '11px 16px',
-    fontSize: 11, color: '#64748b', fontWeight: 600,
-    textTransform: 'uppercase', letterSpacing: '0.06em',
-    borderBottom: '1px solid rgba(59,130,246,0.1)',
-    background: 'rgba(5,13,26,0.5)',
-  };
 
   return (
     <div style={{ padding: '28px 32px', color: '#e2e8f0' }}>
@@ -114,60 +140,13 @@ export default function OrganizationsPage() {
         <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 16px' }}>
           <Users size={14} /> Users ({users.length})
         </h2>
-        <div style={{ background: 'rgba(8,15,30,0.85)', border: '1px solid rgba(59,130,246,0.12)', borderRadius: 14, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead>
-              <tr>
-                {['User', 'Email', 'Role', 'Organization', 'Status'].map(h => (
-                  <th key={h} style={TH}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                Array.from({ length: 4 }).map((_, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid rgba(30,41,59,0.5)' }}>
-                    {[120, 180, 100, 140, 60].map((w, j) => (
-                      <td key={j} style={{ padding: '12px 16px' }}>
-                        <div className="skeleton" style={{ height: 13, borderRadius: 4, width: w }} />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : users.map(u => {
-                const rs = ROLE_STYLE[u.role] ?? { color: '#94a3b8' };
-                return (
-                  <tr key={u.id}
-                    style={{ borderBottom: '1px solid rgba(30,41,59,0.4)', transition: 'background 0.12s' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(30,41,59,0.3)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
-                  >
-                    {/* User avatar + name */}
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg,#2563eb,#0891b2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-                          {u.name[0]?.toUpperCase()}
-                        </div>
-                        <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{u.name}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '12px 16px', color: '#94a3b8', fontSize: 12 }}>{u.email}</td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <span style={{ color: rs.color, fontSize: 12, fontWeight: 600 }}>{ROLE_LABEL[u.role] ?? u.role}</span>
-                    </td>
-                    <td style={{ padding: '12px 16px', color: '#94a3b8', fontSize: 12 }}>{u.company?.name ?? '—'}</td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: u.isActive ? '#34d399' : '#f87171', display: 'inline-block' }} />
-                        <span style={{ fontSize: 11, color: u.isActive ? '#34d399' : '#f87171' }}>{u.isActive ? 'Active' : 'Inactive'}</span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={userColumns}
+          rows={users}
+          loading={loading}
+          skeletonRows={4}
+          rowKey={(u) => u.id}
+        />
       </div>
     </div>
   );

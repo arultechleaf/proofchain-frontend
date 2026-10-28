@@ -6,9 +6,10 @@ import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, ChevronRight, Loader2, Check, AlertCircle, ArrowLeft, Building2 } from 'lucide-react';
 import { deliveriesApi, companiesApi } from '@/lib/api';
-import type { Company } from '@/types';
+import type { Company } from '@/models';
 import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
+import { Field } from '@/components/ui';
 
 interface DeliveryForm {
   deliveryReference: string;
@@ -160,33 +161,24 @@ export default function CreateDeliveryPage() {
           </motion.div>
         ) : (
           <motion.form initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="form-label">Delivery Reference *</label>
+            <Field label="Delivery Reference" required error={errors.deliveryReference?.message}>
               <input className="form-input" placeholder="DEL-2024-001" {...register('deliveryReference', { required: 'Required' })} />
-              {errors.deliveryReference && <p className="text-red-400 text-xs mt-1">{errors.deliveryReference.message}</p>}
-            </div>
-            <div>
-              <label className="form-label">Receiver Organization *</label>
+            </Field>
+            <Field label="Receiver Organization" required error={errors.receiverCompanyId?.message}>
               <select className="form-input" {...register('receiverCompanyId', { required: 'Required' })}>
                 <option value="">Select receiver...</option>
                 {companies.map(c => <option key={c.id} value={c.id}>{c.name} ({c.organizationCode})</option>)}
               </select>
-              {errors.receiverCompanyId && <p className="text-red-400 text-xs mt-1">{errors.receiverCompanyId.message}</p>}
-            </div>
-            <div>
-              <label className="form-label">Description *</label>
-              <textarea className="form-input resize-none h-24" placeholder="Describe the delivery contents..." {...register('description', { required: 'Required', minLength: { value: 5, message: 'Min 5 chars' } })} />
-              {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description.message}</p>}
-            </div>
-            <div>
-              <label className="form-label">Quantity *</label>
+            </Field>
+            <Field label="Description" required error={errors.description?.message}>
+              <textarea className="form-input" rows={4} placeholder="Describe the delivery contents..." {...register('description', { required: 'Required', minLength: { value: 5, message: 'Min 5 chars' } })} />
+            </Field>
+            <Field label="Quantity" required error={errors.quantity?.message}>
               <input type="number" className="form-input" min="1" placeholder="100" {...register('quantity', { required: 'Required', min: { value: 1, message: 'Min 1' } })} />
-              {errors.quantity && <p className="text-red-400 text-xs mt-1">{errors.quantity.message}</p>}
-            </div>
-            <div>
-              <label className="form-label">Metadata (JSON, optional)</label>
-              <textarea className="form-input font-mono text-xs resize-none h-20" placeholder='{"weight": "10kg", "fragile": true}' {...register('metadata')} />
-            </div>
+            </Field>
+            <Field label="Metadata (JSON, optional)">
+              <textarea className="form-input font-mono text-xs" rows={3} placeholder='{"weight": "10kg", "fragile": true}' {...register('metadata')} />
+            </Field>
             <button type="submit" className="btn btn-primary w-full justify-center py-2.5">
               Review Details <ChevronRight className="w-4 h-4" />
             </button>

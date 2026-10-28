@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Ban, CheckCircle2, Plus, ShieldCheck, XCircle } from 'lucide-react';
 import { invoicesApi } from '@/lib/api';
-import type { Invoice, InvoiceLine, InvoiceType, InvoiceVerification } from '@/types';
+import type { Invoice, InvoiceLine, InvoiceType, InvoiceVerification } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDay, formatMoney, truncateHash } from '@/lib/utils';
+import { stateName } from '@/lib/gst';
 import {
   Card, Column, DataTable, Grid, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, canWrite, useAsync,
 } from '@/components/ui';
@@ -56,14 +57,50 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
     }
   };
 
-  const columns: Column<InvoiceLine>[] = [
-    { header: '#', cell: (l) => l.position + 1, width: 40 },
-    { header: 'Description', cell: (l) => l.description, nowrap: false },
-    { header: 'Qty', align: 'right', cell: (l) => l.quantity },
-    { header: 'Rate', align: 'right', cell: (l) => formatMoney(l.rate) },
-    { header: 'Tax', align: 'right', cell: (l) => `${l.taxRate}%` },
-    { header: 'Amount', align: 'right', cell: (l) => formatMoney(l.amount) },
-  ];
+  // Invoices made before GST support have no taxable value, so they keep the simple layout.
+  const gst = invoice.taxableValue != null;
+  const intra = (invoice.igst ?? 0) === 0;
+
+  const columns: Column<InvoiceLine>[] = gst
+    ? [
+        { header: 'Product', cell: (l) => <>{l.description}{l.sku ? <span className="text-muted"> · {l.sku}</span> : null}</>, nowrap: false },
+        { header: 'HSN / SAC', cell: (l) => l.hsnCode || '—' },
+        { header: 'Qty', align: 'right', cell: (l) => <>{l.quantity}{l.unit ? ` ${l.unit}` : ''}</> },
+        { header: 'Price', align: 'right', cell: (l) => formatMoney(l.rate) },
+        { header: 'Discount', align: 'right', cell: (l) => ((l.discountAmount ?? 0) > 0 ? formatMoney(l.discountAmount) : '—') },
+        { header: 'Taxable', align: 'right', cell: (l) => formatMoney(l.taxableAmount ?? l.amount) },
+        { header: 'GST', align: 'right', cell: (l) => <>{formatMoney(l.gstAmount ?? 0)} <span className="text-muted">({l.taxRate}%)</span></> },
+        { header: 'Total', align: 'right', cell: (l) => <strong>{formatMoney(l.lineTotal ?? l.amount)}</strong> },
+      ]
+    : [
+        { header: 'Description', cell: (l) => l.description, nowrap: false },
+        { header: 'Qty', align: 'right', cell: (l) => l.quantity },
+        { header: 'Rate', align: 'right', cell: (l) => formatMoney(l.rate) },
+        { header: 'Tax', align: 'right', cell: (l) => `${l.taxRate}%` },
+        { header: 'Amount', align: 'right', cell: (l) => formatMoney(l.amount) },
+      ];
+
+  const amountRows: Array<[string, React.ReactNode]> = gst
+    ? [
+        ['Subtotal', formatMoney(invoice.subtotal)],
+        ['Discount', formatMoney(invoice.discount)],
+        ['Taxable value', formatMoney(invoice.taxableValue)],
+        ...(intra
+          ? [['CGST', formatMoney(invoice.cgst)], ['SGST', formatMoney(invoice.sgst)]] as Array<[string, React.ReactNode]>
+          : [['IGST', formatMoney(invoice.igst)]] as Array<[string, React.ReactNode]>),
+        ...((invoice.roundOff ?? 0) !== 0 ? [['Round off', formatMoney(invoice.roundOff)]] as Array<[string, React.ReactNode]> : []),
+        ['Grand total', <strong key="t">{formatMoney(invoice.total)}</strong>],
+        [type === 'sale' ? 'Amount received' : 'Amount paid', formatMoney(invoice.paidAmount)],
+        ['Balance due', <strong key="b" style={{ color: balance > 0 ? '#fbbf24' : '#34d399' }}>{formatMoney(balance)}</strong>],
+      ]
+    : [
+        ['Subtotal', formatMoney(invoice.subtotal)],
+        ['Tax', formatMoney(invoice.taxTotal)],
+        ['Discount', formatMoney(invoice.discount)],
+        ['Total', <strong key="t">{formatMoney(invoice.total)}</strong>],
+        [type === 'sale' ? 'Received' : 'Paid', formatMoney(invoice.paidAmount)],
+        ['Balance due', <strong key="b" style={{ color: balance > 0 ? '#fbbf24' : '#34d399' }}>{formatMoney(balance)}</strong>],
+      ];
 
   return (
     <Page>
@@ -102,18 +139,20 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
             <Link href={`/parties/${invoice.partyId}`} style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>
               {invoice.party?.name ?? '—'}
             </Link>
-            <KeyValue rows={[['Due date', formatDay(invoice.dueDate)]]} />
+            <KeyValue rows={[
+              ['Due date', formatDay(invoice.dueDate)],
+              ...(gst ? [
+                ['Payment type', invoice.paymentType ? invoice.paymentType.toUpperCase() : '—'],
+                ['Mobile', invoice.customerMobile || '—'],
+                ['GSTIN', invoice.customerGstin || '—'],
+                ['Place of supply', invoice.placeOfSupply ? `${invoice.placeOfSupply} · ${stateName(invoice.placeOfSupply)}` : '—'],
+                ['Billing address', invoice.billingAddress || '—'],
+              ] as Array<[string, React.ReactNode]> : []),
+            ]} />
           </Card>
 
           <Card title="Amounts">
-            <KeyValue rows={[
-              ['Subtotal', formatMoney(invoice.subtotal)],
-              ['Tax', formatMoney(invoice.taxTotal)],
-              ['Discount', formatMoney(invoice.discount)],
-              ['Total', <strong key="t">{formatMoney(invoice.total)}</strong>],
-              [type === 'sale' ? 'Received' : 'Paid', formatMoney(invoice.paidAmount)],
-              ['Balance due', <strong key="b" style={{ color: balance > 0 ? '#fbbf24' : '#34d399' }}>{formatMoney(balance)}</strong>],
-            ]} />
+            <KeyValue rows={amountRows} />
           </Card>
 
           {type === 'sale' && canPay && <PayOnline invoice={invoice} balance={balance} onPaid={reload} />}

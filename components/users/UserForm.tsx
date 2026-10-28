@@ -1,9 +1,9 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Field, Grid, SubmitButton, useAsync } from '@/components/ui';
+import { CheckField, Field, Grid, SubmitButton, useAsync } from '@/components/ui';
 import { companiesApi } from '@/lib/api';
-import type { Company, User } from '@/types';
+import type { Company, User } from '@/models';
 
 export interface UserFormValues {
   name: string;
@@ -48,7 +48,7 @@ export function UserForm({
   const role = watch('role');
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <form method="post" onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <Grid cols={2}>
         <Field label="Full name" required error={errors.name?.message}>
           <input className="form-input" {...register('name', { required: 'Name is required' })} />
@@ -82,9 +82,7 @@ export function UserForm({
           })} />
       </Field>
       {!isNew && (
-        <label style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: '#cbd5e1', cursor: isSelf ? 'not-allowed' : 'pointer' }}>
-          <input type="checkbox" disabled={isSelf} {...register('isActive')} /> Account is active (can sign in)
-        </label>
+        <CheckField label="Account is active (can sign in)" disabled={isSelf} {...register('isActive')} />
       )}
       <div><SubmitButton loading={loading}>{submitLabel}</SubmitButton></div>
     </form>

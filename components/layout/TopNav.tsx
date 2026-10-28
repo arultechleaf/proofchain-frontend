@@ -1,8 +1,9 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Bell, ChevronRight, Menu } from 'lucide-react';
+import { ChevronRight, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { NotificationBell } from '@/components/layout/NotificationBell';
 
 const BREADCRUMBS: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -25,6 +26,15 @@ const BREADCRUMBS: Record<string, string> = {
   '/reports/sales': 'Sales Report',
   '/reports/outstanding': 'Outstanding',
   '/reports/stock': 'Stock Report',
+  '/reports/purchases': 'Purchase Report',
+  '/reports/transactions': 'Transaction History',
+  '/notifications': 'Notifications',
+  '/billing': 'Billing',
+  '/quotations': 'Quotations & Estimates',
+  '/quotations/create': 'New Quotation',
+  '/expenses': 'Expenses',
+  '/cash-bank': 'Cash & Bank',
+  '/parties/ledger': 'Party Ledger',
   '/users': 'Users',
   '/roles': 'Roles & Permissions',
   '/profile': 'My Profile',
@@ -104,7 +114,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
 
       {/* Right actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', flexShrink: 0 }}>
-        {/* Demo badge */}
+        {/* Demo badge 
         <span style={{
           display: 'inline-flex', alignItems: 'center', gap: 5,
           padding: '2px 10px', borderRadius: 9999,
@@ -114,20 +124,10 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
         }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#fbbf24', display: 'inline-block' }} />
           Demo Mode
-        </span>
+        </span>*/}
 
         {/* Notifications */}
-        <button style={{
-          position: 'relative', padding: 8,
-          color: '#475569', background: 'none', border: 'none',
-          cursor: 'pointer', borderRadius: 8, display: 'flex',
-        }}>
-          <Bell size={16} />
-          <span style={{
-            position: 'absolute', top: 7, right: 7,
-            width: 6, height: 6, borderRadius: '50%', background: '#60a5fa',
-          }} />
-        </button>
+        <NotificationBell enabled={!!user} />
 
         {/* User chip */}
         {user && (

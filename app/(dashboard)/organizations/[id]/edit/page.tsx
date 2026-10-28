@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { companiesApi } from '@/lib/api';
-import type { Company } from '@/types';
+import type { Company } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError } from '@/lib/utils';
 import { Card, Notice, Page, PageHeader, Spinner, useAsync } from '@/components/ui';
@@ -41,6 +41,7 @@ export default function EditOrganizationPage() {
                 organizationCode: v.organizationCode.trim(),
                 organizationType: v.organizationType,
                 description: v.description.trim() || undefined,
+                gstin: v.gstin.trim().toUpperCase(),
                 isActive: v.isActive,
               });
               router.push(`/organizations/${id}`);

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Copy, Check, ExternalLink, Shield, Clock, Package, Hash, Blocks } from 'lucide-react';
 import { deliveriesApi, approvalsApi, verificationApi } from '@/lib/api';
-import type { Delivery, Approval, ProofRecord, VerificationResult } from '@/types';
+import type { Delivery, Approval, ProofRecord, VerificationResult } from '@/models';
 import { formatDate, formatRelative, statusColor, statusLabel, truncateHash, copyToClipboard } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
 

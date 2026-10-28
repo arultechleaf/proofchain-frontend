@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Blocks, Copy } from 'lucide-react';
 import { blockchainApi, invoicesApi } from '@/lib/api';
-import type { BlockchainTransaction, Invoice } from '@/types';
+import type { BlockchainTransaction, Invoice } from '@/models';
 import { copyToClipboard, formatDate } from '@/lib/utils';
 import { Card, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, useAsync } from '@/components/ui';
 

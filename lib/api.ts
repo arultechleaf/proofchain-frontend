@@ -1,6 +1,41 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://192.168.1.14:3002';
+/**
+ * Where API calls go. Empty (the default) means same origin: the browser calls /api/... on the
+ * frontend's own address and next.config.ts forwards it to the backend (BACKEND_URL).
+ * Set NEXT_PUBLIC_API_URL only to point the browser straight at a backend on another origin.
+ */
+export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/+$/, '');
+
+const TOKEN_KEY = 'accessToken';
+const USER_KEY = 'user';
+
+/** The signed-in session kept in localStorage. Everything that touches it goes through here. */
+export const session = {
+  getToken(): string | null {
+    return typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_KEY);
+  },
+  getUser<T>(): T | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem(USER_KEY);
+      return raw ? (JSON.parse(raw) as T) : null;
+    } catch {
+      return null;
+    }
+  },
+  save(token: string, user: unknown) {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  },
+  saveUser(user: unknown) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  },
+  clear() {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  },
+};
 
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -12,10 +47,8 @@ const PUBLIC_PATHS = ['/login', '/register', '/forgot-password', '/reset-passwor
 
 // ── Request interceptor — attach JWT ──────────────────────────────────────────
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('accessToken');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-  }
+  const token = session.getToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
@@ -27,8 +60,7 @@ api.interceptors.response.use(
     // redirecting would reload the page and throw the error message away.
     const onPublicPage = typeof window !== 'undefined' && PUBLIC_PATHS.includes(window.location.pathname);
     if (err.response?.status === 401 && typeof window !== 'undefined' && !onPublicPage) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
+      session.clear();
       window.location.href = '/login';
     }
     return Promise.reject(err);
@@ -49,6 +81,11 @@ export const authApi = {
   changePassword: (currentPassword: string, newPassword: string) =>
     api.post('/auth/change-password', { currentPassword, newPassword }),
   updateProfile: (name: string) => api.patch('/auth/me', { name }),
+};
+
+export const emailOtpApi = {
+  send: (email: string) => api.post('/email-otp/send', { email }),
+  verify: (email: string, otp: string) => api.post('/email-otp/verify', { email, otp }),
 };
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
@@ -110,6 +147,7 @@ export const partiesApi = {
   get: (id: string) => api.get(`/parties/${id}`),
   create: (data: unknown) => api.post('/parties', data),
   update: (id: string, data: unknown) => api.patch(`/parties/${id}`, data),
+  remove: (id: string) => api.delete(`/parties/${id}`),
 };
 
 export const itemsApi = {
@@ -118,6 +156,7 @@ export const itemsApi = {
   create: (data: unknown) => api.post('/items', data),
   update: (id: string, data: unknown) => api.patch(`/items/${id}`, data),
   adjust: (id: string, data: { change: number; note?: string }) => api.post(`/items/${id}/adjust`, data),
+  remove: (id: string) => api.delete(`/items/${id}`),
   stockSummary: () => api.get('/items/stock/summary'),
   movements: (itemId?: string) => api.get('/items/stock/movements', { params: { itemId } }),
 };
@@ -127,6 +166,7 @@ export const invoicesApi = {
     api.get(type === 'sale' ? '/sales' : '/purchases', { params }),
   create: (type: 'sale' | 'purchase', data: unknown) =>
     api.post(type === 'sale' ? '/sales' : '/purchases', data),
+  nextNumber: (type: 'sale' | 'purchase') => api.get('/invoices/next-number', { params: { type } }),
   get: (id: string) => api.get(`/invoices/${id}`),
   verify: (id: string) => api.post(`/invoices/${id}/verify`),
   cancel: (id: string) => api.patch(`/invoices/${id}/cancel`),
@@ -134,6 +174,7 @@ export const invoicesApi = {
 
 export const paymentsApi = {
   list: (params?: Params) => api.get('/payments', { params }),
+  remove: (id: string) => api.delete(`/payments/${id}`),
   create: (data: unknown) => api.post('/payments', data),
 };
 
@@ -149,6 +190,55 @@ export const reportsApi = {
   sales: (params?: Params) => api.get('/reports/sales', { params }),
   outstanding: (params?: Params) => api.get('/reports/outstanding', { params }),
   stock: () => api.get('/reports/stock'),
+  transactions: (params?: Params) => api.get('/reports/transactions', { params }),
+};
+
+// ── Cash & bank ───────────────────────────────────────────────────────────────
+export const cashBankApi = {
+  accounts: () => api.get('/cash-bank/accounts'),
+  createAccount: (data: unknown) => api.post('/cash-bank/accounts', data),
+  updateAccount: (id: string, data: unknown) => api.patch(`/cash-bank/accounts/${id}`, data),
+  transactions: (params?: Params) => api.get('/cash-bank/transactions', { params }),
+  createTransaction: (data: unknown) => api.post('/cash-bank/transactions', data),
+  transfer: (data: unknown) => api.post('/cash-bank/transfer', data),
+  removeAccount: (id: string) => api.delete(`/cash-bank/accounts/${id}`),
+  removeTransaction: (id: string) => api.delete(`/cash-bank/transactions/${id}`),
+};
+
+// ── Expenses ──────────────────────────────────────────────────────────────────
+export const expensesApi = {
+  list: (params?: Params) => api.get('/expenses', { params }),
+  summary: (params?: Params) => api.get('/expenses/summary', { params }),
+  categories: () => api.get('/expenses/categories'),
+  create: (data: unknown) => api.post('/expenses', data),
+  update: (id: string, data: unknown) => api.patch(`/expenses/${id}`, data),
+  remove: (id: string) => api.delete(`/expenses/${id}`),
+};
+
+// ── Quotations ────────────────────────────────────────────────────────────────
+export const quotationsApi = {
+  list: (params?: Params) => api.get('/quotations', { params }),
+  get: (id: string) => api.get(`/quotations/${id}`),
+  create: (data: unknown) => api.post('/quotations', data),
+  setStatus: (id: string, status: string) => api.patch(`/quotations/${id}/status`, { status }),
+  convert: (id: string) => api.post(`/quotations/${id}/convert`),
+  remove: (id: string) => api.delete(`/quotations/${id}`),
+};
+
+// ── Roles & permissions ───────────────────────────────────────────────────────
+export const rolesApi = {
+  permissions: () => api.get('/roles/permissions'),
+  updatePermissions: (changes: unknown) => api.put('/roles/permissions', { changes }),
+};
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+export const notificationsApi = {
+  list: (params?: Params) => api.get('/notifications', { params }),
+  unreadCount: () => api.get('/notifications/unread-count'),
+  markRead: (id: string) => api.patch(`/notifications/${id}/read`),
+  markAllRead: () => api.post('/notifications/read-all'),
+  remove: (id: string) => api.delete(`/notifications/${id}`),
+  clearRead: () => api.delete('/notifications/read'),
 };
 
 // ── Audit ─────────────────────────────────────────────────────────────────────

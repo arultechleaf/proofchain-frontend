@@ -16,6 +16,7 @@ export interface Company {
   organizationCode: string;
   organizationType: 'sender' | 'receiver' | 'auditor';
   description?: string;
+  gstin?: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -55,6 +56,7 @@ export interface Approval {
 }
 
 export * from './billing';
+export * from './notifications';
 
 export interface BlockchainTransaction {
   id: string;

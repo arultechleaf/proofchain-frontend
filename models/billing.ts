@@ -31,6 +31,7 @@ export interface Item {
   companyId: string;
   name: string;
   sku?: string | null;
+  hsnCode?: string | null;
   unit: string;
   salePrice: number;
   purchasePrice: number;
@@ -65,6 +66,15 @@ export interface InvoiceLine {
   rate: number;
   taxRate: number;
   amount: number;
+  sku?: string | null;
+  hsnCode?: string | null;
+  unit?: string | null;
+  discountType?: 'amount' | 'percent' | null;
+  discountValue?: number;
+  discountAmount?: number;
+  taxableAmount?: number | null;
+  gstAmount?: number;
+  lineTotal?: number | null;
 }
 
 export interface Invoice {
@@ -84,6 +94,17 @@ export interface Invoice {
   paidAmount: number;
   status: InvoiceStatus;
   notes?: string | null;
+  paymentType?: 'cash' | 'upi' | 'bank' | 'credit' | null;
+  customerMobile?: string | null;
+  customerGstin?: string | null;
+  billingAddress?: string | null;
+  placeOfSupply?: string | null;
+  /** null on invoices made before GST support. */
+  taxableValue?: number | null;
+  cgst?: number;
+  sgst?: number;
+  igst?: number;
+  roundOff?: number;
   payloadHash?: string | null;
   canonicalPayload?: string | null;
   blockchainStatus: string;

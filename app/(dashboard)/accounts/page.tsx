@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowDownLeft, ArrowUpRight, Scale, Users } from 'lucide-react';
 import { partiesApi } from '@/lib/api';
-import type { Party, PartySummary } from '@/types';
+import type { Party, PartySummary } from '@/models';
 import { formatMoney } from '@/lib/utils';
 import {
   Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, useAsync,

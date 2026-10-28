@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, Search, RefreshCw, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, RefreshCw, Package } from 'lucide-react';
 import { deliveriesApi } from '@/lib/api';
-import type { Delivery } from '@/types';
+import type { Delivery } from '@/models';
 import { formatRelative, statusLabel } from '@/lib/utils';
+import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsColumn } from '@/components/ui';
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   pending:   { bg: 'rgba(245,158,11,0.1)',  color: '#fbbf24', border: 'rgba(245,158,11,0.25)'  },
@@ -24,13 +25,30 @@ function Badge({ status }: { status: string }) {
   );
 }
 
-const TH: React.CSSProperties = {
-  textAlign: 'left', padding: '12px 16px',
-  fontSize: 11, color: '#64748b', fontWeight: 600,
-  textTransform: 'uppercase', letterSpacing: '0.06em',
-  whiteSpace: 'nowrap', borderBottom: '1px solid rgba(59,130,246,0.1)',
-  background: 'rgba(5,13,26,0.6)',
-};
+const columns: Column<Delivery>[] = [
+  {
+    header: 'Reference',
+    cell: (d) => (
+      <Link href={`/deliveries/${d.id}`} style={{ color: '#60a5fa', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+        {d.deliveryReference}
+      </Link>
+    ),
+  },
+  {
+    header: 'Description',
+    cell: (d) => (
+      <span style={{ display: 'block', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.description}</span>
+    ),
+  },
+  { header: 'Sender', cell: (d) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{d.senderCompany?.name ?? '—'}</span> },
+  { header: 'Receiver', cell: (d) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{d.receiverCompany?.name ?? '—'}</span> },
+  { header: 'Qty', align: 'right', cell: (d) => <strong style={{ color: '#e2e8f0' }}>{d.quantity?.toLocaleString()}</strong> },
+  { header: 'Status', cell: (d) => <Badge status={d.status} /> },
+  { header: 'Blockchain', cell: (d) => <Badge status={d.blockchainStatus} /> },
+  { header: 'Created', cell: (d) => <span style={{ color: '#64748b', fontSize: 12 }}>{formatRelative(d.createdAt)}</span> },
+  // Deliveries are proven on the blockchain, so they are view-only: no edit or delete.
+  actionsColumn<Delivery>((d) => <RowActions view={`/deliveries/${d.id}`} />, 80),
+];
 
 export default function DeliveriesPage() {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
@@ -54,12 +72,6 @@ export default function DeliveriesPage() {
   useEffect(() => { fetchDeliveries(); }, [page, statusFilter]);
 
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); fetchDeliveries(); };
-
-  const inputStyle: React.CSSProperties = {
-    background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(51,65,85,0.6)',
-    borderRadius: 8, color: '#e2e8f0', fontSize: 13, padding: '7px 12px',
-    outline: 'none', width: '100%',
-  };
 
   return (
     <div style={{ padding: '28px 32px', minHeight: '100%', color: '#e2e8f0' }}>
@@ -87,21 +99,14 @@ export default function DeliveriesPage() {
         gap: 10, marginBottom: 20, alignItems: 'center',
       }}>
         {/* Search input */}
-        <div style={{ position: 'relative' }}>
-          <Search size={14} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#475569', pointerEvents: 'none' }} />
-          <input
-            style={{ ...inputStyle, paddingLeft: 34, height: 38, width: '100%' }}
-            placeholder="Search reference or description..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
+        <SearchInput
+            small placeholder="Search reference or description..." value={search} onChange={e => setSearch(e.target.value)} />
 
         {/* Status filter */}
         <select
+          className="form-input form-input-sm" style={{ width: 150 }}
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-          style={{ ...inputStyle, width: 150, height: 38, cursor: 'pointer' }}
         >
           <option value="">All Statuses</option>
           {['pending', 'approved', 'rejected', 'draft'].map(s => (
@@ -121,94 +126,19 @@ export default function DeliveriesPage() {
       </form>
 
 
-      {/* Table */}
-      <div style={{ background: 'rgba(8,15,30,0.8)', border: '1px solid rgba(59,130,246,0.12)', borderRadius: 14, overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead>
-              <tr>
-                {['Reference', 'Description', 'Sender', 'Receiver', 'Qty', 'Status', 'Blockchain', 'Created'].map(h => (
-                  <th key={h} style={TH}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid rgba(30,41,59,0.5)' }}>
-                    {Array.from({ length: 8 }).map((_, j) => (
-                      <td key={j} style={{ padding: '12px 16px' }}>
-                        <div className="skeleton" style={{ height: 13, borderRadius: 4, width: j === 1 ? 160 : 80 }} />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : deliveries.length > 0 ? (
-                deliveries.map((d) => (
-                  <tr
-                    key={d.id}
-                    style={{ borderBottom: '1px solid rgba(30,41,59,0.5)', transition: 'background 0.12s' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(30,41,59,0.4)'}
-                    onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
-                  >
-                    <td style={{ padding: '12px 16px', whiteSpace: 'nowrap', minWidth: 140 }}>
-                      <Link href={`/deliveries/${d.id}`} style={{ color: '#60a5fa', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
-                        {d.deliveryReference}
-                      </Link>
-                    </td>
-                    <td style={{ padding: '12px 16px', color: '#cbd5e1', maxWidth: 200 }}>
-                      <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.description}</span>
-                    </td>
-                    <td style={{ padding: '12px 16px', color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>{d.senderCompany?.name ?? '—'}</td>
-                    <td style={{ padding: '12px 16px', color: '#94a3b8', fontSize: 12, whiteSpace: 'nowrap' }}>{d.receiverCompany?.name ?? '—'}</td>
-                    <td style={{ padding: '12px 16px', color: '#e2e8f0', textAlign: 'right', fontWeight: 600 }}>{d.quantity?.toLocaleString()}</td>
-                    <td style={{ padding: '12px 16px' }}><Badge status={d.status} /></td>
-                    <td style={{ padding: '12px 16px' }}><Badge status={d.blockchainStatus} /></td>
-                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: 12, whiteSpace: 'nowrap' }}>{formatRelative(d.createdAt)}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={8} style={{ textAlign: 'center', padding: '60px 20px' }}>
-                    <Package size={40} color="#334155" style={{ margin: '0 auto 12px', display: 'block' }} />
-                    <p style={{ color: '#475569', fontSize: 14, marginBottom: 12 }}>No deliveries found</p>
-                    <Link href="/deliveries/create" style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 6,
-                      padding: '8px 16px', borderRadius: 8, background: '#2563eb',
-                      color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none',
-                    }}>
-                      <Plus size={14} /> Create Delivery
-                    </Link>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        {total > limit && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', borderTop: '1px solid rgba(59,130,246,0.08)' }}>
-            <span style={{ color: '#64748b', fontSize: 12 }}>
-              Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total}
-            </span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {[
-                { label: '← Prev', action: () => setPage(p => Math.max(1, p - 1)), disabled: page === 1 },
-                { label: 'Next →', action: () => setPage(p => p + 1), disabled: page * limit >= total },
-              ].map(btn => (
-                <button key={btn.label} onClick={btn.action} disabled={btn.disabled} style={{
-                  padding: '6px 12px', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: btn.disabled ? 'not-allowed' : 'pointer',
-                  background: 'rgba(30,41,59,0.8)', border: '1px solid rgba(51,65,85,0.6)', color: btn.disabled ? '#334155' : '#94a3b8',
-                  opacity: btn.disabled ? 0.5 : 1,
-                }}>
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      <DataTable
+        columns={columns}
+        rows={deliveries}
+        loading={loading}
+        rowKey={(d) => d.id}
+        empty={
+          <EmptyState icon={Package} title="No deliveries found" action={
+            <Link href="/deliveries/create" className="btn btn-primary"><Plus size={14} /> Create Delivery</Link>
+          } />
+        }
+        startIndex={(page - 1) * limit}
+        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
+      />
     </div>
   );
 }

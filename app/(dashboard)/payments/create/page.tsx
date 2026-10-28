@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { invoicesApi, partiesApi, paymentsApi } from '@/lib/api';
-import type { Invoice, Party } from '@/types';
+import type { Invoice, Party } from '@/models';
 import { apiError, formatMoney, todayIso } from '@/lib/utils';
 import { Card, Field, Grid, Notice, Page, PageHeader, Spinner, SubmitButton, useAsync } from '@/components/ui';
 

@@ -8,7 +8,7 @@ import {
   Hash, Clock, Network,
 } from 'lucide-react';
 import { blockchainApi } from '@/lib/api';
-import type { BlockchainTransaction, BlockchainNetworkStatus } from '@/types';
+import type { BlockchainTransaction, BlockchainNetworkStatus } from '@/models';
 import { formatRelative, truncateHash, statusColor, statusLabel } from '@/lib/utils';
 
 /* --- Network Topology SVG ------------------------------------------------- */
