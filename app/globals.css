@@ -1,10 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lato:wght@300;400;700;900&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
-@source "../components";
-@source "../app";
-@source "../hooks";
-@source "../lib";
 
 /* ==========================================================================
    1. DESIGN TOKENS
@@ -897,6 +893,7 @@ input::-webkit-inner-spin-button {
 /* For Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 /* ==========================================================================
@@ -1006,6 +1003,7 @@ body {
   border-radius: inherit;
   background: linear-gradient(135deg, #3b82f6, #06b6d4, #8b5cf6);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -1042,7 +1040,7 @@ body {
   transition: all 0.2s ease; outline: none; cursor: pointer; border: none;
   text-decoration: none;
 }
-.btn:focus-visible { ring: 2px; }
+.btn:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
 .btn-primary {
   background: #2563eb; color: #fff;
   box-shadow: 0 4px 6px rgba(37,99,235,0.2);
@@ -1540,7 +1538,7 @@ textarea.form-input { resize: none; }
 .notif-item-title { color: #e2e8f0; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 .notif-item-msg {
   color: #94a3b8; font-size: 12px; line-height: 1.4;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .notif-item-time { color: #475569; font-size: 11px; }
 .notif-dot { width: 7px; height: 7px; border-radius: 50%; background: #60a5fa; display: inline-block; flex-shrink: 0; }
