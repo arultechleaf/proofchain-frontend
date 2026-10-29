@@ -1756,3 +1756,50 @@ select option:checked { background-color: #e6f0fb; color: #111827; }
   font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #94a3b8;
 }
 .form-fieldset > .form-section:first-child, .auth-form > .form-section:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+
+/* Inputs: no filled block, just an outline (the card behind shows through) */
+.form-input, .cell-input, .input-with-icon .form-input, .input-icon-wrap > .form-input {
+  background: transparent;
+  border: 1px solid rgba(100, 116, 139, 0.55);
+}
+.form-input:focus, .cell-input:focus { border-color: rgba(59, 130, 246, 0.7); }
+select.form-input { background-color: transparent; }
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset; transition: background-color 9999s ease-out 0s; -webkit-text-fill-color: inherit;
+}
+
+/* Roles page → "By user": user list on the left, screens with tick boxes on the right */
+.access-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; align-items: start; }
+.access-users { position: sticky; top: 8px; }
+.access-user-list { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; max-height: 70vh; overflow-y: auto; }
+.access-user {
+  display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 9px 12px; border-radius: 10px; cursor: pointer;
+  background: transparent; border: 1px solid transparent; color: #cbd5e1;
+}
+.access-user:hover { background: rgba(30,41,59,0.55); }
+.access-user.active { background: rgba(37,99,235,0.2); border-color: rgba(59,130,246,0.5); color: #fff; }
+.access-user.inactive { opacity: 0.6; }
+.access-user-name { font-weight: 600; font-size: 14px; }
+.access-user-meta { font-size: 11px; color: #94a3b8; }
+.access-screens { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.access-head { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+.access-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.access-group-actions { display: inline-flex; gap: 12px; }
+.access-rows { display: flex; flex-direction: column; }
+.access-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto 170px; gap: 12px; align-items: center;
+  padding: 10px 4px; border-bottom: 1px solid rgba(51,65,85,0.45);
+}
+.access-row:last-child { border-bottom: 0; }
+.access-row.on { background: linear-gradient(90deg, rgba(16,185,129,0.06), transparent); }
+.access-check { display: flex; gap: 10px; align-items: center; cursor: pointer; font-size: 13px; color: #e2e8f0; min-width: 0; }
+.access-check input { width: 18px; height: 18px; accent-color: #2563eb; flex: none; }
+.access-role-default { font-size: 11px; color: #64748b; white-space: nowrap; }
+.access-level { padding-top: 6px; padding-bottom: 6px; font-size: 13px; }
+@media (max-width: 900px) {
+  .access-layout { grid-template-columns: minmax(0, 1fr); }
+  .access-users { position: static; }
+  .access-user-list { max-height: 220px; }
+  .access-row { grid-template-columns: minmax(0, 1fr) 150px; }
+  .access-role-default { grid-column: 1 / -1; order: 3; }
+}

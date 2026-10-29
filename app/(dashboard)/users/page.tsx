@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, Search, UserCheck, UserX, Users } from 'lucide-react';
+import { KeyRound, Plus, Search, UserCheck, UserX, Users } from 'lucide-react';
 import { usersApi } from '@/lib/api';
 import type { User } from '@/models';
 import { useAuth } from '@/lib/auth';
@@ -56,10 +56,15 @@ export default function UsersPage() {
       <RowActions
         view={isAdmin ? `/users/${u.id}` : undefined}
         edit={isAdmin ? `/users/${u.id}` : undefined}
-        extra={isAdmin && !u.isActive ? (
-          <button type="button" className="icon-btn icon-view" title="Activate" aria-label="Activate" onClick={() => setActive(u, true)}>
-            <UserCheck size={15} />
-          </button>
+        extra={isAdmin ? (
+          <>
+            <Link href={`/roles?user=${u.id}`} className="icon-btn icon-view" title="Screen access" aria-label="Screen access"><KeyRound size={15} /></Link>
+            {!u.isActive && (
+              <button type="button" className="icon-btn icon-view" title="Activate" aria-label="Activate" onClick={() => setActive(u, true)}>
+                <UserCheck size={15} />
+              </button>
+            )}
+          </>
         ) : undefined}
         remove={isAdmin && u.isActive ? {
           label: 'Deactivate',

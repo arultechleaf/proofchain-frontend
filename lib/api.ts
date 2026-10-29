@@ -252,6 +252,8 @@ export const quotationsApi = {
 // ── Roles & permissions ───────────────────────────────────────────────────────
 export const rolesApi = {
   mine: () => api.get('/roles/permissions/me'),
+  userAccess: (userId: Id) => api.get(`/roles/users/${userId}/access`),
+  saveUserAccess: (userId: Id, screens: Array<{ key: string; level: string | null }>) => api.put(`/roles/users/${userId}/access`, { screens }),
   list: () => api.get('/roles'),
   create: (data: { key: string; name: string; description?: string }) => api.post('/roles', data),
   remove: (key: string) => api.delete('/roles/' + key),

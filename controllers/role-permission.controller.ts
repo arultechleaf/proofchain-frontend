@@ -10,7 +10,7 @@ import {
 } from '@/models/role-permission';
 
 export function useRolePermissionController() {
-  const { user } = useAuth();
+  const { user, refreshScreens } = useAuth();
   const { data, loading, error, reload } = useAsync<PermissionMatrix>(() => rolePermissionService.matrix(), []);
   const [edits, setEdits] = useState<Record<string, AccessLevel>>({});
   const [saving, setSaving] = useState(false);
@@ -78,6 +78,7 @@ export function useRolePermissionController() {
     setMessage(null);
     try {
       await rolePermissionService.save(changes);
+      void refreshScreens(); // the menu of the signed-in administrator follows right away
       setEdits({});
       setMessage({ kind: 'success', text: `${changes.length} permission${changes.length > 1 ? 's' : ''} saved` });
       await reload();

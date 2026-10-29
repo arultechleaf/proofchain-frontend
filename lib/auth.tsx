@@ -15,6 +15,8 @@ interface AuthState {
   /** True while the screen list is being fetched after sign-in. */
   accessLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  /** Load the screen list again (after an administrator changes the signed-in user's own access). */
+  refreshScreens: () => Promise<void>;
   /** Replace the stored session, for example with the fresh token issued after a password change. */
   applySession: (token: string, user: User) => void;
   logout: () => void;
@@ -48,9 +50,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true; };
   }, [token]);
 
+  // Permissions can change while someone is signed in, so reload the list when the tab gets focus again.
+  useEffect(() => {
+    if (!token) return;
+    const onFocus = () => {
+      rolesApi.mine()
+        .then((res) => setAccess({ token, screens: res.data.data.screens as ScreenAccess[] }))
+        .catch(() => { /* keep the list that is already loaded */ });
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [token]);
+
   const screens = token && access?.token === token ? access.screens : null;
   const accessLoading = !!token && access?.token !== token;
   useEffect(() => { setScreens(screens); }, [screens]);
+
+  const refreshScreens = async () => {
+    if (!token) return;
+    try {
+      const res = await rolesApi.mine();
+      setAccess({ token, screens: res.data.data.screens as ScreenAccess[] });
+    } catch { /* keep the list that is already loaded */ }
+  };
 
   const login = async (email: string, password: string) => {
     const res = await authApi.login(email, password);
@@ -78,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, isLoading, isAuthenticated: !!user, screens, accessLoading, login, applySession, logout }}
+      value={{ user, token, isLoading, isAuthenticated: !!user, screens, accessLoading, login, applySession, refreshScreens, logout }}
     >
       {children}
     </AuthContext.Provider>

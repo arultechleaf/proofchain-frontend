@@ -26,6 +26,22 @@ export interface PermissionChange {
   level: AccessLevel;
 }
 
+/** One screen as it applies to one user: what their role gives, their own setting (if any) and the result. */
+export interface UserScreen {
+  key: string;
+  label: string;
+  path: string;
+  group: string;
+  roleLevel: AccessLevel;
+  override: AccessLevel | null;
+  level: AccessLevel;
+}
+
+export interface UserAccess {
+  user: { id: number; name: string; email: string; role: string; roleId: number; userCode: string | null; isActive: boolean };
+  screens: UserScreen[];
+}
+
 export const LEVEL_INFO: Record<AccessLevel, { label: string; color: string }> = {
   full: { label: 'Full access', color: '#34d399' },
   own: { label: 'Own organization', color: '#60a5fa' },
@@ -39,6 +55,12 @@ export const rolePermissionService = {
   },
   async save(changes: PermissionChange[]): Promise<PermissionMatrix> {
     return (await rolesApi.updatePermissions(changes)).data.data;
+  },
+  async userAccess(userId: number): Promise<UserAccess> {
+    return (await rolesApi.userAccess(userId)).data.data;
+  },
+  async saveUserAccess(userId: number, screens: Array<{ key: string; level: AccessLevel | null }>): Promise<UserAccess> {
+    return (await rolesApi.saveUserAccess(userId, screens)).data.data;
   },
   async list(): Promise<RoleInfo[]> {
     return (await rolesApi.list()).data.data;

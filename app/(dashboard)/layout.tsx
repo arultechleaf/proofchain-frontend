@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -12,9 +12,18 @@ import { Loader2 } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { isAuthenticated, isLoading, accessLoading, screens, user } = useAuth();
+  const { isAuthenticated, isLoading, accessLoading, screens, user, refreshScreens } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Pick up permission changes an administrator made since the last page: reload the screen list on every page change.
+  const lastRefresh = useRef(0);
+  useEffect(() => {
+    if (!isAuthenticated || Date.now() - lastRefresh.current < 3000) return;
+    lastRefresh.current = Date.now();
+    void refreshScreens();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, isAuthenticated]);
 
   // On phones the sidebar is a slide-over: start closed, and close it again after choosing a page.
   useEffect(() => {
