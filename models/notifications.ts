@@ -1,7 +1,7 @@
 export type NotificationType = 'delivery' | 'approval' | 'invoice' | 'payment' | 'system';
 
 export interface AppNotification {
-  id: string;
+  id: number;
   type: NotificationType;
   title: string;
   message: string;
@@ -13,7 +13,7 @@ export interface AppNotification {
 export type TransactionKind = 'sale' | 'purchase' | 'payment_in' | 'payment_out';
 
 export interface TransactionRow {
-  id: string;
+  id: number;
   kind: TransactionKind;
   date: string;
   reference: string;

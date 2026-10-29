@@ -6,6 +6,8 @@ import { Plus, RefreshCw, Package } from 'lucide-react';
 import { deliveriesApi } from '@/lib/api';
 import type { Delivery } from '@/models';
 import { formatRelative, statusLabel } from '@/lib/utils';
+import { useAuth } from '@/lib/auth';
+import { canUse } from '@/lib/roles';
 import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsColumn, Button } from '@/components/ui';
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
@@ -51,6 +53,7 @@ const columns: Column<Delivery>[] = [
 ];
 
 export default function DeliveriesPage() {
+  const { user } = useAuth();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -80,16 +83,15 @@ export default function DeliveriesPage() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Deliveries</h1>
-          <p style={{ color: '#475569', fontSize: 13, marginTop: 3 }}>{total} total records</p>
         </div>
-        <Link href="/deliveries/create" style={{
+        {canUse('deliveries_create', user?.role) && <Link href="/deliveries/create" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '9px 18px', borderRadius: 8,
           background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600,
           textDecoration: 'none', boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
         }}>
           <Plus size={15} /> New Delivery
-        </Link>
+        </Link>}
       </div>
 
       {/* Filters – always single row */}

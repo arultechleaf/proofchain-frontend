@@ -13,9 +13,10 @@ export function Page({ children, narrow }: { children: React.ReactNode; narrow?:
 }
 
 export function PageHeader({
-  title, subtitle, backHref, actions,
+  title, backHref, actions,
 }: {
   title: string;
+  /** Accepted for compatibility but no longer shown under the title. */
   subtitle?: React.ReactNode;
   backHref?: string;
   actions?: React.ReactNode;
@@ -30,7 +31,6 @@ export function PageHeader({
         )}
         <div>
           <h1 className="page-title">{title}</h1>
-          {subtitle && <p className="page-subtitle">{subtitle}</p>}
         </div>
       </div>
       {actions && <div className="page-header-actions">{actions}</div>}
@@ -356,7 +356,7 @@ export function DataTable<T>({
   columns: Column<T>[];
   rows: T[];
   loading?: boolean;
-  rowKey: (row: T) => string;
+  rowKey: (row: T) => string | number;
   empty?: React.ReactNode;
   footer?: React.ReactNode;
   compact?: boolean;
@@ -451,4 +451,4 @@ export function KeyValue({ rows }: { rows: Array<[string, React.ReactNode]> }) {
 /* ── Data loading & roles (implemented in hooks/ and lib/, re-exported for convenience) ── */
 
 export { useAsync } from '@/controllers/useAsync';
-export { canWrite } from '@/lib/roles';
+export { canWrite, canUse } from '@/lib/roles';

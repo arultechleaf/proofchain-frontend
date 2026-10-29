@@ -9,6 +9,7 @@ import { deliveriesApi, approvalsApi, verificationApi } from '@/lib/api';
 import type { Delivery, Approval, ProofRecord, VerificationResult } from '@/models';
 import { formatDate, formatRelative, statusColor, statusLabel, truncateHash, copyToClipboard } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
+import { canUse } from '@/lib/roles';
 import { Tabs } from '@/components/ui';
 
 function CopyButton({ text }: { text: string }) {
@@ -98,7 +99,7 @@ export default function DeliveryDetailPage() {
     </div>
   );
 
-  const canApprove = user?.role === 'company_b' || user?.role === 'admin';
+  const canApprove = canUse('approvals', user?.role);
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-5">

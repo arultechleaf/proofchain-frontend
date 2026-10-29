@@ -3,8 +3,8 @@ import type { BlockchainTransaction, VerificationStatus } from './index';
 export type PartyType = 'customer' | 'supplier' | 'both';
 
 export interface Party {
-  id: string;
-  companyId: string;
+  id: number;
+  companyId: number;
   name: string;
   partyType: PartyType;
   phone?: string | null;
@@ -27,8 +27,8 @@ export interface PartySummary {
 }
 
 export interface Item {
-  id: string;
-  companyId: string;
+  id: number;
+  companyId: number;
   name: string;
   sku?: string | null;
   hsnCode?: string | null;
@@ -44,8 +44,8 @@ export interface Item {
 }
 
 export interface StockMovement {
-  id: string;
-  itemId: string;
+  id: number;
+  itemId: number;
   item?: Item;
   change: number;
   balanceAfter: number;
@@ -58,9 +58,9 @@ export type InvoiceType = 'sale' | 'purchase';
 export type InvoiceStatus = 'issued' | 'partial' | 'paid' | 'cancelled';
 
 export interface InvoiceLine {
-  id: string;
+  id: number;
   position: number;
-  itemId?: string | null;
+  itemId?: number | null;
   description: string;
   quantity: number;
   rate: number;
@@ -78,11 +78,11 @@ export interface InvoiceLine {
 }
 
 export interface Invoice {
-  id: string;
-  companyId: string;
+  id: number;
+  companyId: number;
   type: InvoiceType;
   invoiceNumber: string;
-  partyId: string;
+  partyId: number;
   party?: Party;
   invoiceDate: string;
   dueDate?: string | null;
@@ -108,16 +108,16 @@ export interface Invoice {
   payloadHash?: string | null;
   canonicalPayload?: string | null;
   blockchainStatus: string;
-  blockchainTransactionId?: string | null;
+  blockchainTransactionId?: number | null;
   transaction?: BlockchainTransaction | null;
   createdAt: string;
 }
 
 export interface Payment {
-  id: string;
-  partyId: string;
+  id: number;
+  partyId: number;
   party?: Party;
-  invoiceId?: string | null;
+  invoiceId?: number | null;
   invoice?: Invoice | null;
   direction: 'in' | 'out';
   amount: number;
@@ -129,7 +129,7 @@ export interface Payment {
 }
 
 export interface InvoiceVerification {
-  invoiceId: string;
+  invoiceId: number;
   invoiceNumber: string;
   status: VerificationStatus;
   expectedHash: string | null;

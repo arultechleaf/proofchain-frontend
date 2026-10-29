@@ -129,7 +129,7 @@ export default function DashboardPage() {
       )}
 
       {/* Stats grid */}
-      <div className="stat-grid" style={{ marginBottom: 32 }}>
+      <div className="stat-grid stat-grid-line" style={{ marginBottom: 32 }}>
         {stats.map(({ value, suffix, ...s }) => (
           <StatCard key={s.label} {...s} loading={loading}
             value={<><AnimatedCounter value={value} />{suffix}</>} />
@@ -147,7 +147,7 @@ export default function DashboardPage() {
               Reports <ArrowUpRight size={12} />
             </Link>
           </div>
-          <div className="stat-grid">
+          <div className="stat-grid stat-grid-line">
             <StatCard label="Sales" value={formatMoney(billing.sales)} color="#60a5fa" />
             <StatCard label="Purchases" value={formatMoney(billing.purchases)} color="#22d3ee" />
             <StatCard label="To receive" value={formatMoney(billing.receivable)} color="#34d399" hint="Unpaid sales" />

@@ -39,7 +39,7 @@ export default function CreateDeliveryPage() {
     }).catch(() => {});
   }, []);
 
-  const selectedCompany = companies.find(c => c.id === formValues.receiverCompanyId);
+  const selectedCompany = companies.find(c => String(c.id) === String(formValues.receiverCompanyId));
 
   const onSubmit = async (data: DeliveryForm) => {
     if (step < 1) { setStep(1); return; }
@@ -75,7 +75,6 @@ export default function CreateDeliveryPage() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Create Delivery</h1>
-          <p className="text-slate-500 text-sm">Register a new delivery with blockchain proof</p>
         </div>
       </div>
 

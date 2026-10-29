@@ -57,8 +57,8 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(data.email, data.password);
-      router.push('/dashboard');
+      const signedIn = await login(data.email, data.password);
+      router.push(signedIn.mustChangePassword ? '/change-password' : '/dashboard');
     } catch (err: any) {
       setError(apiError(err, 'Could not sign in'));
     } finally {

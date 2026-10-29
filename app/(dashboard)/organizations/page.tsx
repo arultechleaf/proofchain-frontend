@@ -77,7 +77,6 @@ export default function OrganizationsPage() {
       <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Organizations & Users</h1>
-          <p style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>Registered organizations and network participants</p>
         </div>
         {me?.role === 'admin' && (
           <div style={{ display: 'flex', gap: 10 }}>

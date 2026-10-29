@@ -8,9 +8,9 @@ import { authApi, emailOtpApi } from '@/lib/api';
 import { apiError } from '@/lib/utils';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Field, Notice, SubmitButton } from '@/components/ui';
+import { ProfileFields, emptyProfile, profilePayload, type ProfileValues } from '@/components/account/ProfileFields';
 
-interface RegisterForm {
-  name: string;
+interface RegisterForm extends ProfileValues {
   email: string;
   organizationCode: string;
   password: string;
@@ -26,7 +26,7 @@ export default function RegisterPage() {
   const [verifiedEmail, setVerifiedEmail] = useState('');
   const [resendInSeconds, setResendInSeconds] = useState(0);
   const [done, setDone] = useState('');
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterForm>();
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterForm>({ defaultValues: { ...emptyProfile(), email: '', organizationCode: '', password: '', confirm: '' } });
   const email = watch('email')?.trim().toLowerCase() ?? '';
   const isEmailVerified = email.length > 0 && verifiedEmail === email;
 
@@ -75,7 +75,7 @@ export default function RegisterPage() {
     setError('');
     try {
       const res = await authApi.register({
-        name: v.name.trim(),
+        ...profilePayload(v),
         email: v.email.trim(),
         password: v.password,
         organizationCode: v.organizationCode.trim(),
@@ -104,9 +104,8 @@ export default function RegisterPage() {
     <AuthShell title="Create account" subtitle="Join your organization. An administrator approves new accounts before they can sign in.">
       {error && <Notice kind="error">{error}</Notice>}
       <form method="post" onSubmit={handleSubmit(onSubmit)} className="auth-form">
-        <Field label="Full name" required error={errors.name?.message}>
-          <input className="form-input" autoComplete="name" {...register('name', { required: 'Name is required', minLength: { value: 2, message: 'Too short' } })} />
-        </Field>
+        <ProfileFields register={register} errors={errors} watch={watch} />
+        <h3 className="form-section">Account</h3>
         <Field label="Work email" required error={errors.email?.message}>
           <input type="email" className="form-input" autoComplete="email"
             {...register('email', { required: 'Email is required', pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email' } })} />

@@ -35,7 +35,7 @@ export function usePartyListController() {
     [type, query, page],
   );
 
-  const remove = async (id: string, name: string) => {
+  const remove = async (id: number, name: string) => {
     setMessage(null);
     try {
       await partyService.remove(id);

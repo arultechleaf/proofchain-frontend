@@ -60,7 +60,6 @@ export default function VerificationPage() {
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Verification</h1>
-        <p style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>Verify delivery proof integrity against blockchain records</p>
       </div>
 
       {/* Search card */}

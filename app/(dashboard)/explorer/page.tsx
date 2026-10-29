@@ -209,7 +209,6 @@ export default function ExplorerPage() {
           </div>
           <div>
             <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e2e8f0', lineHeight: 1.2 }}>Blockchain Explorer</h1>
-            <p style={{ fontSize: 13, color: '#475569', marginTop: 2 }}>Hyperledger Besu network status &amp; transactions</p>
           </div>
         </div>
         <button onClick={() => load(true)} disabled={refreshing} className="btn btn-secondary"

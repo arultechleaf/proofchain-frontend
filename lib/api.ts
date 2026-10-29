@@ -37,6 +37,9 @@ export const session = {
   },
 };
 
+/** Records are identified by whole numbers (1, 2, 3 ...); route parameters may arrive as text. */
+export type Id = number | string;
+
 export const api = axios.create({
   baseURL: `${API_URL}/api`,
   headers: { 'Content-Type': 'application/json' },
@@ -74,6 +77,12 @@ api.interceptors.response.use(
     // A 401 from the sign-in form itself means "wrong password", not "session expired":
     // redirecting would reload the page and throw the error message away.
     const onPublicPage = typeof window !== 'undefined' && PUBLIC_PATHS.includes(window.location.pathname);
+    // A temporary password must be replaced before anything else can be used.
+    const msg = String(err.response?.data?.message ?? '');
+    if (err.response?.status === 403 && msg.startsWith('PASSWORD_CHANGE_REQUIRED') && typeof window !== 'undefined'
+      && window.location.pathname !== '/change-password') {
+      window.location.href = '/change-password';
+    }
     if (err.response?.status === 401 && typeof window !== 'undefined' && !onPublicPage) {
       session.clear();
       window.location.href = '/login';
@@ -88,7 +97,7 @@ export const authApi = {
     api.post('/auth/login', { email, password }),
   logout: () => api.post('/auth/logout'),
   me: () => api.get('/auth/me'),
-  register: (data: { name: string; email: string; password: string; organizationCode: string }) =>
+  register: (data: Record<string, unknown>) =>
     api.post('/auth/register', data),
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token: string, password: string) =>
@@ -113,20 +122,20 @@ export const dashboardApi = {
 export const deliveriesApi = {
   create: (data: unknown) => api.post('/deliveries', data),
   list: (params?: Record<string, unknown>) => api.get('/deliveries', { params }),
-  get: (id: string) => api.get(`/deliveries/${id}`),
-  getProof: (id: string) => api.get(`/deliveries/${id}/proof`),
+  get: (id: Id) => api.get(`/deliveries/${id}`),
+  getProof: (id: Id) => api.get(`/deliveries/${id}/proof`),
 };
 
 // ── Approvals ─────────────────────────────────────────────────────────────────
 export const approvalsApi = {
-  create: (deliveryId: string, data: { decision: string; comment?: string }) =>
+  create: (deliveryId: Id, data: { decision: string; comment?: string }) =>
     api.post(`/deliveries/${deliveryId}/approvals`, data),
-  list: (deliveryId: string) => api.get(`/deliveries/${deliveryId}/approvals`),
+  list: (deliveryId: Id) => api.get(`/deliveries/${deliveryId}/approvals`),
 };
 
 // ── Verification ──────────────────────────────────────────────────────────────
 export const verificationApi = {
-  verify: (deliveryId: string) => api.post(`/deliveries/${deliveryId}/verify`),
+  verify: (deliveryId: Id) => api.post(`/deliveries/${deliveryId}/verify`),
 };
 
 // ── Blockchain ────────────────────────────────────────────────────────────────
@@ -140,17 +149,17 @@ export const blockchainApi = {
 // ── Companies ─────────────────────────────────────────────────────────────────
 export const companiesApi = {
   list: () => api.get('/companies'),
-  get: (id: string) => api.get(`/companies/${id}`),
+  get: (id: Id) => api.get(`/companies/${id}`),
   create: (data: unknown) => api.post('/companies', data),
-  update: (id: string, data: unknown) => api.patch(`/companies/${id}`, data),
+  update: (id: Id, data: unknown) => api.patch(`/companies/${id}`, data),
 };
 
 // ── Users ─────────────────────────────────────────────────────────────────────
 export const usersApi = {
   list: () => api.get('/users'),
-  get: (id: string) => api.get(`/users/${id}`),
+  get: (id: Id) => api.get(`/users/${id}`),
   create: (data: unknown) => api.post('/users', data),
-  update: (id: string, data: unknown) => api.patch(`/users/${id}`, data),
+  update: (id: Id, data: unknown) => api.patch(`/users/${id}`, data),
 };
 
 // ── Billing ───────────────────────────────────────────────────────────────────
@@ -159,21 +168,21 @@ type Params = Record<string, unknown>;
 export const partiesApi = {
   list: (params?: Params) => api.get('/parties', { params }),
   accounts: () => api.get('/parties/accounts'),
-  get: (id: string) => api.get(`/parties/${id}`),
+  get: (id: Id) => api.get(`/parties/${id}`),
   create: (data: unknown) => api.post('/parties', data),
-  update: (id: string, data: unknown) => api.patch(`/parties/${id}`, data),
-  remove: (id: string) => api.delete(`/parties/${id}`),
+  update: (id: Id, data: unknown) => api.patch(`/parties/${id}`, data),
+  remove: (id: Id) => api.delete(`/parties/${id}`),
 };
 
 export const itemsApi = {
   list: (params?: Params) => api.get('/items', { params }),
-  get: (id: string) => api.get(`/items/${id}`),
+  get: (id: Id) => api.get(`/items/${id}`),
   create: (data: unknown) => api.post('/items', data),
-  update: (id: string, data: unknown) => api.patch(`/items/${id}`, data),
-  adjust: (id: string, data: { change: number; note?: string }) => api.post(`/items/${id}/adjust`, data),
-  remove: (id: string) => api.delete(`/items/${id}`),
+  update: (id: Id, data: unknown) => api.patch(`/items/${id}`, data),
+  adjust: (id: Id, data: { change: number; note?: string }) => api.post(`/items/${id}/adjust`, data),
+  remove: (id: Id) => api.delete(`/items/${id}`),
   stockSummary: () => api.get('/items/stock/summary'),
-  movements: (itemId?: string) => api.get('/items/stock/movements', { params: { itemId } }),
+  movements: (itemId?: Id) => api.get('/items/stock/movements', { params: { itemId } }),
 };
 
 export const invoicesApi = {
@@ -182,20 +191,20 @@ export const invoicesApi = {
   create: (type: 'sale' | 'purchase', data: unknown) =>
     api.post(type === 'sale' ? '/sales' : '/purchases', data),
   nextNumber: (type: 'sale' | 'purchase') => api.get('/invoices/next-number', { params: { type } }),
-  get: (id: string) => api.get(`/invoices/${id}`),
-  verify: (id: string) => api.post(`/invoices/${id}/verify`),
-  cancel: (id: string) => api.patch(`/invoices/${id}/cancel`),
+  get: (id: Id) => api.get(`/invoices/${id}`),
+  verify: (id: Id) => api.post(`/invoices/${id}/verify`),
+  cancel: (id: Id) => api.patch(`/invoices/${id}/cancel`),
 };
 
 export const paymentsApi = {
   list: (params?: Params) => api.get('/payments', { params }),
-  remove: (id: string) => api.delete(`/payments/${id}`),
+  remove: (id: Id) => api.delete(`/payments/${id}`),
   create: (data: unknown) => api.post('/payments', data),
 };
 
 export const razorpayApi = {
   config: () => api.get('/payments/razorpay/config'),
-  createOrder: (invoiceId: string, amount?: number) =>
+  createOrder: (invoiceId: Id, amount?: number) =>
     api.post('/payments/razorpay/order', { invoiceId, amount }),
   verify: (data: { orderId: string; paymentId: string; signature: string }) =>
     api.post('/payments/razorpay/verify', data),
@@ -212,12 +221,12 @@ export const reportsApi = {
 export const cashBankApi = {
   accounts: () => api.get('/cash-bank/accounts'),
   createAccount: (data: unknown) => api.post('/cash-bank/accounts', data),
-  updateAccount: (id: string, data: unknown) => api.patch(`/cash-bank/accounts/${id}`, data),
+  updateAccount: (id: Id, data: unknown) => api.patch(`/cash-bank/accounts/${id}`, data),
   transactions: (params?: Params) => api.get('/cash-bank/transactions', { params }),
   createTransaction: (data: unknown) => api.post('/cash-bank/transactions', data),
   transfer: (data: unknown) => api.post('/cash-bank/transfer', data),
-  removeAccount: (id: string) => api.delete(`/cash-bank/accounts/${id}`),
-  removeTransaction: (id: string) => api.delete(`/cash-bank/transactions/${id}`),
+  removeAccount: (id: Id) => api.delete(`/cash-bank/accounts/${id}`),
+  removeTransaction: (id: Id) => api.delete(`/cash-bank/transactions/${id}`),
 };
 
 // ── Expenses ──────────────────────────────────────────────────────────────────
@@ -226,22 +235,26 @@ export const expensesApi = {
   summary: (params?: Params) => api.get('/expenses/summary', { params }),
   categories: () => api.get('/expenses/categories'),
   create: (data: unknown) => api.post('/expenses', data),
-  update: (id: string, data: unknown) => api.patch(`/expenses/${id}`, data),
-  remove: (id: string) => api.delete(`/expenses/${id}`),
+  update: (id: Id, data: unknown) => api.patch(`/expenses/${id}`, data),
+  remove: (id: Id) => api.delete(`/expenses/${id}`),
 };
 
 // ── Quotations ────────────────────────────────────────────────────────────────
 export const quotationsApi = {
   list: (params?: Params) => api.get('/quotations', { params }),
-  get: (id: string) => api.get(`/quotations/${id}`),
+  get: (id: Id) => api.get(`/quotations/${id}`),
   create: (data: unknown) => api.post('/quotations', data),
-  setStatus: (id: string, status: string) => api.patch(`/quotations/${id}/status`, { status }),
-  convert: (id: string) => api.post(`/quotations/${id}/convert`),
-  remove: (id: string) => api.delete(`/quotations/${id}`),
+  setStatus: (id: Id, status: string) => api.patch(`/quotations/${id}/status`, { status }),
+  convert: (id: Id) => api.post(`/quotations/${id}/convert`),
+  remove: (id: Id) => api.delete(`/quotations/${id}`),
 };
 
 // ── Roles & permissions ───────────────────────────────────────────────────────
 export const rolesApi = {
+  mine: () => api.get('/roles/permissions/me'),
+  list: () => api.get('/roles'),
+  create: (data: { key: string; name: string; description?: string }) => api.post('/roles', data),
+  remove: (key: string) => api.delete('/roles/' + key),
   permissions: () => api.get('/roles/permissions'),
   updatePermissions: (changes: unknown) => api.put('/roles/permissions', { changes }),
 };
@@ -250,9 +263,9 @@ export const rolesApi = {
 export const notificationsApi = {
   list: (params?: Params) => api.get('/notifications', { params }),
   unreadCount: () => api.get('/notifications/unread-count'),
-  markRead: (id: string) => api.patch(`/notifications/${id}/read`),
+  markRead: (id: Id) => api.patch(`/notifications/${id}/read`),
   markAllRead: () => api.post('/notifications/read-all'),
-  remove: (id: string) => api.delete(`/notifications/${id}`),
+  remove: (id: Id) => api.delete(`/notifications/${id}`),
   clearRead: () => api.delete('/notifications/read'),
 };
 

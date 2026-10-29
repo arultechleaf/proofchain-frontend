@@ -142,7 +142,7 @@ export default function CashBankPage() {
               <Field label="To" required>
                 <select className="form-input" value={c.transfer.toAccountId} onChange={(e) => c.setTransfer({ ...c.transfer, toAccountId: e.target.value })} required>
                   <option value="">Select…</option>
-                  {c.activeAccounts.filter((x) => x.id !== c.transfer.fromAccountId).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+                  {c.activeAccounts.filter((x) => String(x.id) !== c.transfer.fromAccountId).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
                 </select>
               </Field>
               <Field label="Amount" required>
@@ -179,8 +179,8 @@ export default function CashBankPage() {
                 {x.accountType === 'cash' ? 'Cash' : 'Bank'}{x.accountNumber ? ` · ${x.accountNumber}` : ''}{x.isActive ? '' : ' · inactive'}
               </p>
               <div className="toolbar" style={{ marginBottom: 0, marginTop: 4 }}>
-                <button className="btn btn-ghost" onClick={() => c.setAccountFilter(c.accountFilter === x.id ? '' : x.id)}>
-                  {c.accountFilter === x.id ? 'Show all' : 'View transactions'}
+                <button className="btn btn-ghost" onClick={() => c.setAccountFilter(c.accountFilter === String(x.id) ? '' : String(x.id))}>
+                  {c.accountFilter === String(x.id) ? 'Show all' : 'View transactions'}
                 </button>
                 {c.canWrite && (
                   <button className="btn btn-ghost" onClick={() => c.toggleActive(x.id, !x.isActive)}>
@@ -194,7 +194,7 @@ export default function CashBankPage() {
       )}
 
       <h2 className="card-title" style={{ marginBottom: 12 }}>
-        Transactions{c.accountFilter ? ` · ${a?.rows.find((x) => x.id === c.accountFilter)?.name ?? ''}` : ''}
+        Transactions{c.accountFilter ? ` · ${a?.rows.find((x) => String(x.id) === c.accountFilter)?.name ?? ''}` : ''}
       </h2>
       <DataTable
         columns={columns}

@@ -1,12 +1,12 @@
 /** MODEL — quotations / estimates. */
-import { quotationsApi } from '@/lib/api';
+import { quotationsApi, type Id } from '@/lib/api';
 import type { Invoice, Party } from '@/models';
 
 export type QuotationStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'converted';
 
 export interface QuotationLine {
-  id: string;
-  itemId?: string | null;
+  id: number;
+  itemId?: number | null;
   description: string;
   quantity: number;
   rate: number;
@@ -15,9 +15,9 @@ export interface QuotationLine {
 }
 
 export interface Quotation {
-  id: string;
+  id: number;
   quotationNumber: string;
-  partyId: string;
+  partyId: number;
   party?: Party;
   quotationDate: string;
   validUntil?: string | null;
@@ -28,7 +28,7 @@ export interface Quotation {
   total: number;
   status: QuotationStatus;
   notes?: string | null;
-  convertedInvoiceId?: string | null;
+  convertedInvoiceId?: number | null;
 }
 
 export interface QuotationList {
@@ -46,12 +46,12 @@ export const QUOTATION_STATUS_TABS: Array<{ key: string; label: string }> = [
 ];
 
 export interface QuotationPayload {
-  partyId: string;
+  partyId: Id;
   quotationDate: string;
   validUntil?: string;
   discount?: number;
   notes?: string;
-  lines: Array<{ itemId?: string; description?: string; quantity: number; rate: number; taxRate: number }>;
+  lines: Array<{ itemId?: Id; description?: string; quantity: number; rate: number; taxRate: number }>;
 }
 
 export const quotationService = {
@@ -59,19 +59,19 @@ export const quotationService = {
     const res = await quotationsApi.list({ status: q.status || undefined, search: q.search || undefined, page: q.page, limit: q.limit });
     return { rows: res.data.data ?? [], total: res.data.total ?? 0 };
   },
-  async get(id: string): Promise<Quotation> {
+  async get(id: Id): Promise<Quotation> {
     return (await quotationsApi.get(id)).data.data;
   },
   async create(payload: QuotationPayload): Promise<Quotation> {
     return (await quotationsApi.create(payload)).data.data;
   },
-  async setStatus(id: string, status: Exclude<QuotationStatus, 'converted'>): Promise<Quotation> {
+  async setStatus(id: Id, status: Exclude<QuotationStatus, 'converted'>): Promise<Quotation> {
     return (await quotationsApi.setStatus(id, status)).data.data;
   },
-  async remove(id: string): Promise<void> {
+  async remove(id: Id): Promise<void> {
     await quotationsApi.remove(id);
   },
-  async convert(id: string): Promise<{ quotation: Quotation; invoice: Invoice }> {
+  async convert(id: Id): Promise<{ quotation: Quotation; invoice: Invoice }> {
     return (await quotationsApi.convert(id)).data.data;
   },
 };

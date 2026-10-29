@@ -2,7 +2,7 @@
  * MODEL — customers & suppliers.
  * Owns the data shapes, the form <-> API mapping and the API calls. No React, no UI.
  */
-import { partiesApi } from '@/lib/api';
+import { partiesApi, type Id } from '@/lib/api';
 import type { Invoice, Party, PartySummary, Payment, PartyType } from '@/models';
 
 export type { Party, PartySummary, PartyType };
@@ -84,16 +84,16 @@ export const partyService = {
     const res = await partiesApi.list({ type: q.type || undefined, search: q.search || undefined, page: q.page, limit: q.limit });
     return { rows: res.data.data ?? [], total: res.data.total ?? 0 };
   },
-  async get(id: string): Promise<PartyLedger> {
+  async get(id: Id): Promise<PartyLedger> {
     return (await partiesApi.get(id)).data.data;
   },
   async create(values: PartyFormValues): Promise<Party> {
     return (await partiesApi.create(formToPartyPayload(values))).data.data;
   },
-  async remove(id: string): Promise<void> {
+  async remove(id: Id): Promise<void> {
     await partiesApi.remove(id);
   },
-  async update(id: string, values: PartyFormValues): Promise<Party> {
+  async update(id: Id, values: PartyFormValues): Promise<Party> {
     return (await partiesApi.update(id, formToPartyPayload(values))).data.data;
   },
 };

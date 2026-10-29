@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import type { ElementType } from 'react';
 import { useAuth } from '@/lib/auth';
+import { canView, matchScreen } from '@/lib/access';
 
 interface NavItem {
   href: string;
@@ -233,13 +234,17 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, screens } = useAuth();
 
-  const visibleItems = GROUPED_ITEMS.filter(
-    (item) =>
-      !item.roles ||
-      (!!user && item.roles.includes(user.role))
-  );
+  // The menu is built from the screens this user may open (role_permissions in MySQL); the built-in role lists
+  // are only a fallback if that list could not be loaded.
+  const visibleItems = GROUPED_ITEMS.filter((item) => {
+    if (screens) {
+      const screen = matchScreen(screens, item.href);
+      return !screen || canView(screen.level);
+    }
+    return !item.roles || (!!user && item.roles.includes(user.role));
+  });
 
   const width = collapsed ? 72 : 240;
 

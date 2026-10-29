@@ -8,7 +8,7 @@ import type { Invoice, InvoiceType } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDay, formatMoney } from '@/lib/utils';
 import {
-  Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, StatusBadge, actionsColumn, canWrite, useAsync,
+  Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, StatusBadge, actionsColumn, canUse, canWrite, useAsync,
 } from '@/components/ui';
 
 export const INVOICE_COPY: Record<InvoiceType, { base: string; title: string; noun: string; newLabel: string; party: string }> = {
@@ -81,7 +81,7 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
       <PageHeader
         title={copy.title}
   //      subtitle={`${total} ${copy.noun}`}
-        actions={canWrite(user?.role) && (
+        actions={canUse(type === 'sale' ? 'sales_create' : 'purchases_create', user?.role) && (
           <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={15} /> {copy.newLabel}</Link>
         )}
       />
@@ -113,7 +113,7 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
         rowKey={(i) => i.id}
         empty={
           <EmptyState icon={FileText} title={`No ${copy.noun} found`}
-            action={canWrite(user?.role) ? <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={14} /> {copy.newLabel}</Link> : undefined} />
+            action={canUse(type === 'sale' ? 'sales_create' : 'purchases_create', user?.role) ? <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={14} /> {copy.newLabel}</Link> : undefined} />
         }
         startIndex={(page - 1) * limit}
         footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}

@@ -27,9 +27,9 @@ interface PendingPayment {
 
 type Message = { kind: 'success' | 'error' | 'info'; text: string };
 
-const pendingKey = (invoiceId: string) => `razorpay-pending:${invoiceId}`;
+const pendingKey = (invoiceId: number | string) => `razorpay-pending:${invoiceId}`;
 
-function readPending(invoiceId: string): PendingPayment | null {
+function readPending(invoiceId: number | string): PendingPayment | null {
   try {
     const raw = localStorage.getItem(pendingKey(invoiceId));
     return raw ? (JSON.parse(raw) as PendingPayment) : null;
@@ -38,7 +38,7 @@ function readPending(invoiceId: string): PendingPayment | null {
   }
 }
 
-function writePending(invoiceId: string, value: PendingPayment | null) {
+function writePending(invoiceId: number | string, value: PendingPayment | null) {
   try {
     if (value) localStorage.setItem(pendingKey(invoiceId), JSON.stringify(value));
     else localStorage.removeItem(pendingKey(invoiceId));

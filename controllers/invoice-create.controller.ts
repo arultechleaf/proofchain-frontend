@@ -100,7 +100,7 @@ export function useInvoiceCreateController(type: InvoiceType) {
   const itemList = items.data ?? [];
 
   const applyParty = (p: Party | undefined) => {
-    setPartyId(p?.id ?? '');
+    setPartyId(p ? String(p.id) : '');
     if (p) {
       setPartyQuery(p.name);
       setCustomerMobile(p.phone ?? '');
@@ -113,7 +113,7 @@ export function useInvoiceCreateController(type: InvoiceType) {
   const [preselected, setPreselected] = useState(false);
   if (!preselected && partyId && partyList.length) {
     setPreselected(true);
-    applyParty(partyList.find((p) => p.id === partyId));
+    applyParty(partyList.find((p) => String(p.id) === partyId));
   }
 
   const pickParty = (text: string) => {
@@ -131,7 +131,7 @@ export function useInvoiceCreateController(type: InvoiceType) {
     const item = itemList.find((i) => i.name.toLowerCase() === text.trim().toLowerCase());
     updateLine(key, item
       ? {
-          name: item.name, itemId: item.id, sku: item.sku ?? '', hsnCode: item.hsnCode ?? '', unit: item.unit || 'pcs',
+          name: item.name, itemId: String(item.id), sku: item.sku ?? '', hsnCode: item.hsnCode ?? '', unit: item.unit || 'pcs',
           rate: String(sale ? item.salePrice : item.purchasePrice), taxRate: String(item.taxRate),
         }
       : { name: text, itemId: '' });
@@ -166,7 +166,7 @@ export function useInvoiceCreateController(type: InvoiceType) {
     const demand = new Map<string, number>();
     for (const l of lines) if (l.itemId) demand.set(l.itemId, (demand.get(l.itemId) ?? 0) + num(l.quantity));
     return [...demand.entries()].flatMap(([id, qty]) => {
-      const item = itemList.find((i) => i.id === id);
+      const item = itemList.find((i) => String(i.id) === id);
       return item && qty > item.stock ? [`${item.name}: only ${item.stock} ${item.unit} in stock (selling ${qty})`] : [];
     });
   }, [lines, itemList, sale]);

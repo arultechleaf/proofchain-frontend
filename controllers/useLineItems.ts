@@ -16,7 +16,7 @@ export interface LineState {
 }
 
 export interface PriceableItem {
-  id: string;
+  id: number;
   name: string;
   salePrice: number;
   taxRate: number;
@@ -30,7 +30,7 @@ const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
 export function useLineItems(items: PriceableItem[], discount: string) {
   const [lines, setLines] = useState<LineState[]>([blankLine()]);
-  const byId = useMemo(() => new Map(items.map((i) => [i.id, i])), [items]);
+  const byId = useMemo(() => new Map(items.map((i) => [String(i.id), i])), [items]);
 
   const update = (key: number, patch: Partial<LineState>) =>
     setLines((ls) => ls.map((l) => (l.key === key ? { ...l, ...patch } : l)));

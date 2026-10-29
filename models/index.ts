@@ -1,17 +1,38 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  role: 'admin' | 'company_a' | 'company_b' | 'auditor';
-  companyId: string | null;
+  /** Key of a role from the roles table (admin, manager, auditor, user, company_a, company_b, or a custom role). */
+  role: string;
+  /** The number stored for the role (roles.id). */
+  roleId?: number;
+  companyId: number | null;
   company?: Company;
   isActive: boolean;
+  userCode?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  mobile?: string | null;
+  alternateMobile?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  bloodGroup?: string | null;
+  designation?: string | null;
+  pincode?: string | null;
+  state?: string | null;
+  district?: string | null;
+  city?: string | null;
+  landmark?: string | null;
+  address?: string | null;
+  /** True while the account still has an admin-issued temporary password. */
+  mustChangePassword?: boolean;
+  passwordExpiryAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Company {
-  id: string;
+  id: number;
   name: string;
   organizationCode: string;
   organizationType: 'sender' | 'receiver' | 'auditor';
@@ -27,11 +48,11 @@ export type BlockchainStatus = 'not_submitted' | 'pending' | 'confirmed' | 'fail
 export type VerificationStatus = 'verified' | 'mismatch' | 'not_found' | 'pending' | 'error';
 
 export interface Delivery {
-  id: string;
+  id: number;
   deliveryReference: string;
-  senderCompanyId: string;
+  senderCompanyId: number;
   senderCompany?: Company;
-  receiverCompanyId: string;
+  receiverCompanyId: number;
   receiverCompany?: Company;
   description: string;
   quantity: number;
@@ -39,16 +60,16 @@ export interface Delivery {
   payloadHash?: string | null;
   status: DeliveryStatus;
   blockchainStatus: BlockchainStatus;
-  createdBy: string;
+  createdBy: number;
   creator?: User;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Approval {
-  id: string;
-  deliveryId: string;
-  reviewerId: string;
+  id: number;
+  deliveryId: number;
+  reviewerId: number;
   reviewer?: User;
   decision: 'approved' | 'rejected';
   comment?: string | null;
@@ -59,9 +80,9 @@ export * from './billing';
 export * from './notifications';
 
 export interface BlockchainTransaction {
-  id: string;
-  deliveryId: string | null;
-  invoiceId?: string | null;
+  id: number;
+  deliveryId: number | null;
+  invoiceId?: number | null;
   delivery?: Delivery;
   transactionHash?: string | null;
   blockNumber?: number | null;
@@ -76,11 +97,11 @@ export interface BlockchainTransaction {
 }
 
 export interface ProofRecord {
-  id: string;
-  deliveryId: string;
+  id: number;
+  deliveryId: number;
   algorithm: string;
   payloadHash: string;
-  blockchainTransactionId?: string | null;
+  blockchainTransactionId?: number | null;
   blockchainTransaction?: BlockchainTransaction | null;
   verifiedAt?: string | null;
   verificationStatus: VerificationStatus;
@@ -89,7 +110,7 @@ export interface ProofRecord {
 }
 
 export interface VerificationResult {
-  deliveryId: string;
+  deliveryId: number;
   deliveryReference: string;
   status: VerificationStatus;
   expectedHash: string | null;
@@ -127,8 +148,8 @@ export interface BlockchainNetworkStatus {
 }
 
 export interface AuditLog {
-  id: string;
-  actorId?: string | null;
+  id: number;
+  actorId?: number | null;
   actor?: User | null;
   action: string;
   resourceType: string;

@@ -23,7 +23,7 @@ const inputStyle: React.CSSProperties = {
 
 const columns: Column<AuditLog>[] = [
   { header: 'Time', cell: (l) => <span style={{ color: '#64748b' }}>{formatDate(l.createdAt)}</span> },
-  { header: 'Actor', cell: (l) => l.actor?.name ?? (l.actorId ? l.actorId.slice(0, 8) + '…' : 'System') },
+  { header: 'Actor', cell: (l) => l.actor?.name ?? (l.actorId ? '#' + l.actorId : 'System') },
   {
     header: 'Action',
     cell: (l) => {

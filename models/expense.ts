@@ -1,10 +1,10 @@
 /** MODEL — expenses. */
-import { expensesApi } from '@/lib/api';
+import { expensesApi, type Id } from '@/lib/api';
 
 export const EXPENSE_METHODS = ['cash', 'bank', 'upi', 'card', 'cheque'];
 
 export interface Expense {
-  id: string;
+  id: number;
   category: string;
   description?: string | null;
   amount: number;
@@ -63,7 +63,7 @@ export const expenseService = {
       description: v.description.trim() || undefined,
       reference: v.reference.trim() || undefined,
     }),
-  update: (id: string, v: ExpenseFormValues) =>
+  update: (id: Id, v: ExpenseFormValues) =>
     expensesApi.update(id, {
       category: v.category.trim(),
       amount: Number(v.amount),
@@ -72,5 +72,5 @@ export const expenseService = {
       description: v.description.trim(),
       reference: v.reference.trim(),
     }),
-  remove: (id: string) => expensesApi.remove(id),
+  remove: (id: Id) => expensesApi.remove(id),
 };

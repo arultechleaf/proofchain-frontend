@@ -8,7 +8,7 @@ import { Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActi
 import { PARTY_TABS, usePartyListController } from '@/controllers/party.controller';
 import { PARTY_TYPE_LABEL, type Party } from '@/models/party';
 
-function buildColumns(writable: boolean, remove: (id: string, name: string) => void): Column<Party>[] {
+function buildColumns(writable: boolean, remove: (id: number, name: string) => void): Column<Party>[] {
   return [
   {
     header: 'Name',

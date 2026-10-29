@@ -43,10 +43,13 @@ export default function UsersPage() {
         ? <Link href={`/users/${u.id}`} style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>{u.name}</Link>
         : <strong>{u.name}</strong>,
     },
+    { header: 'Code', cell: (u) => u.userCode ?? '—' },
     { header: 'Email', cell: (u) => u.email },
+    { header: 'Mobile', cell: (u) => u.mobile ?? '—' },
     { header: 'Role', cell: (u) => roleLabel(u.role) },
     { header: 'Organization', cell: (u) => u.company?.name ?? '—' },
     { header: 'Joined', cell: (u) => formatRelative(u.createdAt) },
+    { header: 'Password', cell: (u) => (u.mustChangePassword ? <span className="badge badge-pending">Temporary</span> : '—') },
     { header: 'Status', cell: (u) => <StatusBadge status={u.isActive ? 'active' : 'inactive'} /> },
     // Users are deactivated, not deleted, so their history in invoices and the audit log stays intact.
     actionsColumn<User>((u) => (

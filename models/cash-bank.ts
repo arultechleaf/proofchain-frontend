@@ -1,11 +1,11 @@
 /** MODEL — cash & bank accounts and their transactions. */
-import { cashBankApi } from '@/lib/api';
+import { cashBankApi, type Id } from '@/lib/api';
 
 export type AccountType = 'cash' | 'bank';
 export type BankTxType = 'deposit' | 'withdrawal' | 'transfer_in' | 'transfer_out';
 
 export interface BankAccount {
-  id: string;
+  id: number;
   name: string;
   accountType: AccountType;
   accountNumber?: string | null;
@@ -20,8 +20,8 @@ export interface AccountsResult {
 }
 
 export interface BankTransaction {
-  id: string;
-  accountId: string;
+  id: number;
+  accountId: number;
   accountName: string;
   counterAccountName?: string | null;
   type: BankTxType;
@@ -44,6 +44,7 @@ export interface AccountFormValues {
 }
 
 export interface MovementFormValues {
+  /** Select values are text; the API converts them to numbers. */
   accountId: string;
   type: 'deposit' | 'withdrawal';
   amount: string;
@@ -70,7 +71,7 @@ export const cashBankService = {
   async accounts(): Promise<AccountsResult> {
     return (await cashBankApi.accounts()).data.data;
   },
-  async transactions(q: { accountId?: string; type?: string; page: number; limit: number }): Promise<TransactionList> {
+  async transactions(q: { accountId?: Id; type?: string; page: number; limit: number }): Promise<TransactionList> {
     const res = await cashBankApi.transactions({ accountId: q.accountId || undefined, type: q.type || undefined, page: q.page, limit: q.limit });
     return { rows: res.data.data ?? [], total: res.data.total ?? 0 };
   },
@@ -81,11 +82,11 @@ export const cashBankService = {
       accountNumber: v.accountNumber.trim() || undefined,
       openingBalance: Number(v.openingBalance) || 0,
     }),
-  setActive: (id: string, isActive: boolean) => cashBankApi.updateAccount(id, { isActive }),
-  updateAccount: (id: string, v: AccountFormValues) =>
+  setActive: (id: Id, isActive: boolean) => cashBankApi.updateAccount(id, { isActive }),
+  updateAccount: (id: Id, v: AccountFormValues) =>
     cashBankApi.updateAccount(id, { name: v.name.trim(), accountNumber: v.accountNumber.trim() }),
-  removeAccount: (id: string) => cashBankApi.removeAccount(id),
-  removeTransaction: (id: string) => cashBankApi.removeTransaction(id),
+  removeAccount: (id: Id) => cashBankApi.removeAccount(id),
+  removeTransaction: (id: Id) => cashBankApi.removeTransaction(id),
   createMovement: (v: MovementFormValues) =>
     cashBankApi.createTransaction({
       accountId: v.accountId,

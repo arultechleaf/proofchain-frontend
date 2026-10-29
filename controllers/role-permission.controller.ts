@@ -18,6 +18,42 @@ export function useRolePermissionController() {
 
   const key = (role: string, area: string) => `${role}|${area}`;
   const isAdmin = user?.role === 'admin';
+  const [newRole, setNewRole] = useState({ key: '', name: '' });
+  const [busy, setBusy] = useState(false);
+
+  const roleName = (role: string) => data?.roleInfo.find((r) => r.key === role)?.name ?? role;
+  const isSystem = (role: string) => data?.roleInfo.find((r) => r.key === role)?.isSystem ?? true;
+  const groups = Array.from(new Set((data?.rows ?? []).map((r) => r.group)));
+
+  const createRole = async () => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      await rolePermissionService.createRole(newRole.key.trim(), newRole.name.trim());
+      setNewRole({ key: '', name: '' });
+      setMessage({ kind: 'success', text: 'Role created. It starts with no access, so set what it may open below.' });
+      await reload();
+    } catch (err) {
+      setMessage({ kind: 'error', text: apiError(err, 'Could not create the role') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteRole = async (role: string) => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      await rolePermissionService.deleteRole(role);
+      setMessage({ kind: 'success', text: 'Role deleted' });
+      await reload();
+    } catch (err) {
+      setMessage({ kind: 'error', text: apiError(err, 'Could not delete the role') });
+    } finally {
+      setBusy(false);
+    }
+  };
+
 
   const levelOf = (role: string, area: string): AccessLevel =>
     edits[key(role, area)] ?? data?.rows.find((r) => r.area === area)?.levels[role] ?? 'none';
@@ -54,6 +90,6 @@ export function useRolePermissionController() {
 
   return {
     matrix: data, loading, error: !!error, currentRole: user?.role,
-    isAdmin, levelOf, setLevel, dirty: Object.keys(edits).length, save, discard: () => setEdits({}), saving, message,
+    isAdmin, roleName, isSystem, groups, newRole, setNewRole, createRole, deleteRole, busy, levelOf, setLevel, dirty: Object.keys(edits).length, save, discard: () => setEdits({}), saving, message,
   };
 }

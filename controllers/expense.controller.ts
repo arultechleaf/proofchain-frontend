@@ -33,7 +33,7 @@ export function useExpenseController() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<ExpenseFormValues>(blankForm());
   const [saving, setSaving] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const filters = { from, to, category, search: query };
@@ -62,7 +62,7 @@ export function useExpenseController() {
     }
   };
 
-  const remove = async (id: string) => {
+  const remove = async (id: number) => {
     setMessage(null);
     try {
       await expenseService.remove(id);

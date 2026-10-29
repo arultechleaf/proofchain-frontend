@@ -68,8 +68,11 @@ export function roleLabel(role: string): string {
     company_a: 'Company A (Sender)',
     company_b: 'Company B (Receiver)',
     auditor: 'Auditor',
+    manager: 'Manager',
+    user: 'User',
   };
-  return map[role] ?? role;
+  // custom roles: store_manager -> Store manager
+  return map[role] ?? (role.charAt(0).toUpperCase() + role.slice(1).replace(/_/g, ' '));
 }
 
 export function roleColor(role: string): string {

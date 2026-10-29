@@ -19,8 +19,8 @@ export default function ApprovalsPage() {
   const { user } = useAuth();
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading]       = useState(true);
-  const [approvingId, setApprovingId] = useState<string | null>(null);
-  const [comments, setComments]     = useState<Record<string, string>>({});
+  const [approvingId, setApprovingId] = useState<number | null>(null);
+  const [comments, setComments]     = useState<Record<number, string>>({});
 
   useEffect(() => {
     deliveriesApi.list({ status: 'pending', limit: 50 })
@@ -29,7 +29,7 @@ export default function ApprovalsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleAction = async (deliveryId: string, decision: 'approved' | 'rejected') => {
+  const handleAction = async (deliveryId: number, decision: 'approved' | 'rejected') => {
     setApprovingId(deliveryId);
     try {
       await approvalsApi.create(deliveryId, { decision, comment: comments[deliveryId] });
@@ -43,9 +43,6 @@ export default function ApprovalsPage() {
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Approvals</h1>
-        <p style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>
-          {loading ? '...' : `${deliveries.length} deliver${deliveries.length === 1 ? 'y' : 'ies'} pending review`}
-        </p>
       </div>
 
       {/* Loading */}

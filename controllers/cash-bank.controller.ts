@@ -24,7 +24,7 @@ export function useCashBankController() {
   const [page, setPage] = useState(1);
   const [form, setForm] = useState<CashBankForm>(null);
   const [saving, setSaving] = useState(false);
-  const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
+  const [editingAccountId, setEditingAccountId] = useState<number | null>(null);
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const [account, setAccount] = useState<AccountFormValues>(blankAccount());
@@ -71,7 +71,7 @@ export function useCashBankController() {
       setMessage(null);
       setEditingAccountId(null);
       if (f === 'account') setAccount(blankAccount());
-      if (f === 'movement') setMovement(blankMovement(accountFilter || activeAccounts[0]?.id));
+      if (f === 'movement') setMovement(blankMovement(accountFilter || String(activeAccounts[0]?.id ?? '')));
       setForm(f);
     },
     closeForm: () => setForm(null),
@@ -93,7 +93,7 @@ export function useCashBankController() {
     removeTransaction: (t: BankTransaction) => run(() => cashBankService.removeTransaction(t.id), t.type.startsWith('transfer') ? 'Transfer deleted (both sides)' : 'Transaction deleted', () => undefined),
     submitMovement: () => run(() => cashBankService.createMovement(movement), movement.type === 'deposit' ? 'Deposit recorded' : 'Withdrawal recorded', () => setMovement(blankMovement())),
     submitTransfer: () => run(() => cashBankService.transfer(transfer), 'Transfer completed', () => setTransfer(blankTransfer())),
-    toggleActive: (id: string, isActive: boolean) =>
+    toggleActive: (id: number, isActive: boolean) =>
       run(() => cashBankService.setActive(id, isActive), isActive ? 'Account activated' : 'Account deactivated', () => undefined),
   };
 }

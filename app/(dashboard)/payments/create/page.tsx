@@ -34,8 +34,8 @@ function RecordPayment() {
     invoicesApi.get(fromInvoice).then((res) => {
       const inv: Invoice = res.data.data;
       setDirection(inv.type === 'sale' ? 'in' : 'out');
-      setPartyId(inv.partyId);
-      setInvoiceId(inv.id);
+      setPartyId(String(inv.partyId));
+      setInvoiceId(String(inv.id));
       setAmount(String(Math.round((inv.total - inv.paidAmount) * 100) / 100));
     }).catch(() => {});
   }, [params]);
@@ -49,12 +49,12 @@ function RecordPayment() {
       .catch(() => setOpenInvoices([]));
   }, [partyId, direction]);
 
-  const selected = openInvoices.find((i) => i.id === invoiceId);
+  const selected = openInvoices.find((i) => String(i.id) === invoiceId);
   const due = selected ? Math.round((selected.total - selected.paidAmount) * 100) / 100 : null;
 
   const changeInvoice = (id: string) => {
     setInvoiceId(id);
-    const inv = openInvoices.find((i) => i.id === id);
+    const inv = openInvoices.find((i) => String(i.id) === id);
     if (inv) setAmount(String(Math.round((inv.total - inv.paidAmount) * 100) / 100));
   };
 

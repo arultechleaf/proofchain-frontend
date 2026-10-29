@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { ChevronRight, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { roleLabel } from '@/lib/utils';
 import { NotificationBell } from '@/components/layout/NotificationBell';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
@@ -49,12 +50,16 @@ const ROLE_COLORS: Record<string, string> = {
   company_a: '#60a5fa',
   company_b: '#22d3ee',
   auditor: '#fbbf24',
+  manager: '#34d399',
+  user: '#94a3b8',
 };
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Administrator',
   company_a: 'Company A',
   company_b: 'Company B',
   auditor: 'Auditor',
+  manager: 'Manager',
+  user: 'User',
 };
 
 interface TopNavProps {
@@ -76,7 +81,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
     }, []);
 
   return (
-    <header style={{
+    <header className="topnav" style={{
       height: 56,
       minHeight: 56,
       display: 'flex',
@@ -145,7 +150,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
             </div>
             <div className="topnav-user-text">
               <p style={{ color: '#e2e8f0', fontSize: 12, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{user.name}</p>
-              <p style={{ color: ROLE_COLORS[user.role] ?? '#64748b', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? user.role}</p>
+              <p style={{ color: ROLE_COLORS[user.role] ?? '#64748b', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</p>
             </div>
           </div>
         )}

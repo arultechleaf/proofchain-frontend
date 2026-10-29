@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import { apiError, formatDate } from '@/lib/utils';
 import { Card, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, useAsync } from '@/components/ui';
 import { UserForm, userToForm } from '@/components/users/UserForm';
+import { profilePayload } from '@/components/account/ProfileFields';
 
 export default function EditUserPage() {
   const { id } = useParams<{ id: string }>();
@@ -39,6 +40,7 @@ export default function EditUserPage() {
         <UserForm
           defaultValues={userToForm(user)}
           isSelf={me?.id === user.id}
+          userCode={user.userCode}
           loading={saving}
           submitLabel="Save Changes"
           onSubmit={async (v) => {
@@ -46,7 +48,7 @@ export default function EditUserPage() {
             setMessage(null);
             try {
               await usersApi.update(id, {
-                name: v.name.trim(),
+                ...profilePayload(v, true),
                 role: v.role,
                 companyId: v.companyId || undefined,
                 isActive: v.isActive,
