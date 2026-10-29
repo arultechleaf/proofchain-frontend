@@ -1,0 +1,160 @@
+/* ---------- common button styles ---------- */
+.custom_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);                
+  height: var(--btn-height-md);        
+  min-width: var(--btn-min-width);     
+  padding: 0 var(--space-6);           
+  font-family: var(--font-primary);
+  font-size: var(--fs-base);           
+  font-weight: var(--fw-regular);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);     
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              opacity var(--transition-fast);
+}
+
+.custom_button:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* ---------- Icon ---------- */
+.custom_button_icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.custom_button_icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Icon-only (no text): square button */
+.custom_button_icon_only {
+  min-width: 0;
+  width: var(--btn-height-md);
+  padding: 0;
+}
+
+/* ---------- Variants ---------- */
+
+/* Primary – solid blue */
+.custom_button_primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+.custom_button_primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+/* Danger – solid red */
+.custom_button_danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--text-inverse);
+}
+.custom_button_danger:hover {
+  background-color: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+.custom_button_danger:focus-visible {
+  box-shadow: var(--shadow-focus-danger);
+}
+
+/* Secondary – blue with lighter hover */
+.custom_button_secondary {
+  background-color: var(--color-secondary);
+  border-color: var(--border-dark);
+  color: var(--text-inverse);
+}
+.custom_button_secondary:hover {
+  background-color: var(--color-secondary-hover);
+}
+
+/* Tertiary – outline blue */
+.custom_button_tertiary {
+  background-color: var(--bg-surface);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+}
+
+/* Quaternary – neutral, dark border (Cancel / Back) */
+.custom_button_quaternary {
+  background-color: var(--bg-surface);
+  border-color: var(--border-dark);
+  color: var(--text-body);
+}
+
+/* Close button */
+.custom_button_close {
+  background-color: var(--bg-close-btn);
+  border-color: var(--bg-close-btn);
+  color: var(--close-btn-color);
+  border-radius: var(--radius-xl);
+}
+
+/* back button */
+.custom_button_back{
+  background-color: var(--color-white);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+  border-radius: var(--radius-md);
+  font-weight: var(--fw-bold);
+  padding: 0 var(--space-2);  
+}
+
+/* ---------- Disabled ---------- */
+.custom_button:disabled,
+.custom_button_disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* this is for disabled buttons */
+.custom_button_primary.custom_button_disabled,
+.custom_button_secondary.custom_button_disabled {
+  background-color: var(--color-secondary-muted);
+  border-color: var(--color-secondary-muted);
+}
+.custom_button_danger.custom_button_disabled {
+  background-color: var(--color-danger-muted);
+  border-color: var(--color-danger-muted);
+  opacity: 0.7;
+}
+.custom_button_tertiary.custom_button_disabled,
+.custom_button_quaternary.custom_button_disabled {
+  opacity: 0.55;
+}
+
+.custom_button_loading {
+  cursor: progress;
+  pointer-events: none;
+}
+
+.custom_button_loading_content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes custom_button_spin {
+  to { transform: rotate(360deg); }
+}

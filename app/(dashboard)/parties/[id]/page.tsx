@@ -6,9 +6,7 @@ import { useParams } from 'next/navigation';
 import { FileText, Plus, Receipt, Wallet } from 'lucide-react';
 import type { Invoice, Payment } from '@/models';
 import { formatDay, formatMoney } from '@/lib/utils';
-import {
-  Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Spinner, StatCard, StatusBadge,
-} from '@/components/ui';
+import { Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Spinner, StatCard, StatusBadge, Tabs } from '@/components/ui';
 import { PartyForm } from '@/components/parties/PartyForm';
 import { PARTY_DETAIL_TABS, usePartyDetailController } from '@/controllers/party.controller';
 import { balanceInfo, partyToForm } from '@/models/party';
@@ -70,13 +68,8 @@ export default function PartyDetailPage() {
         <StatCard label="Opening balance" value={formatMoney(summary.openingBalance)} color="#a78bfa" />
       </Grid>
 
-      <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
-        {PARTY_DETAIL_TABS.map((t) => (
-          <button key={t} onClick={() => c.setTab(t)} style={{
-            padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500, border: 0, cursor: 'pointer',
-            background: c.tab === t ? 'rgba(37,99,235,0.25)' : 'transparent', color: c.tab === t ? '#60a5fa' : '#94a3b8',
-          }}>{t}</button>
-        ))}
+      <div style={{ marginBottom: 14 }}>
+        <Tabs value={c.tab} onChange={c.setTab} options={PARTY_DETAIL_TABS.map((t) => ({ key: t, label: t }))} />
       </div>
 
       {c.tab === 'Invoices' && (

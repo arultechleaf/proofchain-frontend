@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Shield, Search, CheckCircle2, XCircle, AlertCircle, Clock, Loader2 } from 'lucide-react';
+import { Shield, Search, CheckCircle2, XCircle, AlertCircle, Clock } from 'lucide-react';
 import { deliveriesApi, verificationApi } from '@/lib/api';
 import type { VerificationResult, Delivery } from '@/models';
 import { formatDate } from '@/lib/utils';
+import { Button } from '@/components/ui';
 
 const STATUS_CONFIG: Record<string, { icon: React.ElementType; color: string; bg: string; border: string; label: string }> = {
   verified:  { icon: CheckCircle2, color: '#34d399', bg: 'rgba(5,150,105,0.12)',   border: 'rgba(16,185,129,0.3)',  label: 'VERIFIED' },
@@ -54,7 +55,7 @@ export default function VerificationPage() {
   const sc = result ? (STATUS_CONFIG[result.status] ?? STATUS_CONFIG.error) : null;
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 780, color: '#e2e8f0' }}>
+    <div className="page" style={{ maxWidth: 780 }}>
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
@@ -74,16 +75,7 @@ export default function VerificationPage() {
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
-          <button type="submit" disabled={searching} style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            height: 40, padding: '0 18px', borderRadius: 8, flexShrink: 0,
-            background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600,
-            cursor: searching ? 'not-allowed' : 'pointer', border: 'none',
-            opacity: searching ? 0.7 : 1,
-          }}>
-            {searching ? <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> : <Search size={15} />}
-            {searching ? 'Searching...' : 'Search'}
-          </button>
+          <Button type="submit" icon={Search} loading={searching}>{searching ? 'Searching...' : 'Search'}</Button>
         </form>
         {error && (
           <p style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#f87171', fontSize: 13, marginTop: 10 }}>
@@ -102,15 +94,7 @@ export default function VerificationPage() {
               </p>
               <p style={{ color: '#94a3b8', fontSize: 13, margin: 0 }}>{delivery.description}</p>
             </div>
-            <button onClick={runVerification} disabled={verifying} style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              height: 38, padding: '0 16px', borderRadius: 8, flexShrink: 0,
-              background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600,
-              cursor: verifying ? 'not-allowed' : 'pointer', border: 'none', opacity: verifying ? 0.7 : 1,
-            }}>
-              {verifying ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Shield size={14} />}
-              {verifying ? 'Verifying...' : 'Verify Now'}
-            </button>
+            <Button icon={Shield} loading={verifying} onClick={runVerification}>{verifying ? 'Verifying...' : 'Verify Now'}</Button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             {[

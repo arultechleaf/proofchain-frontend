@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { NotificationBell } from '@/components/layout/NotificationBell';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
 const BREADCRUMBS: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -126,6 +127,8 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
           Demo Mode
         </span>*/}
 
+        <ThemeToggle />
+
         {/* Notifications */}
         <NotificationBell enabled={!!user} />
 
@@ -140,7 +143,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
             }}>
               {user.name[0]?.toUpperCase()}
             </div>
-            <div>
+            <div className="topnav-user-text">
               <p style={{ color: '#e2e8f0', fontSize: 12, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{user.name}</p>
               <p style={{ color: ROLE_COLORS[user.role] ?? '#64748b', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? user.role}</p>
             </div>

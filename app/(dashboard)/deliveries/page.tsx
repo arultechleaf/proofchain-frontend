@@ -6,7 +6,7 @@ import { Plus, RefreshCw, Package } from 'lucide-react';
 import { deliveriesApi } from '@/lib/api';
 import type { Delivery } from '@/models';
 import { formatRelative, statusLabel } from '@/lib/utils';
-import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsColumn } from '@/components/ui';
+import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsColumn, Button } from '@/components/ui';
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   pending:   { bg: 'rgba(245,158,11,0.1)',  color: '#fbbf24', border: 'rgba(245,158,11,0.25)'  },
@@ -74,7 +74,7 @@ export default function DeliveriesPage() {
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); fetchDeliveries(); };
 
   return (
-    <div style={{ padding: '28px 32px', minHeight: '100%', color: '#e2e8f0' }}>
+    <div className="page">
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -115,14 +115,10 @@ export default function DeliveriesPage() {
         </select>
 
         {/* Search button */}
-        <button type="submit" style={{ height: 38, padding: '0 18px', background: 'rgba(37,99,235,0.2)', border: '1px solid rgba(59,130,246,0.4)', borderRadius: 8, color: '#60a5fa', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
-          Search
-        </button>
+        <Button type="submit">Search</Button>
 
         {/* Refresh */}
-        <button type="button" onClick={fetchDeliveries} title="Refresh" style={{ width: 38, height: 38, background: 'rgba(30,41,59,0.7)', border: '1px solid rgba(51,65,85,0.5)', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <RefreshCw size={14} color="#64748b" style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
-        </button>
+        <Button variant="secondary" iconOnly icon={RefreshCw} iconSpin={loading} aria-label="Refresh" title="Refresh" onClick={fetchDeliveries} />
       </form>
 
 

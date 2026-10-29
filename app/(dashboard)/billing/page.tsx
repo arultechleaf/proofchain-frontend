@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { AlertTriangle, ArrowDownLeft, ArrowUpRight, Plus, Receipt, RefreshCw, ShoppingCart, Wallet } from 'lucide-react';
 import type { Invoice, Payment } from '@/models';
 import { formatDay, formatMoney } from '@/lib/utils';
-import {
-  Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, StatusBadge,
-} from '@/components/ui';
+import { Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, StatusBadge, Tabs, Button } from '@/components/ui';
 import { BILLING_PERIODS, useBillingOverviewController } from '@/controllers/billing.controller';
 import { AGING_LABELS } from '@/models/billing-overview';
 
@@ -50,13 +48,8 @@ export default function BillingPage() {
         subtitle={`Overview of the last ${c.days} days`}
         actions={
           <>
-            {BILLING_PERIODS.map((p) => (
-              <button key={p.days} onClick={() => c.setDays(p.days)}
-                className={c.days === p.days ? 'btn btn-primary' : 'btn btn-secondary'}>{p.label}</button>
-            ))}
-            <button onClick={c.reload} className="btn btn-ghost" aria-label="Refresh">
-              <RefreshCw size={14} className={c.loading ? 'spin' : undefined} />
-            </button>
+            <Tabs value={c.days} onChange={c.setDays} options={BILLING_PERIODS.map((p) => ({ key: p.days, label: p.label }))} />
+            <Button variant="ghost" iconOnly icon={RefreshCw} iconSpin={c.loading} aria-label="Refresh" onClick={c.reload} />
           </>
         }
       />

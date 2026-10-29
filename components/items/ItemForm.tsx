@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Field, Grid, SubmitButton } from '@/components/ui';
+import { Field, Grid, Form } from '@/components/ui';
 import type { Item } from '@/models';
 
 export interface ItemFormValues {
@@ -63,8 +63,7 @@ export function ItemForm({
   const num = { valueAsNumber: true, min: { value: 0, message: 'Cannot be negative' } };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <Form onSubmit={handleSubmit(onSubmit)} loading={loading} submitLabel={submitLabel} readOnly={readOnly}>
         <Grid cols="2fr 1fr 1fr 1fr">
           <Field label="Item name" required error={errors.name?.message}>
             <input className="form-input" placeholder="Temperature Sensor"
@@ -105,8 +104,6 @@ export function ItemForm({
         <Field label="Description">
           <textarea className="form-input" rows={2} style={{ resize: 'none' }} {...register('description')} />
         </Field>
-      </fieldset>
-      {!readOnly && <div><SubmitButton loading={loading}>{submitLabel}</SubmitButton></div>}
-    </form>
+    </Form>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Field, Grid, SubmitButton } from '@/components/ui';
+import { Field, Grid, Form } from '@/components/ui';
 import type { PartyFormValues } from '@/models/party';
 
 export function PartyForm({
@@ -16,8 +16,7 @@ export function PartyForm({
   const { register, handleSubmit, formState: { errors } } = useForm<PartyFormValues>({ defaultValues });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <Form onSubmit={handleSubmit(onSubmit)} loading={loading} submitLabel={submitLabel} readOnly={readOnly}>
         <Grid cols="2fr 1fr">
           <Field label="Name" required error={errors.name?.message}>
             <input className="form-input" placeholder="Acme Retail Pvt Ltd"
@@ -54,10 +53,6 @@ export function PartyForm({
         <Field label="Opening balance" hint="Positive: they owe you. Negative: you owe them.">
           <input type="number" step="0.01" className="form-input" {...register('openingBalance', { valueAsNumber: true })} />
         </Field>
-      </fieldset>
-      {!readOnly && (
-        <div><SubmitButton loading={loading}>{submitLabel}</SubmitButton></div>
-      )}
-    </form>
+    </Form>
   );
 }

@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth';
 import { apiError, formatDate, formatMoney } from '@/lib/utils';
 import {
   Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Spinner, StatCard,
-  SubmitButton, canWrite, useAsync,
+  Form, canWrite, useAsync,
 } from '@/components/ui';
 import { ItemForm, formToItemPayload, itemToForm } from '@/components/items/ItemForm';
 
@@ -107,15 +107,14 @@ export default function ItemDetailPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {writable && (
             <Card title="Adjust stock" icon={Boxes}>
-              <form onSubmit={adjust} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <Form onSubmit={adjust} loading={adjusting} submitLabel="Update Stock">
                 <Field label="Quantity change" hint="e.g. 10 to add, -3 to remove">
                   <input type="number" step="any" className="form-input" value={change} onChange={(e) => setChange(e.target.value)} />
                 </Field>
                 <Field label="Note">
                   <input className="form-input" placeholder="Stock count correction" value={note} onChange={(e) => setNote(e.target.value)} />
                 </Field>
-                <div><SubmitButton loading={adjusting}>Update Stock</SubmitButton></div>
-              </form>
+              </Form>
             </Card>
           )}
         </div>

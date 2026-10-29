@@ -65,7 +65,8 @@ export function Grid({ cols, gap = 16, children, style }: {
   cols: number | string; gap?: number; children: React.ReactNode; style?: React.CSSProperties;
 }) {
   const template = typeof cols === 'number' ? `repeat(${cols}, minmax(0, 1fr))` : cols;
-  return <div className="grid-layout" style={{ gridTemplateColumns: template, gap, ...style }}>{children}</div>;
+  // data-cols lets the stylesheet reflow the grid on tablets and phones.
+  return <div className="grid-layout" data-cols={typeof cols === 'number' ? cols : 'custom'} style={{ gridTemplateColumns: template, gap, ...style }}>{children}</div>;
 }
 
 /* ── Feedback ───────────────────────────────────────────────────────────── */
@@ -175,6 +176,91 @@ export function SubmitButton({
       {loading && <Loader2 size={15} className="spin" />}
       {children}
     </button>
+  );
+}
+
+/**
+ * The one form wrapper every form uses: a vertical stack of fields, an optional error line, and a row with
+ * the submit button (and Cancel). `readOnly` disables every field and hides the buttons.
+ */
+export function Form({
+  onSubmit, loading, submitLabel, readOnly, onCancel, cancelLabel = 'Cancel', error, post, children,
+}: {
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void | Promise<void>;
+  loading?: boolean;
+  /** Omit to render no buttons (for forms with their own). */
+  submitLabel?: React.ReactNode;
+  readOnly?: boolean;
+  onCancel?: () => void;
+  cancelLabel?: string;
+  error?: string;
+  /** Posts instead of GET if JavaScript has not loaded yet (keeps passwords out of the URL). */
+  post?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <form className="form-stack" method={post ? 'post' : undefined} onSubmit={(e) => { e.preventDefault(); void onSubmit(e); }}>
+      <fieldset className="form-fieldset" disabled={readOnly}>{children}</fieldset>
+      {error ? <Notice kind="error">{error}</Notice> : null}
+      {!readOnly && submitLabel != null && (
+        <div className="form-actions">
+          <SubmitButton loading={loading}>{submitLabel}</SubmitButton>
+          {onCancel && <button type="button" className="btn btn-ghost" onClick={onCancel}>{cancelLabel}</button>}
+        </div>
+      )}
+    </form>
+  );
+}
+
+/* ── Buttons & tabs ─────────────────────────────────────────────────────── */
+
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success' | 'ghost' | 'link';
+
+/** The one button. Looks come from the .btn-* rules in globals.css. */
+export function Button({
+  variant = 'primary', size = 'md', icon: Icon, iconSpin, iconOnly, loading, fullWidth, type = 'button',
+  className, disabled, children, ...rest
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: ButtonVariant;
+  size?: 'sm' | 'md';
+  icon?: React.ElementType;
+  /** Spin the icon (e.g. a refresh icon while reloading). */
+  iconSpin?: boolean;
+  /** Square button with just the icon; give it an aria-label. */
+  iconOnly?: boolean;
+  loading?: boolean;
+  fullWidth?: boolean;
+}) {
+  const classes = ['btn', 'btn-' + variant, size === 'sm' && 'btn-sm', iconOnly && 'btn-icon', fullWidth && 'btn-block btn-full', className]
+    .filter(Boolean).join(' ');
+  const iconSize = size === 'sm' ? 14 : 15;
+  return (
+    <button type={type} className={classes} disabled={disabled || loading} aria-busy={loading || undefined} {...rest}>
+      {loading ? <Loader2 size={iconSize} className="spin" /> : Icon ? <Icon size={iconSize} className={iconSpin ? 'spin' : undefined} /> : null}
+      {children}
+    </button>
+  );
+}
+
+/** A row of switch buttons (filters, tabs). tone colours the active button; fill stretches them evenly. */
+export function Tabs<K extends string | number>({
+  value, onChange, options, fill,
+}: {
+  value: K;
+  onChange: (key: K) => void;
+  options: ReadonlyArray<{ key: K; label: React.ReactNode; tone?: 'success' | 'danger' }>;
+  fill?: boolean;
+}) {
+  return (
+    <div className={'seg' + (fill ? ' seg-fill' : '')} role="tablist">
+      {options.map((o) => (
+        <button
+          key={String(o.key)} type="button" role="tab" aria-selected={value === o.key}
+          className={[value === o.key && 'active', o.tone && 'tone-' + o.tone].filter(Boolean).join(' ') || undefined}
+          onClick={() => onChange(o.key)}
+        >{o.label}</button>
+      ))}
+    </div>
   );
 }
 
@@ -313,9 +399,9 @@ export function DataTable<T>({
             )
             : rows.map((row, index) => (
                 <tr key={rowKey(row)}>
-                  {serial && <td className="col-center col-serial">{startIndex + index + 1}</td>}
+                  {serial && <td className="col-center col-serial" data-label="S.No">{startIndex + index + 1}</td>}
                   {columns.map((c) => (
-                    <td key={colKey(c)} className={`${align(c)}${c.nowrap === false ? ' col-wrap' : ''}`}>
+                    <td key={colKey(c)} className={`${align(c)}${c.nowrap === false ? ' col-wrap' : ''}`} data-label={c.id === 'actions' || typeof c.header !== 'string' ? undefined : c.header}>
                       {c.cell(row)}
                     </td>
                   ))}

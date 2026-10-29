@@ -7,9 +7,7 @@ import { paymentsApi } from '@/lib/api';
 import type { Payment } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDay, formatMoney } from '@/lib/utils';
-import {
-  Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, actionsColumn, canWrite, useAsync,
-} from '@/components/ui';
+import { Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, actionsColumn, canWrite, useAsync, Tabs } from '@/components/ui';
 
 const TABS = [
   { key: '', label: 'All' },
@@ -92,14 +90,8 @@ export default function PaymentsPage() {
         <StatCard label="Net cash flow" value={formatMoney((data?.totals?.received ?? 0) - (data?.totals?.paid ?? 0))} color="#60a5fa" icon={Wallet} loading={loading && !data} />
       </Grid>
 
-      <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.7)', borderRadius: 10, padding: 3, width: 'fit-content', marginBottom: 16 }}>
-        {TABS.map((t) => (
-          <button key={t.key} onClick={() => { setDirection(t.key); setPage(1); }} style={{
-            padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500, border: 0, cursor: 'pointer',
-            background: direction === t.key ? 'rgba(37,99,235,0.25)' : 'transparent',
-            color: direction === t.key ? '#60a5fa' : '#94a3b8',
-          }}>{t.label}</button>
-        ))}
+      <div style={{ marginBottom: 16 }}>
+        <Tabs value={direction} onChange={(k) => { setDirection(k); setPage(1); }} options={TABS} />
       </div>
 
       {error ? <Notice kind="error">Could not load payments.</Notice> : null}

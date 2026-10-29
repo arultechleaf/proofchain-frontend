@@ -6,7 +6,7 @@ import { KeyRound, UserRound } from 'lucide-react';
 import { authApi, session } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { apiError, roleLabel } from '@/lib/utils';
-import { Card, Field, KeyValue, Notice, Page, PageHeader, SubmitButton } from '@/components/ui';
+import { Card, Field, KeyValue, Notice, Page, PageHeader, SubmitButton, Form } from '@/components/ui';
 
 interface PasswordForm {
   currentPassword: string;
@@ -79,7 +79,7 @@ export default function ProfilePage() {
 
       <Card title="Change password" icon={KeyRound}>
         {pwMsg && <Notice kind={pwMsg.kind}>{pwMsg.text}</Notice>}
-        <form method="post" onSubmit={handleSubmit(changePassword)} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <Form post onSubmit={handleSubmit(changePassword)} loading={savingPw} submitLabel="Change Password">
           <Field label="Current password" required error={errors.currentPassword?.message}>
             <input type="password" className="form-input" autoComplete="current-password"
               {...register('currentPassword', { required: 'Enter your current password' })} />
@@ -92,8 +92,7 @@ export default function ProfilePage() {
             <input type="password" className="form-input" autoComplete="new-password"
               {...register('confirm', { required: 'Confirm the new password', validate: (v) => v === watch('newPassword') || 'Passwords do not match' })} />
           </Field>
-          <div><SubmitButton loading={savingPw}>Change Password</SubmitButton></div>
-        </form>
+        </Form>
       </Card>
     </Page>
   );

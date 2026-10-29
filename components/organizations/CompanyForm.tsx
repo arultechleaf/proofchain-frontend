@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { CheckField, Field, Grid, SubmitButton } from '@/components/ui';
+import { CheckField, Field, Grid, Form } from '@/components/ui';
 import type { Company } from '@/models';
 
 export interface CompanyFormValues {
@@ -37,7 +37,7 @@ export function CompanyForm({
   const { register, handleSubmit, formState: { errors } } = useForm<CompanyFormValues>({ defaultValues });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <Form onSubmit={handleSubmit(onSubmit)} loading={loading} submitLabel={submitLabel}>
       <Field label="Organization name" required error={errors.name?.message}>
         <input className="form-input" placeholder="Company C — Distributor"
           {...register('name', { required: 'Name is required', maxLength: { value: 100, message: 'Max 100 characters' } })} />
@@ -70,7 +70,6 @@ export function CompanyForm({
       {showActive && (
         <CheckField label="Organization is active" {...register('isActive')} />
       )}
-      <div><SubmitButton loading={loading}>{submitLabel}</SubmitButton></div>
-    </form>
+    </Form>
   );
 }

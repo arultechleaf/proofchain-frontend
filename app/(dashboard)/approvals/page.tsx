@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, XCircle, MessageSquare, Package, Building2, Hash, Calendar } from 'lucide-react';
-import { SearchInput } from '@/components/ui';
+import { SearchInput, Button } from '@/components/ui';
 import { deliveriesApi, approvalsApi } from '@/lib/api';
 import type { Delivery } from '@/models';
 import { formatRelative, statusLabel } from '@/lib/utils';
@@ -38,7 +38,7 @@ export default function ApprovalsPage() {
   };
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 900, color: '#e2e8f0' }}>
+    <div className="page" style={{ maxWidth: 900 }}>
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
@@ -137,38 +137,10 @@ export default function ApprovalsPage() {
                 />
 
               {/* Approve */}
-              <button
-                onClick={() => handleAction(d.id, 'approved')}
-                disabled={isBusy}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  height: 36, padding: '0 16px', borderRadius: 8, flexShrink: 0,
-                  background: isBusy ? 'rgba(5,150,105,0.1)' : 'rgba(5,150,105,0.15)',
-                  border: '1px solid rgba(16,185,129,0.35)',
-                  color: '#34d399', fontSize: 13, fontWeight: 600,
-                  cursor: isBusy ? 'not-allowed' : 'pointer', opacity: isBusy ? 0.6 : 1,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <CheckCircle2 size={15} /> Approve
-              </button>
+              <Button variant="success" icon={CheckCircle2} disabled={isBusy} onClick={() => handleAction(d.id, 'approved')}>Approve</Button>
 
               {/* Reject */}
-              <button
-                onClick={() => handleAction(d.id, 'rejected')}
-                disabled={isBusy}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  height: 36, padding: '0 16px', borderRadius: 8, flexShrink: 0,
-                  background: 'rgba(185,28,28,0.1)',
-                  border: '1px solid rgba(239,68,68,0.3)',
-                  color: '#f87171', fontSize: 13, fontWeight: 600,
-                  cursor: isBusy ? 'not-allowed' : 'pointer', opacity: isBusy ? 0.6 : 1,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                <XCircle size={15} /> Reject
-              </button>
+              <Button variant="danger" icon={XCircle} disabled={isBusy} onClick={() => handleAction(d.id, 'rejected')}>Reject</Button>
             </div>
           </div>
         );

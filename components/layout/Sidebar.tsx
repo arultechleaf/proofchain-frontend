@@ -245,6 +245,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   return (
     <aside
+      className="app-sidebar"
+      data-collapsed={collapsed}
       style={{
         width,
         minWidth: width,

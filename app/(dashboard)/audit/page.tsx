@@ -5,7 +5,7 @@ import { ClipboardList, Download, RefreshCw } from 'lucide-react';
 import { auditApi } from '@/lib/api';
 import type { AuditLog } from '@/models';
 import { formatDate, downloadBlob } from '@/lib/utils';
-import { Column, DataTable, EmptyState, Pager } from '@/components/ui';
+import { Column, DataTable, EmptyState, Pager, Button, Page, PageHeader } from '@/components/ui';
 
 const ACTION_STYLE: Record<string, { color: string; bg: string; border: string }> = {
   CREATE_DELIVERY:    { color: '#60a5fa', bg: 'rgba(37,99,235,0.1)',  border: 'rgba(59,130,246,0.25)' },
@@ -47,7 +47,7 @@ const columns: Column<AuditLog>[] = [
   {
     header: 'Details',
     cell: (l) => (
-      <span style={{ display: 'block', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', color: '#475569' }}>
+      <span className="audit-details">
         {l.details ? JSON.stringify(l.details).slice(0, 80) : '—'}
       </span>
     ),
@@ -82,38 +82,29 @@ export default function AuditPage() {
     } catch { } finally { setExporting(false); }
   };
 
-  const btnStyle: React.CSSProperties = { ...inputStyle, height: 36, padding: '0 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500 };
 
   return (
-    <div style={{ padding: '28px 32px', color: '#e2e8f0' }}>
-
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Audit Logs</h1>
-          <p style={{ color: '#475569', fontSize: 13, marginTop: 4 }}>{total} total entries</p>
-        </div>
-
-        {/* Controls */}
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <select
-            className="form-input form-input-sm" style={{ width: 140 }}
-            value={resourceType}
-            onChange={e => { setResourceType(e.target.value); setPage(1); }}
-          >
-            <option value="">All Types</option>
-            <option value="delivery">Delivery</option>
-            <option value="user">User</option>
-            <option value="auth">Auth</option>
-          </select>
-          <button onClick={fetchLogs} style={btnStyle} title="Refresh">
-            <RefreshCw size={13} color="#94a3b8" style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
-          </button>
-          <button onClick={handleExport} disabled={exporting} style={{ ...btnStyle, color: '#94a3b8' }}>
-            <Download size={13} /> Export CSV
-          </button>
-        </div>
-      </div>
+    <Page>
+      <PageHeader
+        title="Audit Logs"
+        subtitle={`${total} total entries`}
+        actions={
+          <>
+            <select
+              className="form-input form-input-sm" style={{ width: 140 }}
+              value={resourceType} aria-label="Resource type"
+              onChange={e => { setResourceType(e.target.value); setPage(1); }}
+            >
+              <option value="">All Types</option>
+              <option value="delivery">Delivery</option>
+              <option value="user">User</option>
+              <option value="auth">Auth</option>
+            </select>
+            <Button variant="secondary" size="sm" iconOnly icon={RefreshCw} iconSpin={loading} aria-label="Refresh" title="Refresh" onClick={fetchLogs} />
+            <Button variant="secondary" size="sm" icon={Download} loading={exporting} onClick={handleExport}>Export CSV</Button>
+          </>
+        }
+      />
 
       <DataTable
         compact
@@ -126,6 +117,6 @@ export default function AuditPage() {
         startIndex={(page - 1) * limit}
         footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
       />
-    </div>
+    </Page>
   );
 }

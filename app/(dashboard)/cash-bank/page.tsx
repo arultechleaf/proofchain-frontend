@@ -4,7 +4,7 @@
 import { ArrowLeftRight, Banknote, Landmark, Plus, Wallet } from 'lucide-react';
 import { formatDay, formatMoney } from '@/lib/utils';
 import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, SubmitButton, actionsColumn,
+  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, Form, actionsColumn,
 } from '@/components/ui';
 import { useCashBankController } from '@/controllers/cash-bank.controller';
 import { TX_LABEL, type BankTransaction } from '@/models/cash-bank';
@@ -77,7 +77,7 @@ export default function CashBankPage() {
 
       {c.form === 'account' && (
         <Card title={c.editingAccountId ? 'Edit account' : 'New account'} icon={Landmark} style={{ marginBottom: 20 }}>
-          <form className="form-stack" onSubmit={(e) => { e.preventDefault(); c.submitAccount(); }}>
+          <Form onSubmit={() => c.submitAccount()} loading={c.saving} submitLabel={c.editingAccountId ? 'Save changes' : 'Create account'} onCancel={c.closeForm}>
             <Grid cols={4}>
               <Field label="Name" required>
                 <input className="form-input" value={c.account.name} onChange={(e) => c.setAccount({ ...c.account, name: e.target.value })} placeholder="HDFC Current" required />
@@ -95,17 +95,13 @@ export default function CashBankPage() {
                 <input type="number" step="0.01" className="form-input" disabled={!!c.editingAccountId} value={c.account.openingBalance} onChange={(e) => c.setAccount({ ...c.account, openingBalance: e.target.value })} />
               </Field>
             </Grid>
-            <div className="toolbar" style={{ marginBottom: 0 }}>
-              <SubmitButton loading={c.saving}>{c.editingAccountId ? 'Save changes' : 'Create account'}</SubmitButton>
-              <button type="button" className="btn btn-ghost" onClick={c.closeForm}>Cancel</button>
-            </div>
-          </form>
+          </Form>
         </Card>
       )}
 
       {c.form === 'movement' && (
         <Card title="Deposit / withdrawal" icon={Plus} style={{ marginBottom: 20 }}>
-          <form className="form-stack" onSubmit={(e) => { e.preventDefault(); c.submitMovement(); }}>
+          <Form onSubmit={() => c.submitMovement()} loading={c.saving} submitLabel={"Save"} onCancel={c.closeForm}>
             <Grid cols={4}>
               <Field label="Account" required>
                 <select className="form-input" value={c.movement.accountId} onChange={(e) => c.setMovement({ ...c.movement, accountId: e.target.value })} required>
@@ -129,17 +125,13 @@ export default function CashBankPage() {
             <Field label="Description">
               <input className="form-input" value={c.movement.description} onChange={(e) => c.setMovement({ ...c.movement, description: e.target.value })} placeholder="Cheque deposit, petty cash…" />
             </Field>
-            <div className="toolbar" style={{ marginBottom: 0 }}>
-              <SubmitButton loading={c.saving}>Save</SubmitButton>
-              <button type="button" className="btn btn-ghost" onClick={c.closeForm}>Cancel</button>
-            </div>
-          </form>
+          </Form>
         </Card>
       )}
 
       {c.form === 'transfer' && (
         <Card title="Transfer between accounts" icon={ArrowLeftRight} style={{ marginBottom: 20 }}>
-          <form className="form-stack" onSubmit={(e) => { e.preventDefault(); c.submitTransfer(); }}>
+          <Form onSubmit={() => c.submitTransfer()} loading={c.saving} submitLabel={"Transfer"} onCancel={c.closeForm}>
             <Grid cols={4}>
               <Field label="From" required>
                 <select className="form-input" value={c.transfer.fromAccountId} onChange={(e) => c.setTransfer({ ...c.transfer, fromAccountId: e.target.value })} required>
@@ -160,11 +152,7 @@ export default function CashBankPage() {
                 <input type="date" className="form-input" value={c.transfer.transactionDate} onChange={(e) => c.setTransfer({ ...c.transfer, transactionDate: e.target.value })} />
               </Field>
             </Grid>
-            <div className="toolbar" style={{ marginBottom: 0 }}>
-              <SubmitButton loading={c.saving}>Transfer</SubmitButton>
-              <button type="button" className="btn btn-ghost" onClick={c.closeForm}>Cancel</button>
-            </div>
-          </form>
+          </Form>
         </Card>
       )}
 

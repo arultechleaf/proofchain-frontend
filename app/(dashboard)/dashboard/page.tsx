@@ -5,7 +5,7 @@ import { motion, animate } from 'framer-motion';
 import { Package, CheckCircle2, XCircle, Clock, Blocks, TrendingUp, RefreshCw, ArrowUpRight } from 'lucide-react';
 import { dashboardApi, reportsApi } from '@/lib/api';
 import { apiError, formatMoney, formatRelative, statusLabel, todayIso } from '@/lib/utils';
-import { Notice, Page, PageHeader, StatCard } from '@/components/ui';
+import { Notice, Page, PageHeader, StatCard, Button } from '@/components/ui';
 import Link from 'next/link';
 
 // ── Animated counter ──────────────────────────────────────────────────────────
@@ -124,9 +124,7 @@ export default function DashboardPage() {
       {loadError && (
         <Notice kind="error">
           {loadError}{' '}
-          <button onClick={fetchData} style={{ background: 'none', border: 0, color: '#60a5fa', cursor: 'pointer', textDecoration: 'underline', fontSize: 13 }}>
-            Try again
-          </button>
+          <Button variant="link" onClick={fetchData}>Try again</Button>
         </Notice>
       )}
 

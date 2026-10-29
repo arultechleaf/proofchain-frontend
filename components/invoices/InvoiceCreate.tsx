@@ -114,20 +114,20 @@ function InvoiceForm({ type }: { type: InvoiceType }) {
                   const units = UNITS.includes(l.unit) ? UNITS : [...UNITS, l.unit];
                   return (
                     <tr key={l.key}>
-                      <td>
+                      <td data-label="Product name">
                         <input className="cell-input" list="product-list" autoComplete="off" placeholder="Search product…" aria-label="Product name"
                           value={l.name} onChange={(e) => c.pickProduct(l.key, e.target.value)} />
                       </td>
-                      <td><input className="cell-input" aria-label="SKU" value={l.sku} onChange={(e) => c.updateLine(l.key, { sku: e.target.value })} /></td>
-                      <td><input className="cell-input" aria-label="HSN or SAC code" value={l.hsnCode} onChange={(e) => c.updateLine(l.key, { hsnCode: e.target.value })} /></td>
-                      <td><input type="number" step="any" min="0" className="cell-input" aria-label="Quantity" value={l.quantity} onChange={(e) => c.updateLine(l.key, { quantity: e.target.value })} /></td>
-                      <td>
+                      <td data-label="SKU"><input className="cell-input" aria-label="SKU" value={l.sku} onChange={(e) => c.updateLine(l.key, { sku: e.target.value })} /></td>
+                      <td data-label="HSN / SAC"><input className="cell-input" aria-label="HSN or SAC code" value={l.hsnCode} onChange={(e) => c.updateLine(l.key, { hsnCode: e.target.value })} /></td>
+                      <td data-label="Qty"><input type="number" step="any" min="0" className="cell-input" aria-label="Quantity" value={l.quantity} onChange={(e) => c.updateLine(l.key, { quantity: e.target.value })} /></td>
+                      <td data-label="Unit">
                         <select className="cell-input" aria-label="Unit" value={l.unit} onChange={(e) => c.updateLine(l.key, { unit: e.target.value })}>
                           {units.map((u) => <option key={u} value={u}>{u}</option>)}
                         </select>
                       </td>
-                      <td><input type="number" step="0.01" min="0" className="cell-input" aria-label="Price per unit" value={l.rate} onChange={(e) => c.updateLine(l.key, { rate: e.target.value })} /></td>
-                      <td>
+                      <td data-label="Price / unit"><input type="number" step="0.01" min="0" className="cell-input" aria-label="Price per unit" value={l.rate} onChange={(e) => c.updateLine(l.key, { rate: e.target.value })} /></td>
+                      <td data-label="Discount">
                         <div className="disc-cell">
                           <input type="number" step="0.01" min="0" className="cell-input" aria-label="Discount" value={l.discountValue}
                             onChange={(e) => c.updateLine(l.key, { discountValue: e.target.value })} />
@@ -139,14 +139,14 @@ function InvoiceForm({ type }: { type: InvoiceType }) {
                         </div>
                         {calc.error && <p className="cell-error">{calc.error}</p>}
                       </td>
-                      <td>
+                      <td data-label="GST %">
                         <select className="cell-input" aria-label="GST rate" value={l.taxRate} onChange={(e) => c.updateLine(l.key, { taxRate: e.target.value })}>
                           {rates.map((r) => <option key={r} value={String(r)}>{r}%</option>)}
                         </select>
                       </td>
-                      <td className="r">{formatMoney(calc.taxableAmount)}</td>
-                      <td className="r">{formatMoney(calc.gstAmount)}</td>
-                      <td className="r strong">{formatMoney(calc.lineTotal)}</td>
+                      <td className="r" data-label="Taxable">{formatMoney(calc.taxableAmount)}</td>
+                      <td className="r" data-label="GST amt">{formatMoney(calc.gstAmount)}</td>
+                      <td className="r strong" data-label="Line total">{formatMoney(calc.lineTotal)}</td>
                       <td>
                         {c.lines.length > 1 && (
                           <button type="button" className="btn btn-ghost" onClick={() => c.removeLine(l.key)} aria-label="Remove line">

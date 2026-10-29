@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { ArrowDownLeft, ArrowUpRight, Clock } from 'lucide-react';
 import { reportsApi } from '@/lib/api';
 import { formatDay, formatMoney } from '@/lib/utils';
-import {
-  Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, useAsync,
-} from '@/components/ui';
+import { Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, useAsync, Tabs } from '@/components/ui';
 
 interface OutstandingRow {
   id: string;
@@ -68,13 +66,8 @@ export default function OutstandingReportPage() {
     <Page>
       <PageHeader title="Outstanding" subtitle="Unpaid invoices and bills, aged from the due date" />
 
-      <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.7)', borderRadius: 10, padding: 3, width: 'fit-content', marginBottom: 18 }}>
-        {([['', 'All'], ['sale', 'Receivable'], ['purchase', 'Payable']] as const).map(([k, label]) => (
-          <button key={k} onClick={() => setType(k)} style={{
-            padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500, border: 0, cursor: 'pointer',
-            background: type === k ? 'rgba(37,99,235,0.25)' : 'transparent', color: type === k ? '#60a5fa' : '#94a3b8',
-          }}>{label}</button>
-        ))}
+      <div style={{ marginBottom: 18 }}>
+        <Tabs value={type} onChange={setType} options={[{ key: '', label: 'All' }, { key: 'sale', label: 'Receivable' }, { key: 'purchase', label: 'Payable' }] as const} />
       </div>
 
       {error ? <Notice kind="error">Could not load the report.</Notice> : null}

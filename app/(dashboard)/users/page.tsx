@@ -7,9 +7,7 @@ import { usersApi } from '@/lib/api';
 import type { User } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatRelative, roleLabel } from '@/lib/utils';
-import {
-  Column, DataTable, EmptyState, Notice, Page, PageHeader, RowActions, StatusBadge, actionsColumn, useAsync,
-} from '@/components/ui';
+import { Column, DataTable, EmptyState, Notice, Page, PageHeader, RowActions, StatusBadge, actionsColumn, useAsync, Button } from '@/components/ui';
 
 export default function UsersPage() {
   const { user: me } = useAuth();
@@ -86,9 +84,7 @@ export default function UsersPage() {
       {isAdmin && pending > 0 && (
         <Notice kind="info">
           {pending} account{pending > 1 ? 's are' : ' is'} inactive — new registrations stay inactive until you approve them.{' '}
-          <button onClick={() => setPendingOnly(!pendingOnly)} style={{ background: 'none', border: 0, color: '#60a5fa', cursor: 'pointer', textDecoration: 'underline', fontSize: 13 }}>
-            {pendingOnly ? 'Show everyone' : 'Show only inactive'}
-          </button>
+          <Button variant="link" onClick={() => setPendingOnly(!pendingOnly)}>{pendingOnly ? 'Show everyone' : 'Show only inactive'}</Button>
         </Notice>
       )}
       {error ? <Notice kind="error">Could not load users.</Notice> : null}

@@ -1,0 +1,153 @@
+/* ---------- Base ---------- */
+.custom_card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--modal-width);           /* 420px, overridden by `width` prop */
+  max-width: 100%;
+  padding: var(--space-8) var(--space-8) var(--space-6);
+  background-color: var(--bg-surface);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-xl);     /* "modals, cards" radius from globals */
+  font-family: var(--font-primary);
+  text-align: center;
+}
+
+/* ---------- Close button ---------- */
+.custom_card_close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--close-btn-size);        /* 24px */
+  height: var(--close-btn-size);
+  padding: 0;
+  background-color: var(--bg-close-btn);
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--color-gray-600);
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+.custom_card_close:hover {
+  background-color: var(--color-gray-300);
+}
+.custom_card_close:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+.custom_card_close svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* ---------- Status icon (circle + soft halo) ---------- */
+.custom_card_status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--status-icon-halo);      /* 72px */
+  height: var(--status-icon-halo);
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-full);
+}
+.custom_card_status_inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--status-icon);           /* 56px */
+  height: var(--status-icon);
+  border-radius: var(--radius-full);
+  color: var(--text-inverse);
+}
+.custom_card_status_inner svg {
+  width: 50%;
+  height: 50%;
+}
+
+/* ---------- Text ---------- */
+.custom_card_title {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-primary);
+  font-size: var(--fs-lg);             /* 20px modal titles */
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  color: var(--text-heading);
+}
+
+.custom_card_description {
+  margin: 0 0 var(--space-6);
+  max-width: 100%;
+  font-size: var(--fs-sm);             /* 14px */
+  line-height: var(--lh-snug);
+  color: var(--text-body);
+}
+
+/* ---------- Actions ---------- */
+.custom_card_actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* ---------- Variants ---------- */
+
+/* Confirm – "Are you sure?" (no icon, navy title) */
+.custom_card_confirm .custom_card_title {
+  color: var(--color-primary-hover);
+}
+.custom_card_confirm .custom_card_description {
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-8);
+}
+
+/* Status variants use a smaller description, like the design */
+.custom_card_success .custom_card_description,
+.custom_card_failed .custom_card_description,
+.custom_card_error .custom_card_description {
+  font-size: var(--fs-xs);             /* 12px */
+}
+
+/* Success – green */
+.custom_card_success .custom_card_status {
+  background-color: var(--color-success-light);
+}
+.custom_card_success .custom_card_status_inner {
+  background-color: var(--color-success);
+}
+.custom_card_success .custom_card_title {
+  color: var(--color-success);
+}
+
+/* Failed / Error – red */
+.custom_card_failed .custom_card_status,
+.custom_card_error .custom_card_status {
+  background-color: var(--color-danger-light);
+}
+.custom_card_failed .custom_card_status_inner,
+.custom_card_error .custom_card_status_inner {
+  background-color: var(--color-danger);
+}
+.custom_card_failed .custom_card_title,
+.custom_card_error .custom_card_title {
+  color: var(--color-danger);
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 768px) {
+  .custom_card {
+    padding: var(--space-6) var(--space-5) var(--space-5);
+  }
+  .custom_card_actions > * {
+    flex: 1;
+    min-width: 0;
+  }
+}

@@ -35,17 +35,17 @@ export function LineItemsCard({ title = 'Items', items, lines, onUpdate, onPickI
           <tbody>
             {lines.map((l) => (
               <tr key={l.key}>
-                <td>
+                <td data-label="Item">
                   <select className="form-input" value={l.itemId} onChange={(e) => onPickItem(l.key, e.target.value)} aria-label="Item">
                     <option value="">Custom line</option>
                     {items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
                   </select>
                 </td>
-                <td><input className="form-input" value={l.description} onChange={(e) => onUpdate(l.key, { description: e.target.value })} aria-label="Description" /></td>
-                <td><input type="number" step="any" min="0" className="form-input" value={l.quantity} onChange={(e) => onUpdate(l.key, { quantity: e.target.value })} aria-label="Quantity" /></td>
-                <td><input type="number" step="0.01" min="0" className="form-input" value={l.rate} onChange={(e) => onUpdate(l.key, { rate: e.target.value })} aria-label="Rate" /></td>
-                <td><input type="number" step="0.01" min="0" max="100" className="form-input" value={l.taxRate} onChange={(e) => onUpdate(l.key, { taxRate: e.target.value })} aria-label="Tax percent" /></td>
-                <td className="amount">{formatMoney(Math.round(num(l.quantity) * num(l.rate) * 100) / 100)}</td>
+                <td data-label="Description"><input className="form-input" value={l.description} onChange={(e) => onUpdate(l.key, { description: e.target.value })} aria-label="Description" /></td>
+                <td data-label="Qty"><input type="number" step="any" min="0" className="form-input" value={l.quantity} onChange={(e) => onUpdate(l.key, { quantity: e.target.value })} aria-label="Quantity" /></td>
+                <td data-label="Rate"><input type="number" step="0.01" min="0" className="form-input" value={l.rate} onChange={(e) => onUpdate(l.key, { rate: e.target.value })} aria-label="Rate" /></td>
+                <td data-label="Tax %"><input type="number" step="0.01" min="0" max="100" className="form-input" value={l.taxRate} onChange={(e) => onUpdate(l.key, { taxRate: e.target.value })} aria-label="Tax percent" /></td>
+                <td className="amount" data-label="Amount">{formatMoney(Math.round(num(l.quantity) * num(l.rate) * 100) / 100)}</td>
                 <td>
                   {lines.length > 1 && (
                     <button type="button" className="btn btn-ghost" onClick={() => onRemove(l.key)} aria-label="Remove line"><Trash2 size={15} color="#f87171" /></button>

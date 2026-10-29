@@ -71,7 +71,7 @@ export default function OrganizationsPage() {
   }, []);
 
   return (
-    <div style={{ padding: '28px 32px', color: '#e2e8f0' }}>
+    <div className="page">
 
       {/* Header */}
       <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>

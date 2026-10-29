@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { invoicesApi, partiesApi, paymentsApi } from '@/lib/api';
 import type { Invoice, Party } from '@/models';
 import { apiError, formatMoney, todayIso } from '@/lib/utils';
-import { Card, Field, Grid, Notice, Page, PageHeader, Spinner, SubmitButton, useAsync } from '@/components/ui';
+import { Card, Field, Grid, Page, PageHeader, Spinner, Form, useAsync, Tabs } from '@/components/ui';
 
 const METHODS = ['cash', 'bank', 'upi', 'card', 'cheque', 'other'];
 
@@ -94,18 +94,11 @@ function RecordPayment() {
     <Page narrow>
       <PageHeader title="Record Payment" subtitle="Money received from a customer or paid to a supplier" backHref="/payments" />
       <Card>
-        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {error && <Notice kind="error">{error}</Notice>}
+        <Form onSubmit={submit} loading={submitting} submitLabel="Save Payment" error={error || undefined}>
 
-          <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.7)', borderRadius: 10, padding: 3 }}>
-            {([['in', 'Received from customer'], ['out', 'Paid to supplier']] as const).map(([key, label]) => (
-              <button type="button" key={key} onClick={() => { setDirection(key); setInvoiceId(''); setPartyId(''); setAmount(''); }} style={{
-                flex: 1, padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: 0, cursor: 'pointer',
-                background: direction === key ? (key === 'in' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)') : 'transparent',
-                color: direction === key ? (key === 'in' ? '#34d399' : '#f87171') : '#94a3b8',
-              }}>{label}</button>
-            ))}
-          </div>
+          <Tabs fill value={direction}
+            onChange={(k) => { setDirection(k); setInvoiceId(''); setPartyId(''); setAmount(''); }}
+            options={[{ key: 'in', label: 'Received from customer', tone: 'success' }, { key: 'out', label: 'Paid to supplier', tone: 'danger' }] as const} />
 
           <Field label={direction === 'in' ? 'Customer' : 'Supplier'} required>
             <select className="form-input" value={partyId} onChange={(e) => { setPartyId(e.target.value); setInvoiceId(''); }}>
@@ -143,9 +136,7 @@ function RecordPayment() {
           <Field label="Notes">
             <input className="form-input" value={notes} onChange={(e) => setNotes(e.target.value)} />
           </Field>
-
-          <div><SubmitButton loading={submitting}>Save Payment</SubmitButton></div>
-        </form>
+        </Form>
       </Card>
     </Page>
   );

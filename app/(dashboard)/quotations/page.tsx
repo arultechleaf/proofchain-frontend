@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { FileText, Plus } from 'lucide-react';
 import { formatDay, formatMoney } from '@/lib/utils';
-import { Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatusBadge, actionsColumn } from '@/components/ui';
+import { Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatusBadge, actionsColumn, Tabs } from '@/components/ui';
 import { useQuotationListController } from '@/controllers/quotation.controller';
 import { QUOTATION_STATUS_TABS, type Quotation } from '@/models/quotation';
 
@@ -38,11 +38,7 @@ export default function QuotationsPage() {
       />
 
       <div className="toolbar">
-        <div className="seg">
-          {QUOTATION_STATUS_TABS.map((t) => (
-            <button key={t.key} className={c.status === t.key ? 'active' : undefined} onClick={() => c.selectStatus(t.key)}>{t.label}</button>
-          ))}
-        </div>
+        <Tabs value={c.status} onChange={c.selectStatus} options={QUOTATION_STATUS_TABS} />
         <form className="toolbar-grow" onSubmit={(e) => { e.preventDefault(); c.submitSearch(); }}>
           <SearchInput placeholder="Search number or customer…" value={c.search} onChange={(e) => c.setSearch(e.target.value)} />
         </form>

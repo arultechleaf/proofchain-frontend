@@ -1,0 +1,112 @@
+
+.datePicker {
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dateInput {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 12px 44px 12px 14px;
+  border: 1px solid #d1dbea;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #111827;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  color-scheme: light;
+}
+
+.dateInput:focus {
+  border-color: #315be8;
+  box-shadow: 0 0 0 3px rgb(49 91 232 / 12%);
+}
+
+.dateInput.invalid,
+.dateInput.invalid:focus {
+  border-color: #d82424;
+  box-shadow: none;
+}
+
+.dateInput:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.customDateInput {
+  border-radius: 12px;
+  min-height: 52px;
+}
+
+.calendarIcon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  pointer-events: none;
+}
+
+.disabledIcon {
+  color: #9ca3af;
+}
+
+.rangeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.helperText {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+@media (max-width: 600px) {
+  .rangeGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.required {
+  color: #d82424;
+}
+css
+.invalid {
+  border-color: #d82424;
+}
+
+.errorText {
+  color: #d82424;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 4px;
+  margin-bottom: 0;
+}

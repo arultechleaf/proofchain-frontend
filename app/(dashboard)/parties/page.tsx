@@ -4,9 +4,7 @@
 import Link from 'next/link';
 import { Plus, Users } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
-import {
-  Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatusBadge, actionsColumn,
-} from '@/components/ui';
+import { Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatusBadge, actionsColumn, Tabs } from '@/components/ui';
 import { PARTY_TABS, usePartyListController } from '@/controllers/party.controller';
 import { PARTY_TYPE_LABEL, type Party } from '@/models/party';
 
@@ -48,15 +46,7 @@ export default function PartiesPage() {
       />
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.7)', borderRadius: 10, padding: 3 }}>
-          {PARTY_TABS.map((t) => (
-            <button key={t.key} onClick={() => c.selectType(t.key)} style={{
-              padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 500, border: 0, cursor: 'pointer',
-              background: c.type === t.key ? 'rgba(37,99,235,0.25)' : 'transparent',
-              color: c.type === t.key ? '#60a5fa' : '#94a3b8',
-            }}>{t.label}</button>
-          ))}
-        </div>
+        <Tabs value={c.type} onChange={c.selectType} options={PARTY_TABS} />
         <form onSubmit={(e) => { e.preventDefault(); c.submitSearch(); }} style={{ flex: 1, minWidth: 220, display: 'flex' }}>
           <SearchInput placeholder="Search name, phone or email..." value={c.search} onChange={(e) => c.setSearch(e.target.value)} />
         </form>

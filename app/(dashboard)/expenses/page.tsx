@@ -4,7 +4,7 @@
 import { Plus, Receipt, TrendingDown } from 'lucide-react';
 import { formatDay, formatMoney } from '@/lib/utils';
 import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatCard, SubmitButton, actionsColumn,
+  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatCard, Form, actionsColumn,
 } from '@/components/ui';
 import { useExpenseController } from '@/controllers/expense.controller';
 import { EXPENSE_METHODS, type Expense } from '@/models/expense';
@@ -45,7 +45,7 @@ export default function ExpensesPage() {
 
       {c.showForm && (
         <Card title={c.editingId ? 'Edit expense' : 'New expense'} icon={Receipt} style={{ marginBottom: 20 }}>
-          <form className="form-stack" onSubmit={(e) => { e.preventDefault(); c.submit(); }}>
+          <Form onSubmit={() => c.submit()} loading={c.saving} submitLabel={c.editingId ? 'Save changes' : 'Save expense'} onCancel={c.toggleForm}>
             <Grid cols={4}>
               <Field label="Category" required hint="Pick an existing one or type a new one">
                 <input className="form-input" list="expense-categories" value={c.form.category}
@@ -74,11 +74,7 @@ export default function ExpensesPage() {
                 <input className="form-input" value={c.form.reference} onChange={(e) => c.setForm({ ...c.form, reference: e.target.value })} />
               </Field>
             </Grid>
-            <div className="toolbar" style={{ marginBottom: 0 }}>
-              <SubmitButton loading={c.saving}>{c.editingId ? 'Save changes' : 'Save expense'}</SubmitButton>
-              <button type="button" className="btn btn-ghost" onClick={c.toggleForm}>Cancel</button>
-            </div>
-          </form>
+          </Form>
         </Card>
       )}
 

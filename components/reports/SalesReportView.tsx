@@ -5,9 +5,7 @@ import { BarChart3, Coins, Percent, Receipt, Wallet } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { reportsApi } from '@/lib/api';
 import { formatDay, formatMoney, todayIso } from '@/lib/utils';
-import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, StatCard, useAsync,
-} from '@/components/ui';
+import { Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, StatCard, useAsync, Tabs } from '@/components/ui';
 
 interface SalesReport {
   type: 'sale' | 'purchase';
@@ -56,14 +54,7 @@ export function SalesReportView({ lockType }: { lockType?: 'sale' | 'purchase' }
 
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          {!lockType && <div style={{ display: 'flex', gap: 4, background: 'rgba(15,23,42,0.7)', borderRadius: 10, padding: 3 }}>
-            {([['sale', 'Sales'], ['purchase', 'Purchases']] as const).map(([k, label]) => (
-              <button key={k} onClick={() => setType(k)} style={{
-                padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500, border: 0, cursor: 'pointer',
-                background: type === k ? 'rgba(37,99,235,0.25)' : 'transparent', color: type === k ? '#60a5fa' : '#94a3b8',
-              }}>{label}</button>
-            ))}
-          </div>}
+          {!lockType && <Tabs value={type} onChange={setType} options={[{ key: 'sale', label: 'Sales' }, { key: 'purchase', label: 'Purchases' }] as const} />}
           <Field label="From">
             <input type="date" className="form-input" value={from} max={to} onChange={(e) => setFrom(e.target.value)} />
           </Field>

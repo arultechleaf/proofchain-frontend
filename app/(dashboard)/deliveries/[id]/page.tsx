@@ -9,6 +9,7 @@ import { deliveriesApi, approvalsApi, verificationApi } from '@/lib/api';
 import type { Delivery, Approval, ProofRecord, VerificationResult } from '@/models';
 import { formatDate, formatRelative, statusColor, statusLabel, truncateHash, copyToClipboard } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
+import { Tabs } from '@/components/ui';
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -119,14 +120,8 @@ export default function DeliveryDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-slate-900/60 rounded-lg w-fit border border-slate-800">
-        {(['details','proof','approvals'] as const).map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors capitalize ${activeTab === tab ? 'bg-slate-800 text-slate-100' : 'text-slate-500 hover:text-slate-300'}`}>
-            {tab}
-          </button>
-        ))}
-      </div>
+      <Tabs value={activeTab} onChange={setActiveTab}
+        options={(['details', 'proof', 'approvals'] as const).map((t) => ({ key: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))} />
 
       {activeTab === 'details' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 lg:grid-cols-3 gap-4">

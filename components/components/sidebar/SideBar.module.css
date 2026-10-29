@@ -1,0 +1,400 @@
+/* ==========================================================================
+   SETTINGS  (the values you are most likely to change)
+   ========================================================================== */
+.sidebar_shell {
+  --sidebar-width: 240px;               /* opened width (or use the `sidebarWidth` prop) */
+  --sidebar-header-height: 64px;
+  /* icon-only width = icon + the same 20px side padding the rows use,
+     so the icons never move while the sidebar opens and closes */
+  --sidebar-collapsed-width: calc(var(--space-5) * 2 + var(--icon-sm) + var(--border-width));
+  /* layer behind the sidebar on phones. transparent = the page stays fully visible.
+     For a light dim use e.g. rgba(0, 0, 0, 0.08) */
+  --sidebar-overlay-bg: transparent;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-body);
+  font-family: var(--font-primary);
+}
+
+/* ==========================================================================
+   PAGE LAYOUT  (header on top, sidebar + content below)
+   ========================================================================== */
+.sidebar_body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.sidebar_content {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-6);
+}
+
+/* The aside is the white box. It stays in view while the page scrolls and
+   clips the text away when it gets narrow (icon-only mode). */
+.sidebar_aside {
+  position: sticky;
+  top: var(--sidebar-header-height);
+  align-self: flex-start;
+  flex-shrink: 0;
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--sidebar-header-height));
+  overflow: hidden;
+  background-color: var(--bg-surface);
+  border-right: var(--border-width) solid var(--border-color);
+}
+.sidebar_shell_collapsed .sidebar_aside {
+  width: var(--sidebar-collapsed-width);
+}
+
+.sidebar_overlay {
+  display: none;                        /* phones only, see the bottom of this file */
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.sidebar_header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  height: var(--sidebar-header-height);
+  padding: 0 var(--space-6);
+  background-color: var(--bg-surface);
+  border-bottom: var(--border-width) solid var(--border-color);
+}
+
+.sidebar_header_left,
+.sidebar_header_right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: -15px;
+}
+.sidebar_header_right {
+  gap: var(--space-5);
+}
+.sidebar_header_center {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* ----- hamburger ----- */
+.sidebar_header_menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-height-md);
+  height: var(--btn-height-md);
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-body);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sidebar_header_menu:hover {
+  background-color: var(--bg-subtle);
+}
+.sidebar_header_menu svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+
+/* ----- cart ----- */
+.sidebar_header_cart {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-1);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sidebar_header_cart:hover {
+  color: var(--color-primary-hover);
+}
+.sidebar_header_cart_icon {
+  position: relative;
+  display: inline-flex;
+}
+.sidebar_header_cart_icon svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+.sidebar_header_cart_label {
+  font-size: 10px;                      /* smaller than --fs-xs, matches the design */
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  color: var(--text-body);
+}
+.sidebar_header_badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 var(--space-1);
+  background-color: var(--color-danger);
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  color: var(--text-inverse);
+}
+
+/* ----- avatar ----- */
+.sidebar_header_avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--color-primary-light);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: box-shadow var(--transition-fast);
+}
+.sidebar_header_avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* keyboard focus ring for every header button */
+.sidebar_header_menu:focus-visible,
+.sidebar_header_cart:focus-visible,
+.sidebar_header_avatar:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* ==========================================================================
+   NAVIGATION
+   ========================================================================== */
+.sidebar_nav {
+  width: calc(var(--sidebar-width) - var(--border-width));
+  height: 100vh;
+  padding: var(--space-2) 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.sidebar_nav_list,
+.sidebar_nav_sublist {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+/* ----- one row (link or button) ----- */
+.sidebar_nav_row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--btn-height-md);
+  padding: 0 var(--space-4) 0 var(--space-5);
+  background-color: transparent;
+  border: none;
+  font-family: var(--font-primary);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-tight);
+  text-align: left;
+  text-decoration: none;
+  color: var(--text-link);
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+.sidebar_nav_row:hover {
+  background-color: var(--bg-subtle);
+}
+.sidebar_nav_row:focus-visible {
+  outline: none;
+  box-shadow: inset var(--shadow-focus);
+}
+
+/* selected row */
+.sidebar_nav_row_active,
+.sidebar_nav_row_active:hover {
+  background-color: var(--color-secondary-light);
+  color: var(--color-primary-hover);
+  font-weight: var(--fw-bold);
+}
+
+/* sub-links */
+.sidebar_nav_row_child {
+  min-height: var(--btn-height-sm);
+  padding-left: calc(var(--space-5) + var(--icon-sm) + var(--space-3));
+}
+
+/* ----- icon ----- */
+.sidebar_nav_icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+.sidebar_nav_icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ----- text ----- */
+.sidebar_nav_label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ----- arrow ----- */
+.sidebar_nav_arrow {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: var(--icon-xs, 14px);
+  height: var(--icon-xs, 14px);
+  color: var(--text-body);
+}
+.sidebar_nav_arrow svg {
+  width: 100%;
+  height: 100%;
+}
+.sidebar_nav_arrow_open {
+  transform: rotate(90deg);
+}
+
+/* ----- dropdown panel ----- */
+.sidebar_nav_panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+.sidebar_nav_panel_open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+.sidebar_nav_sublist {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   ICON-ONLY MODE
+   ========================================================================== */
+.sidebar_shell_collapsed .sidebar_nav_label,
+.sidebar_shell_collapsed .sidebar_nav_arrow {
+  opacity: 0;
+}
+
+.sidebar_shell_collapsed .sidebar_nav_panel,
+.sidebar_shell_collapsed .sidebar_nav_panel_open {
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.sidebar_shell_collapsed .sidebar_nav_row_parent_active {
+  background-color: var(--color-secondary-light);
+  color: var(--color-primary-hover);
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+.sidebar_shell_animated .sidebar_aside {
+  transition: width var(--transition-base);
+}
+.sidebar_shell_animated .sidebar_nav_label {
+  transition: opacity var(--transition-base);
+}
+.sidebar_shell_animated .sidebar_nav_arrow {
+  transition: opacity var(--transition-base), transform var(--transition-fast);
+}
+.sidebar_shell_animated .sidebar_nav_panel {
+  transition: grid-template-rows var(--transition-base), visibility var(--transition-base);
+}
+
+/* ==========================================================================
+   PHONES
+   ========================================================================== */
+@media (max-width: 768px) {
+  .sidebar_header {
+    padding: 0 var(--space-4);
+  }
+  .sidebar_header_right {
+    gap: var(--space-3);
+  }
+  .sidebar_content {
+    padding: var(--space-4);
+  }
+
+  .sidebar_aside,
+  .sidebar_shell_collapsed .sidebar_aside {
+    position: fixed;
+    top: var(--sidebar-header-height);
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: auto;
+    z-index: var(--z-sticky);
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar_shell_collapsed .sidebar_aside {
+    transform: translateX(-100%);
+    visibility: hidden;
+    box-shadow: none;
+  }
+  .sidebar_shell_animated .sidebar_aside {
+    transition: transform var(--transition-base),
+                visibility var(--transition-base),
+                box-shadow var(--transition-base);
+  }
+
+  .sidebar_shell_collapsed .sidebar_nav_label,
+  .sidebar_shell_collapsed .sidebar_nav_arrow {
+    opacity: 1;
+  }
+
+  .sidebar_overlay {
+    display: block;
+    position: fixed;
+    top: var(--sidebar-header-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--z-dropdown);
+    background-color: var(--sidebar-overlay-bg);
+  }
+  .sidebar_shell_collapsed .sidebar_overlay {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

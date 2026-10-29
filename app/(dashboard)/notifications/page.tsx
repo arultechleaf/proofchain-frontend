@@ -6,7 +6,7 @@ import { Bell, CheckCheck, CheckCircle2, CreditCard, FileText, Package, Trash2, 
 import { notificationsApi } from '@/lib/api';
 import type { AppNotification, NotificationType } from '@/models';
 import { apiError, formatRelative } from '@/lib/utils';
-import { Card, EmptyState, Notice, Page, PageHeader, Pager, Spinner, useAsync } from '@/components/ui';
+import { Card, EmptyState, Notice, Page, PageHeader, Pager, Spinner, useAsync, Tabs } from '@/components/ui';
 
 interface NotificationList {
   data: AppNotification[];
@@ -73,13 +73,9 @@ export default function NotificationsPage() {
       {error ? <Notice kind="error">Could not load notifications.</Notice> : null}
       {actionError ? <Notice kind="error">{actionError}</Notice> : null}
 
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
-        {([[false, 'All'], [true, 'Unread']] as const).map(([v, label]) => (
-          <button key={label} className={unreadOnly === v ? 'btn btn-primary' : 'btn btn-secondary'}
-            onClick={() => { setUnreadOnly(v); setPage(1); }}>
-            {label}
-          </button>
-        ))}
+      <div style={{ marginBottom: 16 }}>
+        <Tabs value={String(unreadOnly)} onChange={(k) => { setUnreadOnly(k === 'true'); setPage(1); }}
+          options={[{ key: 'false', label: 'All' }, { key: 'true', label: 'Unread' }]} />
       </div>
 
       <Card style={{ padding: 0 }}>

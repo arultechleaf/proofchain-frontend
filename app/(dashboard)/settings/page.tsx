@@ -45,7 +45,7 @@ export default function SettingsPage() {
   );
 
   return (
-    <div style={{ padding: '28px 32px', maxWidth: 780, color: '#e2e8f0' }}>
+    <div className="page" style={{ maxWidth: 780 }}>
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
