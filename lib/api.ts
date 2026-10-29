@@ -45,17 +45,32 @@ export const api = axios.create({
 
 const PUBLIC_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'];
 
+// ── Global loading indicator ─────────────────────────────────────────────────
+// <GlobalLoader> registers a setter here; it is switched on while any request is in flight.
+let pendingRequests = 0;
+let setGlobalLoading: ((loading: boolean) => void) | undefined;
+
+export function registerLoading(setter: ((loading: boolean) => void) | undefined) {
+  setGlobalLoading = setter;
+  pendingRequests = 0;
+}
+
+const requestStarted = () => { pendingRequests += 1; setGlobalLoading?.(true); };
+const requestFinished = () => { pendingRequests = Math.max(0, pendingRequests - 1); if (pendingRequests === 0) setGlobalLoading?.(false); };
+
 // ── Request interceptor — attach JWT ──────────────────────────────────────────
 api.interceptors.request.use((config) => {
+  requestStarted();
   const token = session.getToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
-});
+}, (err) => { requestFinished(); return Promise.reject(err); });
 
 // ── Response interceptor — handle 401 ────────────────────────────────────────
 api.interceptors.response.use(
-  (res) => res,
+  (res) => { requestFinished(); return res; },
   (err) => {
+    requestFinished();
     // A 401 from the sign-in form itself means "wrong password", not "session expired":
     // redirecting would reload the page and throw the error message away.
     const onPublicPage = typeof window !== 'undefined' && PUBLIC_PATHS.includes(window.location.pathname);
