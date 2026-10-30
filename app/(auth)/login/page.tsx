@@ -98,13 +98,10 @@ export default function LoginPage() {
         transition={{ duration: 0.45 }}
         className="auth-wrap auth-wrap-lg"
       >
-        {/* Logo */}
-        <div className="auth-brand auth-brand-lg">
-          <img src="/inventory-audit-hexlens-A-logo.svg" alt="Inventory Audit" className="auth-logo-img auth-logo-img-lg" />
-        </div>
 
-        {/* Form card */}
+{/* Form card */}
         <div className="glass-card auth-card auth-card-lg">
+          <img src="/A_logo.svg" alt="Inventory Audit" className="auth-logo-img" />
           <h2 className="auth-card-title">Sign In</h2>
 
           {/* Error */}

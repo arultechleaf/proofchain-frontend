@@ -9,6 +9,7 @@ import {
 } from '@/components/ui';
 import { MOVE_PAGE_SIZE, useInventoryController } from '@/controllers/inventory.controller';
 import { REASON_LABEL, type Movement, type StockItem } from '@/models/inventory';
+import { ExportButtons } from '@/components/ui/ExportButtons';
 
 export default function InventoryPage() {
   const c = useInventoryController();
@@ -119,6 +120,7 @@ export default function InventoryPage() {
           <input type="date" className="form-input" style={{ width: 150 }} value={c.to} min={c.from || undefined} onChange={(e) => c.setTo(e.target.value)} aria-label="To" />
           {(c.reason || c.itemId || c.from || c.to) && <Button variant="ghost" size="sm" onClick={c.clearFilters}>Clear</Button>}
           <Button variant="secondary" size="sm" icon={Download} loading={c.exporting} onClick={c.exportCsv}>Export CSV</Button>
+          <ExportButtons onExport={c.exportFile} disabled={c.movesLoading || !c.movesTotal} />
         </div>
         <DataTable bare columns={moveColumns} rows={c.moves} loading={c.movesLoading} rowKey={(m) => m.id}
           empty={<EmptyState icon={Boxes} title="No movements match" />}

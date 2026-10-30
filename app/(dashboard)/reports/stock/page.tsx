@@ -7,6 +7,8 @@ import { reportsApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import type { StockItem, StockSummary } from '@/models/inventory';
 import { formatMoney } from '@/lib/utils';
+import { exportRows, type ExportFormat } from '@/lib/export';
+import { ExportButtons } from '@/components/ui/ExportButtons';
 import {
   Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, useAsync,
 } from '@/components/ui';
@@ -43,9 +45,30 @@ export default function StockReportPage() {
     },
   ];
 
+  const exportStock = (format: ExportFormat) => exportRows(format, {
+    title: 'Stock Report',
+    filename: 'stock-report',
+    rows: items,
+    notes: [
+      `Branch: ${branches.find((b) => String(b.id) === branchId)?.name ?? 'All branches / godowns'}`,
+      `Items: ${items.length} · Stock value: ${formatMoney(t?.stockValue)}`,
+    ],
+    columns: [
+      { header: 'Item', value: (i) => i.name },
+      ...(acrossCompanies ? [{ header: 'Company', value: (i: StockItem) => i.companyName ?? '' }] : []),
+      { header: 'SKU', value: (i) => i.sku },
+      { header: 'Unit', value: (i) => i.unit },
+      { header: branchId ? 'At this branch' : 'In stock', value: (i) => i.stock, align: 'right' },
+      { header: 'Purchase price', value: (i) => i.purchasePrice, display: (i) => formatMoney(i.purchasePrice), align: 'right' },
+      { header: 'Stock value', value: (i) => i.stock * i.purchasePrice, display: (i) => formatMoney(i.stock * i.purchasePrice), align: 'right' },
+      { header: 'Retail value', value: (i) => i.stock * i.salePrice, display: (i) => formatMoney(i.stock * i.salePrice), align: 'right' },
+      { header: 'Status', value: (i) => (i.stock <= 0 ? 'Out of stock' : i.lowStock ? 'Low' : 'OK') },
+    ],
+  });
+
   return (
     <Page>
-      <PageHeader title="Stock Report" />
+      <PageHeader title="Stock Report" actions={<ExportButtons onExport={exportStock} disabled={loading || !items.length} />} />
       {error ? <Notice kind="error">Could not load the report.</Notice> : null}
 
       <div className="toolbar">

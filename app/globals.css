@@ -1332,7 +1332,7 @@ textarea.form-input { resize: none; }
   width: 100%;
   align-items: center;
   justify-content: center;
-  background: #fff url('/blockchain-bg.svg') center center / cover no-repeat fixed;
+  background: #fff;
 }
 .page-center.auth-bg .auth-bg-layer,
 .page-center.auth-bg .auth-orb,
@@ -1357,8 +1357,10 @@ textarea.form-input { resize: none; }
 .auth-logo-lg { width: 64px; height: 64px; border-radius: 18px; margin-bottom: 14px; }
 .auth-logo-icon { width: 26px; height: 26px; color: #fff; }
 .auth-logo-lg .auth-logo-icon { width: 30px; height: 30px; }
-.auth-logo-img { display: block; width: 150px; height: 150px; margin: 0 auto 12px; border-radius: 20px; background: #fff; box-shadow: 0 0 32px rgba(34,168,102,0.3); }
-.auth-logo-img-lg { width: 180px; height: 180px; margin-bottom: 14px; }
+.auth-logo-img { object-fit: contain; display: block; width: 150px; height: 150px; margin: 0 auto 12px; background: transparent; }
+.auth-logo-img-lg { width: 130px; height: 130px; margin-bottom: 10px; }
+.auth-logo-img { width: 110px; height: 110px; }
+.auth-logo-img.auth-logo-img-lg { width: 130px; height: 130px; }
 .auth-brand-name { font-size: 26px; font-weight: 800; line-height: 1.1; }
 .auth-brand-lg .auth-brand-name { font-size: 30px; }
 .auth-tagline { color: #64748b; font-size: 13px; margin-top: 6px; }
@@ -1447,6 +1449,13 @@ textarea.form-input { resize: none; }
   display: block; font-size: 11px; color: #475569;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+/* on the white auth card */
+.auth-card .dev-accounts { border-top-color: #e2e8f0; }
+.auth-card .dev-accounts-title { color: #64748b; }
+.auth-card .dev-account-btn { background: #f8fafc; border-color: #cbd5e1; }
+.auth-card .dev-account-btn:hover { border-color: #127a52; }
+.auth-card .dev-account-label { color: #0f2147; }
+.auth-card .dev-account-email { color: #475569; }
 
 /* Rows of stat cards: identical columns in every row so the cards line up */
 .stat-grid {
@@ -1862,3 +1871,50 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   .entry-row { grid-template-columns: minmax(0, 1fr) 120px; }
   .entry-row > span:nth-child(2) { display: none; }
 }
+
+/* The light theme above inverts the whole page. The auth pages are designed white in both themes,
+   so invert them back (and keep images, already corrected once, as they are). */
+html[data-theme='light'] .page-center.auth-bg { filter: invert(1) hue-rotate(180deg); }
+html[data-theme='light'] .page-center.auth-bg img { filter: none; }
+
+/* Step-by-step sign-up */
+.wizard-steps { display: flex; gap: 6px; list-style: none; padding: 0; margin: 0 0 18px; }
+.wizard-steps li { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; font-size: 11px; color: #94a3b8; }
+.wizard-steps li::before { content: ''; position: absolute; top: 11px; left: -50%; width: 100%; height: 2px; background: #e2e8f0; z-index: 0; }
+.wizard-steps li:first-child::before { display: none; }
+.wizard-steps li.done::before, .wizard-steps li.current::before { background: #127a52; }
+.wizard-dot {
+  position: relative; z-index: 1; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; background: #fff; border: 2px solid #cbd5e1; color: #64748b;
+}
+.wizard-steps li.current .wizard-dot { border-color: #127a52; color: #127a52; }
+.wizard-steps li.done .wizard-dot { background: #127a52; border-color: #127a52; color: #fff; }
+.wizard-steps li.current, .wizard-steps li.done { color: #0f2147; font-weight: 600; }
+.wizard-actions { display: flex; gap: 10px; margin-top: 4px; }
+.wizard-actions .btn { flex: 1; }
+
+/* Sign-up wizard layout: wider card, pinned to the top, light Back button */
+.page-center.auth-bg.auth-top { align-items: flex-start; padding: 40px 0 48px; }
+.auth-wrap-wide { max-width: 580px; }
+.auth-card .wizard-actions .btn-secondary { background: #fff; color: #0f2147; border: 1px solid #94a3b8; }
+.auth-card .wizard-actions .btn-secondary:hover { background: #f1f5f9; }
+.auth-card .wizard-actions { margin-top: 8px; }
+
+/* Logo inside the card, the same size on every auth page */
+.auth-card .auth-logo-img,
+.auth-card .auth-logo-img.auth-logo-img-lg { display: block; width: 110px; height: 110px; margin: 0 auto 14px; }
+
+/* Country / state / city pickers (react-country-state-city) - its own stylesheet is not loaded */
+.geo-select { position: relative; }
+.geo-select .stdropdown-container { position: relative; }
+.geo-select .stdropdown-input { display: block; padding: 0; }
+.geo-select .stdropdown-input input { width: 100%; }
+.geo-select .stdropdown-tools { display: none; }
+.geo-select .stdropdown-menu {
+  position: absolute; z-index: 50; top: 100%; left: 0; width: 100%; margin-top: 4px;
+  max-height: 200px; overflow-y: auto;
+  background: #fff; color: #111827; border: 1px solid #d1d5db; border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+.geo-select .stdropdown-item { padding: 8px 12px; cursor: pointer; font-size: 14px; }
+.geo-select .stdropdown-item:hover, .geo-select .stdropdown-item.selected { background: #e0ecff; color: #111827; }

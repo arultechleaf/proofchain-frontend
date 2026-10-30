@@ -2,7 +2,8 @@
 
 /** VIEW — stock entry for many items at once, transfers between branches, and returns. */
 import { useState } from 'react';
-import { ArrowLeftRight, ClipboardList, Undo2 } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowLeftRight, ClipboardList, FileUp, Undo2 } from 'lucide-react';
 import { Card, Field, Form, Grid, Notice, Page, PageHeader, SearchInput, Spinner, Tabs } from '@/components/ui';
 import { useStockEntryController } from '@/controllers/stock-entry.controller';
 
@@ -15,7 +16,8 @@ export default function StockEntryPage() {
 
   return (
     <Page narrow>
-      <PageHeader title="Stock entry, transfer & returns" backHref="/inventory" />
+      <PageHeader title="Stock entry, transfer & returns" backHref="/inventory"
+        actions={<Link href="/inventory/entry/import" className="btn btn-secondary"><FileUp size={15} /> Add from invoice PDF</Link>} />
 
       <div className="toolbar">
         <select className="form-input" style={{ width: 260 }} value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)} aria-label="Branch">

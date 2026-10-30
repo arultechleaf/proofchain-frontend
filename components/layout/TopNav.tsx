@@ -24,6 +24,7 @@ const BREADCRUMBS: Record<string, string> = {
   '/items': 'Items',
   '/inventory': 'Inventory',
   '/inventory/entry': 'Stock Entry, Transfer & Returns',
+  '/inventory/entry/import': 'Add Stock from Invoice PDF',
   '/company/inventory': 'My Inventory',
   '/accounts': 'Accounts',
   '/reports': 'Reports',

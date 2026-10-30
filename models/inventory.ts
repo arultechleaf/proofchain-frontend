@@ -55,6 +55,25 @@ export interface ItemBranches {
   branches: Array<{ branchId: number; name: string; code: string; kind: string; isDefault: boolean; isActive: boolean; quantity: number }>;
 }
 
+/** An invoice PDF read by the server: header details and the item lines it found. */
+export interface ParsedInvoiceLine {
+  description: string;
+  hsnCode: string | null;
+  quantity: number | null;
+  unit: string | null;
+  rate: number | null;
+  amount: number | null;
+}
+
+export interface ParsedInvoice {
+  invoiceNumber: string | null;
+  invoiceDate: string | null;
+  seller: string | null;
+  buyer: string | null;
+  lines: ParsedInvoiceLine[];
+  warnings: string[];
+}
+
 export const REASON_LABEL: Record<string, string> = {
   opening: 'Opening stock', sale: 'Sale', purchase: 'Purchase', adjustment: 'Adjustment', cancelled: 'Cancelled',
   sale_return: 'Sale return', purchase_return: 'Purchase return', transfer_in: 'Transfer in', transfer_out: 'Transfer out',
@@ -64,6 +83,9 @@ export const REASON_LABEL: Record<string, string> = {
 const clean = (q: object) => Object.fromEntries(Object.entries(q).filter(([, v]) => v !== '' && v != null));
 
 export const inventoryService = {
+  async parseInvoice(file: File): Promise<ParsedInvoice> {
+    return (await itemsApi.importInvoice(file)).data.data;
+  },
   async summary(q: { companyId?: number | string; branchId?: number | string } = {}): Promise<StockSummary> {
     return (await itemsApi.stockSummary(clean(q))).data.data;
   },

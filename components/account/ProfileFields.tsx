@@ -5,8 +5,21 @@
  * 14 inputs: first name, last name, date of birth, gender, blood group, mobile, alternate mobile, designation,
  * pincode, state, district, city, landmark, address.
  */
-import type { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form';
+import { useState } from 'react';
+import type { FieldErrors, Path, UseFormRegister, UseFormWatch } from 'react-hook-form';
+import type { ComponentType } from 'react';
+import { CitySelect as RawCitySelect, CountrySelect as RawCountrySelect, StateSelect as RawStateSelect } from 'react-country-state-city';
+import type { City, Country, State } from 'react-country-state-city/dist/esm/types';
 import { Field, Grid } from '@/components/ui';
+
+// The library types its props as an intersection with the native input props, which rejects its own onChange/defaultValue.
+type Loose = ComponentType<Record<string, unknown>>;
+const CountrySelect = RawCountrySelect as unknown as Loose;
+const StateSelect = RawStateSelect as unknown as Loose;
+const CitySelect = RawCitySelect as unknown as Loose;
+
+/** India's id in the country list the pickers load. */
+const DEFAULT_COUNTRY = { id: 101, name: 'India' };
 
 export interface ProfileValues {
   firstName: string;
@@ -27,6 +40,7 @@ export interface ProfileValues {
 
 export const GENDERS = ['Male', 'Female', 'Other'];
 export const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+export const DESIGNATIONS = ['Admin', 'Manager', 'Auditor', 'Sender (Company A)', 'Receiver (Company B)', 'Store Manager', 'Accountant', 'Sales Executive', 'Delivery Staff', 'Staff'];
 export const MOBILE_PATTERN = /^[6-9]\d{9}$/;
 
 export const emptyProfile = (): ProfileValues => ({
@@ -61,7 +75,8 @@ export function profileFromUser(u?: Partial<Record<keyof ProfileValues | 'name',
  */
 export function profilePayload(v: ProfileValues, clear = false) {
   const out: Record<string, string | undefined> = {};
-  (Object.keys(v) as Array<keyof ProfileValues>).forEach((k) => {
+  // Only the profile keys: the register form passes its whole values (confirm, password...), which the API rejects.
+  (Object.keys(emptyProfile()) as Array<keyof ProfileValues>).forEach((k) => {
     const t = (v[k] ?? '').trim();
     out[k] = t === '' ? (clear ? '' : undefined) : t;
   });
@@ -76,9 +91,18 @@ type Props<T extends ProfileValues> = {
   watch: UseFormWatch<T>;
   /** Registration asks for fewer required details than an administrator-created account. */
   requireMobile?: boolean;
+  /** Show only some sections (the step-by-step sign-up uses this); all three by default. */
+  sections?: ProfileSection[];
 };
 
-export function ProfileFields<T extends ProfileValues>({ register: reg, errors: errs, watch: w, requireMobile = true }: Props<T>) {
+export type ProfileSection = 'personal' | 'contact' | 'address';
+
+export function ProfileFields<T extends ProfileValues>({ register: reg, errors: errs, watch: w, requireMobile = true, sections }: Props<T>) {
+  const show = (s: ProfileSection) => !sections || sections.includes(s);
+  const [geo, setGeo] = useState({ countryId: DEFAULT_COUNTRY.id, stateId: 0 });
+  // Write a value into the form through the field's own change handler (this component has no setValue).
+  const setProfileValue = (name: 'state' | 'city', value: string) =>
+    void reg(name as Path<T>).onChange({ target: { name, value }, type: 'change' });
   // The form hooks are generic over the caller's values; these inputs only ever touch ProfileValues keys.
   const register = reg as unknown as UseFormRegister<ProfileValues>;
   const errors = errs as FieldErrors<ProfileValues>;
@@ -86,6 +110,7 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
 
   return (
     <>
+      {show('personal') && (<>
       <h3 className="form-section">Personal details</h3>
       <Grid cols={2}>
         <Field label="First name" required error={errors.firstName?.message}>
@@ -114,7 +139,9 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
           </select>
         </Field>
       </Grid>
+      </>)}
 
+      {show('contact') && (<>
       <h3 className="form-section">Contact and work</h3>
       <Grid cols={3}>
         <Field label="Mobile" required={requireMobile} error={errors.mobile?.message} hint="10 digits">
@@ -132,26 +159,57 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
             })} />
         </Field>
         <Field label="Designation" error={errors.designation?.message}>
-          <input className="form-input" placeholder="Store manager" {...register('designation', { maxLength: { value: 100, message: 'Max 100 characters' } })} />
+          <select className="form-input" {...register('designation')}>
+            <option value="">Select...</option>
+            {DESIGNATIONS.map((d) => <option key={d} value={d}>{d}</option>)}
+            {/* keep a saved value that is not in the list */}
+            {(() => { const cur = watch('designation'); return cur && !DESIGNATIONS.includes(cur) ? <option value={cur}>{cur}</option> : null; })()}
+          </select>
         </Field>
       </Grid>
+      </>)}
 
+      {show('address') && (<>
       <h3 className="form-section">Address</h3>
       <Grid cols={3}>
         <Field label="Pincode" error={errors.pincode?.message}>
           <input inputMode="numeric" maxLength={6} className="form-input" autoComplete="postal-code"
             {...register('pincode', { pattern: { value: /^\d{6}$/, message: 'Pincode must be 6 digits' } })} />
         </Field>
-        <Field label="State">
-          <input className="form-input" autoComplete="address-level1" {...register('state')} />
+        <Field label="Country">
+          <CountrySelect
+            containerClassName="geo-select"
+            inputClassName="form-input"
+            defaultValue={{ id: DEFAULT_COUNTRY.id, name: DEFAULT_COUNTRY.name } as Country}
+            placeHolder="Select country"
+            showFlag={false}
+            onChange={(c: Country) => { setGeo({ countryId: c.id, stateId: 0 }); setProfileValue('state', ''); setProfileValue('city', ''); }}
+          />
         </Field>
-        <Field label="District">
-          <input className="form-input" {...register('district')} />
+        <Field label="State">
+          <StateSelect
+            key={`state-${geo.countryId}`}
+            containerClassName="geo-select"
+            inputClassName="form-input"
+            countryid={geo.countryId}
+            defaultValue={watch('state') ? ({ name: watch('state') } as unknown as State) : undefined}
+            placeHolder="Select state"
+            onChange={(s: State) => { setGeo((g) => ({ ...g, stateId: s.id })); setProfileValue('state', s.name); setProfileValue('city', ''); }}
+          />
         </Field>
       </Grid>
       <Grid cols={2}>
         <Field label="City / town">
-          <input className="form-input" autoComplete="address-level2" {...register('city')} />
+          <CitySelect
+            key={`city-${geo.countryId}-${geo.stateId}`}
+            containerClassName="geo-select"
+            inputClassName="form-input"
+            countryid={geo.countryId}
+            stateid={geo.stateId}
+            defaultValue={watch('city') ? ({ name: watch('city') } as unknown as City) : undefined}
+            placeHolder="Select city"
+            onChange={(c: City) => setProfileValue('city', c.name)}
+          />
         </Field>
         <Field label="Landmark">
           <input className="form-input" {...register('landmark')} />
@@ -161,6 +219,7 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
         <textarea className="form-input" rows={2} style={{ resize: 'none' }} autoComplete="street-address"
           {...register('address', { maxLength: { value: 500, message: 'Max 500 characters' } })} />
       </Field>
+      </>)}
     </>
   );
 }

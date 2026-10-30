@@ -190,6 +190,13 @@ export const itemsApi = {
   transfer: (data: unknown) => api.post('/items/stock/transfer', data),
   returns: (data: unknown) => api.post('/items/stock/returns', data),
   entry: (data: unknown) => api.post('/items/stock/entry', data),
+  /** Upload an invoice PDF; the server reads its item lines and returns them (nothing is saved). */
+  importInvoice: (file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    // no fixed Content-Type, so the browser adds the multipart boundary itself
+    return api.post('/items/stock/import-invoice', form, { headers: { 'Content-Type': undefined } });
+  },
 };
 
 export const invoicesApi = {

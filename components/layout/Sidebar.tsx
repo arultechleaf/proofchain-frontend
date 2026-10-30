@@ -314,13 +314,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         }}
       >
         <img
-          src="/inventory-audit-hexlens-logo.svg"
+          src="/A_logo.svg"
           alt="Inventory Audit"
           style={{
             width: 40,
             height: 40,
             borderRadius: 10,
             flexShrink: 0,
+            objectFit: 'contain',
             background: '#fff',
             boxShadow: '0 0 20px rgba(34,168,102,0.35)',
           }}

@@ -7,6 +7,8 @@ import { invoicesApi } from '@/lib/api';
 import type { Invoice, InvoiceType } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDay, formatMoney } from '@/lib/utils';
+import { exportRows, type ExportFormat } from '@/lib/export';
+import { ExportButtons } from '@/components/ui/ExportButtons';
 import {
   Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, StatusBadge, actionsColumn, canUse, canWrite, useAsync,
 } from '@/components/ui';
@@ -46,6 +48,33 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
     }
   };
 
+  // Export covers every invoice matching the current search and status, not only the visible page.
+  const exportInvoices = async (format: ExportFormat) => {
+    const all: Invoice[] = [];
+    for (let p = 1; ; p++) {
+      const res = (await invoicesApi.list(type, { status: status || undefined, search: query || undefined, page: p, limit: 200 })).data;
+      all.push(...(res.data as Invoice[]));
+      if (all.length >= res.total || !res.data.length) break;
+    }
+    await exportRows(format, {
+      title: copy.title,
+      filename: type === 'sale' ? 'sales-invoices' : 'purchase-bills',
+      rows: all,
+      notes: [`Status: ${status || 'All'}${query ? ` · Search: ${query}` : ''} · ${all.length} ${copy.noun}`],
+      columns: [
+        { header: 'Number', value: (i) => i.invoiceNumber },
+        { header: copy.party, value: (i) => i.party?.name },
+        { header: 'Date', value: (i) => formatDay(i.invoiceDate) },
+        { header: 'Due', value: (i) => formatDay(i.dueDate) },
+        { header: 'Total', value: (i) => i.total, display: (i) => formatMoney(i.total), align: 'right' },
+        { header: 'Paid', value: (i) => i.paidAmount, display: (i) => formatMoney(i.paidAmount), align: 'right' },
+        { header: 'Balance', value: (i) => (i.status === 'cancelled' ? 0 : i.total - i.paidAmount), display: (i) => formatMoney(i.status === 'cancelled' ? 0 : i.total - i.paidAmount), align: 'right' },
+        { header: 'Status', value: (i) => i.status },
+        { header: 'Proof', value: (i) => i.blockchainStatus },
+      ],
+    });
+  };
+
   const columns: Column<Invoice>[] = [
     {
       header: 'Number',
@@ -81,8 +110,13 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
       <PageHeader
         title={copy.title}
   //      subtitle={`${total} ${copy.noun}`}
-        actions={canUse(type === 'sale' ? 'sales_create' : 'purchases_create', user?.role) && (
-          <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={15} /> {copy.newLabel}</Link>
+        actions={(
+          <>
+            <ExportButtons onExport={exportInvoices} disabled={loading || !total} />
+            {canUse(type === 'sale' ? 'sales_create' : 'purchases_create', user?.role) && (
+              <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={15} /> {copy.newLabel}</Link>
+            )}
+          </>
         )}
       />
 

@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { useAsync } from '@/controllers/useAsync';
 import { useAuth } from '@/lib/auth';
 import { canWrite } from '@/lib/roles';
-import { apiError, downloadBlob } from '@/lib/utils';
-import { inventoryService, type StockSummary } from '@/models/inventory';
+import { apiError, downloadBlob, formatDate } from '@/lib/utils';
+import { exportRows, type ExportFormat } from '@/lib/export';
+import { REASON_LABEL, inventoryService, type Movement, type StockSummary } from '@/models/inventory';
 
 export const MOVE_PAGE_SIZE = 15;
 
@@ -47,6 +48,30 @@ export function useInventoryController() {
     }
   };
 
+  /** PDF / Excel of the whole stock history matching the filters (every page, not just the one shown). */
+  const exportFile = async (format: ExportFormat) => {
+    const all: Movement[] = [];
+    for (let p = 1; ; p++) {
+      const res = await inventoryService.movements({ companyId, branchId, reason, itemId, from, to, page: p, limit: 200 });
+      all.push(...res.rows);
+      if (all.length >= res.total || !res.rows.length) break;
+    }
+    await exportRows(format, {
+      title: 'Stock History',
+      filename: 'stock-history',
+      rows: all,
+      notes: [`${all.length} movements${from || to ? ` · ${from || '…'} to ${to || '…'}` : ''}${reason ? ` · ${REASON_LABEL[reason] ?? reason}` : ''}`],
+      columns: [
+        { header: 'When', value: (m) => formatDate(m.createdAt) },
+        { header: 'Item', value: (m) => m.item?.name },
+        { header: 'Branch', value: (m) => m.branchName },
+        { header: 'Reason', value: (m) => REASON_LABEL[m.reason] ?? m.reason },
+        { header: 'Reference', value: (m) => m.reference },
+        { header: 'Change', value: (m) => m.change, align: 'right' },
+      ],
+    });
+  };
+
   const reset = (setter: (v: string) => void) => (v: string) => { setter(v); setPage(1); };
 
   return {
@@ -57,7 +82,7 @@ export function useInventoryController() {
     setCompanyId: (v: string) => { setCompanyId(v); setBranchId(''); setItemId(''); setPage(1); },
     setBranchId: reset(setBranchId), setReason: reset(setReason), setItemId: reset(setItemId), setFrom: reset(setFrom), setTo: reset(setTo),
     clearFilters: () => { setReason(''); setItemId(''); setFrom(''); setTo(''); setPage(1); },
-    exportCsv, exporting, error,
+    exportCsv, exportFile, exporting, error,
   };
 }
 
