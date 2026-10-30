@@ -1327,6 +1327,17 @@ textarea.form-input { resize: none; }
 .auth-bg-layer { position: absolute; inset: 0; pointer-events: none; }
 .auth-bg-svg { position: absolute; inset: 0; }
 .auth-network-node { position: absolute; border-radius: 50%; background: rgba(59,130,246,0.35); }
+.page-center.auth-bg {
+  min-height: 100vh;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  background: #fff url('/blockchain-bg.svg') center center / cover no-repeat fixed;
+}
+.page-center.auth-bg .auth-bg-layer,
+.page-center.auth-bg .auth-orb,
+.page-center.auth-bg .auth-side { display: none; }
+.page-center.auth-bg .auth-wrap { margin: 0 auto; }
 .auth-orb {
   position: absolute; width: 380px; height: 380px; border-radius: 50%;
   filter: blur(64px); pointer-events: none;
@@ -1346,6 +1357,8 @@ textarea.form-input { resize: none; }
 .auth-logo-lg { width: 64px; height: 64px; border-radius: 18px; margin-bottom: 14px; }
 .auth-logo-icon { width: 26px; height: 26px; color: #fff; }
 .auth-logo-lg .auth-logo-icon { width: 30px; height: 30px; }
+.auth-logo-img { display: block; width: 150px; height: 150px; margin: 0 auto 12px; border-radius: 20px; background: #fff; box-shadow: 0 0 32px rgba(34,168,102,0.3); }
+.auth-logo-img-lg { width: 180px; height: 180px; margin-bottom: 14px; }
 .auth-brand-name { font-size: 26px; font-weight: 800; line-height: 1.1; }
 .auth-brand-lg .auth-brand-name { font-size: 30px; }
 .auth-tagline { color: #64748b; font-size: 13px; margin-top: 6px; }
@@ -1356,6 +1369,29 @@ textarea.form-input { resize: none; }
 .auth-card-title.has-subtitle { margin-bottom: 6px; }
 .auth-card-lg .auth-card-title { margin-bottom: 22px; }
 .auth-card-subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+
+/* Light card on the blockchain background: solid white, dark text, clearly visible inputs */
+.glass-card.auth-card,
+.glass-card.auth-card:hover {
+  background: #fff;
+  border: 1px solid rgba(15,42,80,0.14);
+  box-shadow: 0 16px 48px rgba(15,42,80,0.12);
+}
+.auth-card .auth-card-title { color: #0f2147; }
+.auth-card .auth-card-subtitle,
+.auth-card .auth-footnote { color: #475569; }
+.auth-card .form-label { color: #0f2147; }
+.auth-card .form-input,
+.auth-card .input-with-icon .form-input {
+  background: #fff;
+  color: #1f1f1f;
+  border: 1px solid #94a3b8;
+}
+.auth-card .form-input::placeholder { color: #94a3b8; }
+.auth-card .form-input:focus { border-color: #127a52; box-shadow: 0 0 0 3px rgba(34,168,102,0.18); }
+.auth-card .input-with-icon > svg,
+.auth-card .input-trailing-btn { color: #64748b; }
+.auth-card .auth-link { color: #127a52; font-weight: 600; }
 
 .auth-form { display: flex; flex-direction: column; gap: 14px; }
 .auth-form-lg { gap: 16px; }

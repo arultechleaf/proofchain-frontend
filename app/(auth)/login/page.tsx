@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Lock, Mail, Eye, EyeOff, Loader2, AlertCircle, ChevronRight } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Loader2, AlertCircle, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { apiError } from '@/lib/utils';
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="page-center">
+    <div className="page-center auth-bg">
 
       {/* ── Animated background ── */}
       <div className="auth-bg-layer">
@@ -100,15 +100,7 @@ export default function LoginPage() {
       >
         {/* Logo */}
         <div className="auth-brand auth-brand-lg">
-          <motion.div
-            className="auth-logo auth-logo-lg"
-            animate={{ rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <Shield className="auth-logo-icon" />
-          </motion.div>
-          <h1 className="gradient-text auth-brand-name">ProofChain</h1>
-          <p className="auth-tagline">Blockchain Delivery Verification Platform</p>
+          <img src="/inventory-audit-hexlens-A-logo.svg" alt="Inventory Audit" className="auth-logo-img auth-logo-img-lg" />
         </div>
 
         {/* Form card */}

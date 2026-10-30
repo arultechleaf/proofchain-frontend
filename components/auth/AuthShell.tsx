@@ -1,12 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield } from 'lucide-react';
 
 /** Centered card with the ProofChain logo, shared by the register / forgot / reset pages. */
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="page-center">
+    <div className="page-center auth-bg">
       <div className="auth-orb auth-orb-a" />
       <div className="auth-orb auth-orb-b" />
 
@@ -17,10 +16,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
         className="auth-wrap"
       >
         <div className="auth-brand">
-          <div className="auth-logo">
-            <Shield className="auth-logo-icon" />
-          </div>
-          <h1 className="gradient-text auth-brand-name">ProofChain</h1>
+          <img src="/inventory-audit-hexlens-A-logo.svg" alt="Inventory Audit" className="auth-logo-img" />
         </div>
 
         <div className="glass-card auth-card">

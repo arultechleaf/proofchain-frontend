@@ -14,7 +14,6 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
-  Shield,
   Users,
   Boxes,
   Receipt,
@@ -314,21 +313,18 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           flexShrink: 0,
         }}
       >
-        <div
+        <img
+          src="/inventory-audit-hexlens-logo.svg"
+          alt="Inventory Audit"
           style={{
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             borderRadius: 10,
             flexShrink: 0,
-            background: 'linear-gradient(135deg, #2563eb, #7c3aed)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 20px rgba(37,99,235,0.4)',
+            background: '#fff',
+            boxShadow: '0 0 20px rgba(34,168,102,0.35)',
           }}
-        >
-          <Shield size={18} color="#fff" />
-        </div>
+        />
 
         {!collapsed && (
           <div style={{ overflow: 'hidden', flex: 1, minWidth: 0 }}>
@@ -341,7 +337,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 lineHeight: 1.2,
               }}
             >
-              ProofChain
+              Inventory Audit
             </p>
             <p
               style={{
@@ -351,7 +347,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 lineHeight: 1.4,
               }}
             >
-              Blockchain Delivery
+              Blockchain Ledger
             </p>
           </div>
         )}

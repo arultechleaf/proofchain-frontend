@@ -46,7 +46,7 @@ export const api = axios.create({
   timeout: 15000,
 });
 
-const PUBLIC_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'];
+const PUBLIC_PATHS = ['/login', '/register', '/forgot-password'];
 
 // ── Global loading indicator ─────────────────────────────────────────────────
 // <GlobalLoader> registers a setter here; it is switched on while any request is in flight.
@@ -100,8 +100,10 @@ export const authApi = {
   register: (data: Record<string, unknown>) =>
     api.post('/auth/register', data),
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
-  resetPassword: (token: string, password: string) =>
-    api.post('/auth/reset-password', { token, password }),
+  verifyResetOtp: (email: string, otp: string) =>
+    api.post('/auth/verify-reset-otp', { email, otp }),
+  resetPassword: (email: string, password: string) =>
+    api.post('/auth/reset-password', { email, password }),
   changePassword: (currentPassword: string, newPassword: string) =>
     api.post('/auth/change-password', { currentPassword, newPassword }),
   updateProfile: (name: string) => api.patch('/auth/me', { name }),
