@@ -13,6 +13,7 @@ import {
   Card, Column, DataTable, Grid, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, canWrite, useAsync,
 } from '@/components/ui';
 import { INVOICE_COPY } from './InvoiceList';
+import { companyService, type CompanySettings } from '@/models/company';
 import { PayOnline } from './PayOnline';
 
 export function InvoiceDetail({ type }: { type: InvoiceType }) {
@@ -26,6 +27,8 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const { data: invoice, loading, error, reload } = useAsync<Invoice>(async () => (await invoicesApi.get(id)).data.data, [id]);
+  // Bank details and terms come from My company > Bank & invoice settings (only shown on your own company's documents)
+  const company = useAsync<CompanySettings | null>(async () => { try { return await companyService.settings(); } catch { return null; } }, []);
 
   if (loading && !invoice) return <Page><Spinner /></Page>;
   if (error || !invoice) return <Page><Notice kind="error">Document not found.</Notice></Page>;
@@ -156,6 +159,20 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
           </Card>
 
           {type === 'sale' && canPay && <PayOnline invoice={invoice} balance={balance} onPaid={reload} />}
+
+          {type === 'sale' && company.data && invoice.companyId === user?.companyId && (company.data.bankName || company.data.upiId || company.data.terms) && (
+            <Card title="Pay to">
+              <KeyValue rows={[
+                ...(company.data.bankName ? [['Bank', [company.data.bankName, company.data.bankBranch].filter(Boolean).join(', ')]] : []),
+                ...(company.data.accountHolder ? [['Account holder', company.data.accountHolder]] : []),
+                ...(company.data.accountNumber ? [['Account number', company.data.accountNumber]] : []),
+                ...(company.data.ifscCode ? [['IFSC', company.data.ifscCode]] : []),
+                ...(company.data.upiId ? [['UPI', company.data.upiId]] : []),
+              ] as Array<[string, React.ReactNode]>} />
+              {company.data.terms && <p style={{ fontSize: 12, color: '#94a3b8', whiteSpace: 'pre-wrap', marginTop: 10 }}>{company.data.terms}</p>}
+              {company.data.invoiceFooter && <p style={{ fontSize: 12, color: '#64748b', marginTop: 8 }}>{company.data.invoiceFooter}</p>}
+            </Card>
+          )}
 
           <Card title="Blockchain proof" icon={ShieldCheck}>
             <KeyValue rows={[

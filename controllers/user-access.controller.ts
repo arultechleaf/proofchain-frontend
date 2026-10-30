@@ -10,12 +10,16 @@ import { usersApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { apiError } from '@/lib/utils';
 import { rolePermissionService, type AccessLevel, type UserAccess, type UserScreen } from '@/models/role-permission';
+import { companyService } from '@/models/company';
 import type { User } from '@/models';
 
 /** Administrators can never lose these two, or nobody could fix the settings. */
 const LOCKED_FOR_ADMIN = new Set(['roles', 'users']);
 
-export function useUserAccessController() {
+/** 'all' = an administrator editing anyone; 'team' = a manager editing the people of their own company. */
+export type AccessScope = 'all' | 'team';
+
+export function useUserAccessController(scope: AccessScope = 'all') {
   const { user: me, refreshScreens } = useAuth();
   // /roles?user=3 opens the editor with that user already chosen (the key icon on the Users list)
   const [selectedId, setSelectedId] = useState<number | null>(() => {
@@ -28,10 +32,10 @@ export function useUserAccessController() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
-  const users = useAsync<User[]>(async () => (await usersApi.list()).data.data, []);
+  const users = useAsync<User[]>(async () => (scope === 'team' ? companyService.team() : (await usersApi.list()).data.data), [scope]);
   const access = useAsync<UserAccess | null>(
-    async () => (selectedId ? rolePermissionService.userAccess(selectedId) : null),
-    [selectedId],
+    async () => (selectedId ? (scope === 'team' ? companyService.memberAccess(selectedId) : rolePermissionService.userAccess(selectedId)) : null),
+    [selectedId, scope],
   );
 
   const screens: UserScreen[] = access.data?.screens ?? [];
@@ -78,7 +82,7 @@ export function useUserAccessController() {
     setSaving(true);
     setMessage(null);
     try {
-      await rolePermissionService.saveUserAccess(target.id, changes);
+      await (scope === 'team' ? companyService.saveMemberAccess(target.id, changes) : rolePermissionService.saveUserAccess(target.id, changes));
       setEdits({});
       setMessage({ kind: 'success', text: `Access for ${target.name} saved (${changes.length} screen${changes.length > 1 ? 's' : ''})` });
       await access.reload();

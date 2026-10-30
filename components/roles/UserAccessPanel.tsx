@@ -6,19 +6,19 @@
  */
 import { CheckSquare, Save, Search, Square, Undo2, Users } from 'lucide-react';
 import { Button, Card, EmptyState, Notice, SearchInput, Spinner } from '@/components/ui';
-import { useUserAccessController } from '@/controllers/user-access.controller';
+import { useUserAccessController, type AccessScope } from '@/controllers/user-access.controller';
 import { LEVEL_INFO, type AccessLevel } from '@/models/role-permission';
 import { roleLabel } from '@/lib/utils';
 
 const LEVELS: AccessLevel[] = ['read', 'own', 'full'];
 
-export function UserAccessPanel() {
-  const c = useUserAccessController();
+export function UserAccessPanel({ scope = 'all' }: { scope?: AccessScope }) {
+  const c = useUserAccessController(scope);
 
   return (
     <div className="access-layout">
       {/* ── who ── */}
-      <div className="access-users"><Card title="Users" icon={Users}>
+      <div className="access-users"><Card title={scope === 'team' ? 'My team' : 'Users'} icon={Users}>
         <SearchInput placeholder="Search name, email or code…" value={c.search} onChange={(e) => c.setSearch(e.target.value)} />
         {c.usersError ? <Notice kind="error">Could not load users.</Notice> : null}
         <div className="access-user-list" role="listbox" aria-label="Users">

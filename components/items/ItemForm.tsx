@@ -14,6 +14,7 @@ export interface ItemFormValues {
   taxRate: number;
   stock: number;
   lowStockLevel: number;
+  reorderQuantity: number;
   description: string;
 }
 
@@ -28,6 +29,7 @@ export function itemToForm(i?: Item): ItemFormValues {
     taxRate: i?.taxRate ?? 0,
     stock: i?.stock ?? 0,
     lowStockLevel: i?.lowStockLevel ?? 0,
+    reorderQuantity: i?.reorderQuantity ?? 0,
     description: i?.description ?? '',
   };
 }
@@ -43,6 +45,7 @@ export function formToItemPayload(v: ItemFormValues, includeStock: boolean) {
     purchasePrice: Number(v.purchasePrice) || 0,
     taxRate: Number(v.taxRate) || 0,
     lowStockLevel: Number(v.lowStockLevel) || 0,
+    reorderQuantity: Number(v.reorderQuantity) || 0,
     description: opt(v.description),
     ...(includeStock ? { stock: Number(v.stock) || 0 } : {}),
   };
@@ -97,8 +100,11 @@ export function ItemForm({
               <input type="number" step="any" className="form-input" {...register('stock', num)} />
             </Field>
           )}
-          <Field label="Low-stock alert at" hint="Flagged when stock falls to this level" error={errors.lowStockLevel?.message}>
+          <Field label="Low-stock alert at" hint="The company is notified when stock first falls to this level" error={errors.lowStockLevel?.message}>
             <input type="number" step="any" className="form-input" {...register('lowStockLevel', num)} />
+          </Field>
+          <Field label="Reorder quantity" hint="How much to order when it runs low (shown as a suggestion)" error={errors.reorderQuantity?.message}>
+            <input type="number" step="any" className="form-input" {...register('reorderQuantity', num)} />
           </Field>
         </Grid>
         <Field label="Description">

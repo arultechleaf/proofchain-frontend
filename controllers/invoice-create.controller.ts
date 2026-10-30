@@ -14,6 +14,7 @@ import {
   calcLine, calcTotals, round2, stateCode, supplyKind, type DiscountType,
 } from '@/lib/gst';
 import type { InvoiceType, Item, Party } from '@/models';
+import { companyService, type Branch } from '@/models/company';
 
 export type PaymentType = 'cash' | 'upi' | 'bank' | 'credit';
 export const PAYMENT_TYPES: Array<{ key: PaymentType; label: string }> = [
@@ -40,9 +41,9 @@ export interface LineState {
 }
 
 let nextKey = 1;
-const blankLine = (): LineState => ({
+const blankLine = (taxRate = '0'): LineState => ({
   key: nextKey++, itemId: '', name: '', sku: '', hsnCode: '', quantity: '1', unit: 'pcs',
-  rate: '', discountType: 'amount', discountValue: '', taxRate: '0',
+  rate: '', discountType: 'amount', discountValue: '', taxRate,
 });
 
 export const num = (s: string) => (s.trim() === '' || Number.isNaN(Number(s)) ? 0 : Number(s));
@@ -78,6 +79,7 @@ export function useInvoiceCreateController(type: InvoiceType) {
   const [receivedText, setReceivedText] = useState('');
   const [receivedTouched, setReceivedTouched] = useState(false);
   const [notes, setNotes] = useState('');
+  const [branchId, setBranchId] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -95,6 +97,18 @@ export function useInvoiceCreateController(type: InvoiceType) {
       return null;
     }
   }, [type]);
+
+  // GST % a blank line starts with (My company > Bank & invoice settings); applied once to the untouched first line
+  const companySettings = useAsync<{ defaultTaxRate: number } | null>(async () => { try { return await companyService.settings(); } catch { return null; } }, []);
+  const defaultTax = String(companySettings.data?.defaultTaxRate ?? 0);
+  const [taxApplied, setTaxApplied] = useState(false);
+  if (!taxApplied && companySettings.data) {
+    setTaxApplied(true);
+    if (companySettings.data.defaultTaxRate) setLines((ls) => ls.map((l) => (!l.name && !l.rate && l.taxRate === '0' ? { ...l, taxRate: defaultTax } : l)));
+  }
+
+  // where the stock moves: the default branch unless the company has several and one is chosen
+  const branchesList = useAsync<Branch[]>(async () => { try { return (await companyService.branches()).filter((b) => b.isActive); } catch { return []; } }, []);
 
   const partyList = parties.data ?? [];
   const itemList = items.data ?? [];
@@ -204,6 +218,7 @@ export function useInvoiceCreateController(type: InvoiceType) {
         placeOfSupply: placeOfSupply || undefined,
         roundOff: roundOffOn || undefined,
         notes: notes.trim() || undefined,
+        branchId: branchId ? Number(branchId) : undefined,
         lines: lines.map((l) => ({
           itemId: l.itemId || undefined,
           description: l.name.trim() || undefined,
@@ -240,13 +255,14 @@ export function useInvoiceCreateController(type: InvoiceType) {
     // B
     lines, calcs,
     updateLine, pickProduct,
-    addLine: () => setLines((ls) => [...ls, blankLine()]),
+    addLine: () => setLines((ls) => [...ls, blankLine(defaultTax)]),
     removeLine: (key: number) => setLines((ls) => (ls.length > 1 ? ls.filter((l) => l.key !== key) : ls)),
     // C
     kind, totals, roundOffOn, setRoundOffOn,
     received, receivedText, setReceived: (v: string) => { setReceivedTouched(true); setReceivedText(v); },
     balanceDue,
     notes, setNotes,
+    branches: branchesList.data ?? [], branchId, setBranchId,
     stockWarnings, submitting, error, submit,
   };
 }

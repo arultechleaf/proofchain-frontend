@@ -1803,3 +1803,26 @@ input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:foc
   .access-row { grid-template-columns: minmax(0, 1fr) 150px; }
   .access-role-default { grid-column: 1 / -1; order: 3; }
 }
+
+/* Inventory: branch / godown cards and the bulk stock-entry grid */
+.branch-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.branch-card {
+  display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 12px 14px; border-radius: 12px; cursor: pointer;
+  background: rgba(15,23,42,0.45); border: 1px solid rgba(51,65,85,0.6); color: #e2e8f0; text-decoration: none;
+}
+.branch-card:hover { border-color: rgba(96,165,250,0.6); }
+.branch-card.active { background: rgba(37,99,235,0.2); border-color: #3b82f6; }
+.branch-card.inactive { opacity: 0.6; }
+.branch-card-name { font-weight: 700; font-size: 14px; }
+.branch-card-value { font-size: 20px; font-weight: 800; color: #34d399; }
+.branch-card-meta { font-size: 11px; color: #94a3b8; }
+.entry-grid { display: flex; flex-direction: column; border: 1px solid rgba(51,65,85,0.5); border-radius: 12px; overflow: hidden; }
+.entry-head, .entry-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 150px; gap: 12px; align-items: center; padding: 9px 14px; }
+.entry-head { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; background: rgba(5,13,26,0.5); }
+.entry-row { border-top: 1px solid rgba(51,65,85,0.4); font-size: 13px; }
+.entry-row .form-input { padding-top: 6px; padding-bottom: 6px; }
+@media (max-width: 640px) {
+  .entry-head { display: none; }
+  .entry-row { grid-template-columns: minmax(0, 1fr) 120px; }
+  .entry-row > span:nth-child(2) { display: none; }
+}

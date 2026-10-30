@@ -38,6 +38,8 @@ export interface Item {
   taxRate: number;
   stock: number;
   lowStockLevel: number;
+  /** How much to order when the item runs low. */
+  reorderQuantity?: number;
   description?: string | null;
   isActive: boolean;
   createdAt: string;
@@ -49,7 +51,7 @@ export interface StockMovement {
   item?: Item;
   change: number;
   balanceAfter: number;
-  reason: 'opening' | 'sale' | 'purchase' | 'adjustment' | 'cancelled';
+  reason: 'opening' | 'sale' | 'purchase' | 'adjustment' | 'cancelled' | 'sale_return' | 'purchase_return' | 'transfer_in' | 'transfer_out';
   reference?: string | null;
   createdAt: string;
 }

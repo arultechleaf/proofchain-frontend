@@ -28,6 +28,7 @@ import {
   KeyRound,
   FileText,
   Landmark,
+  MapPin,
   Bell,
   History,
   CreditCard,
@@ -133,6 +134,11 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Inventory',
   },
   {
+    href: '/inventory/entry',
+    icon: ClipboardList,
+    label: 'Stock Entry & Transfer',
+  },
+  {
     href: '/deliveries',
     icon: Package,
     label: 'Deliveries',
@@ -165,6 +171,34 @@ const NAV_ITEMS: NavItem[] = [
     href: '/reports/transactions',
     icon: History,
     label: 'Transaction History',
+  },
+
+  // MY COMPANY
+  {
+    href: '/company',
+    icon: Building2,
+    label: 'Company Profile',
+    section: 'My Company',
+  },
+  {
+    href: '/company/team',
+    icon: Users,
+    label: 'My Team',
+  },
+  {
+    href: '/company/settings',
+    icon: Landmark,
+    label: 'Bank & Invoice Settings',
+  },
+  {
+    href: '/company/branches',
+    icon: MapPin,
+    label: 'Branches & Godowns',
+  },
+  {
+    href: '/company/inventory',
+    icon: Warehouse,
+    label: 'My Inventory',
   },
 
   // BLOCKCHAIN

@@ -77,6 +77,17 @@ function InvoiceForm({ type }: { type: InvoiceType }) {
             </Field>
           </Grid>
 
+          {c.branches.length > 1 && (
+            <div style={{ marginTop: 14 }}>
+              <Field label={c.sale ? 'Stock goes out of' : 'Stock comes into'} hint="The branch or godown whose stock changes">
+                <select className="form-input" value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)}>
+                  <option value="">Default branch</option>
+                  {c.branches.map((b) => <option key={b.id} value={b.id}>{b.name} ({b.code}){b.isDefault ? ' · default' : ''}</option>)}
+                </select>
+              </Field>
+            </div>
+          )}
+
           <div style={{ marginTop: 14 }}>
             <Field label="Billing address">
               <textarea className="form-input" rows={2} value={c.billingAddress} onChange={(e) => c.setBillingAddress(e.target.value)} />

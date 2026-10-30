@@ -179,10 +179,15 @@ export const itemsApi = {
   get: (id: Id) => api.get(`/items/${id}`),
   create: (data: unknown) => api.post('/items', data),
   update: (id: Id, data: unknown) => api.patch(`/items/${id}`, data),
-  adjust: (id: Id, data: { change: number; note?: string }) => api.post(`/items/${id}/adjust`, data),
+  adjust: (id: Id, data: { change: number; branchId?: number; note?: string }) => api.post(`/items/${id}/adjust`, data),
   remove: (id: Id) => api.delete(`/items/${id}`),
-  stockSummary: () => api.get('/items/stock/summary'),
-  movements: (itemId?: Id) => api.get('/items/stock/movements', { params: { itemId } }),
+  stockSummary: (params?: Params) => api.get('/items/stock/summary', { params }),
+  movements: (params?: Params) => api.get('/items/stock/movements', { params }),
+  movementsCsv: (params?: Params) => api.get('/items/stock/movements/export', { params, responseType: 'blob' }),
+  branches: (id: Id) => api.get(`/items/${id}/branches`),
+  transfer: (data: unknown) => api.post('/items/stock/transfer', data),
+  returns: (data: unknown) => api.post('/items/stock/returns', data),
+  entry: (data: unknown) => api.post('/items/stock/entry', data),
 };
 
 export const invoicesApi = {
@@ -213,7 +218,7 @@ export const razorpayApi = {
 export const reportsApi = {
   sales: (params?: Params) => api.get('/reports/sales', { params }),
   outstanding: (params?: Params) => api.get('/reports/outstanding', { params }),
-  stock: () => api.get('/reports/stock'),
+  stock: (params?: Params) => api.get('/reports/stock', { params }),
   transactions: (params?: Params) => api.get('/reports/transactions', { params }),
 };
 
@@ -259,6 +264,24 @@ export const rolesApi = {
   remove: (key: string) => api.delete('/roles/' + key),
   permissions: () => api.get('/roles/permissions'),
   updatePermissions: (changes: unknown) => api.put('/roles/permissions', { changes }),
+};
+
+// ── My company (profile, settings, branches, team) ──────────────────────────────
+export const companyApi = {
+  profile: () => api.get('/company/profile'),
+  updateProfile: (data: unknown) => api.patch('/company/profile', data),
+  settings: () => api.get('/company/settings'),
+  updateSettings: (data: unknown) => api.put('/company/settings', data),
+  branches: () => api.get('/company/branches'),
+  createBranch: (data: unknown) => api.post('/company/branches', data),
+  updateBranch: (id: Id, data: unknown) => api.patch(`/company/branches/${id}`, data),
+  removeBranch: (id: Id) => api.delete(`/company/branches/${id}`),
+  team: () => api.get('/company/team'),
+  teamRoles: () => api.get('/company/team/roles'),
+  addMember: (data: unknown) => api.post('/company/team', data),
+  updateMember: (id: Id, data: unknown) => api.patch(`/company/team/${id}`, data),
+  memberAccess: (id: Id) => api.get(`/company/team/${id}/access`),
+  saveMemberAccess: (id: Id, screens: Array<{ key: string; level: string | null }>) => api.put(`/company/team/${id}/access`, { screens }),
 };
 
 // ── Notifications ─────────────────────────────────────────────────────────────
