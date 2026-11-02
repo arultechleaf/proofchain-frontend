@@ -63,6 +63,11 @@ export interface ParsedInvoiceLine {
   unit: string | null;
   rate: number | null;
   amount: number | null;
+  /** Combined GST rate in percent (CGST + SGST, or IGST). */
+  gstRate: number | null;
+  gstAmount: number | null;
+  /** Amount plus GST. */
+  lineTotal: number | null;
 }
 
 export interface ParsedInvoice {
@@ -70,6 +75,8 @@ export interface ParsedInvoice {
   invoiceDate: string | null;
   seller: string | null;
   buyer: string | null;
+  taxType: 'cgst_sgst' | 'igst' | null;
+  grandTotal: number | null;
   lines: ParsedInvoiceLine[];
   warnings: string[];
 }

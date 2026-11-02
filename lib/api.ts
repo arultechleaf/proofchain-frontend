@@ -97,6 +97,7 @@ export const authApi = {
     api.post('/auth/login', { email, password }),
   logout: () => api.post('/auth/logout'),
   me: () => api.get('/auth/me'),
+  organizations: () => api.get<Array<{ name: string; organizationCode: string }>>('/auth/organizations'),
   register: (data: Record<string, unknown>) =>
     api.post('/auth/register', data),
   forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),

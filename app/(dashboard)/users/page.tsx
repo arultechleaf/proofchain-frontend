@@ -50,7 +50,34 @@ export default function UsersPage() {
     { header: 'Organization', cell: (u) => u.company?.name ?? '—' },
     { header: 'Joined', cell: (u) => formatRelative(u.createdAt) },
     { header: 'Password', cell: (u) => (u.mustChangePassword ? <span className="badge badge-pending">Temporary</span> : '—') },
-    { header: 'Status', cell: (u) => <StatusBadge status={u.isActive ? 'active' : 'inactive'} /> },
+    {
+      header: 'Status',
+      cell: (u) => (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <StatusBadge status={u.isActive ? 'active' : 'inactive'} />
+          {isAdmin && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={u.isActive}
+              aria-label={u.isActive ? `Deactivate ${u.name}` : `Activate ${u.name}`}
+              title={u.id === me?.id ? 'You cannot deactivate your own account' : u.isActive ? 'Click to deactivate' : 'Click to activate'}
+              disabled={u.id === me?.id}
+              onClick={() => {
+                if (!u.isActive || window.confirm(`Deactivate ${u.name}? They will no longer be able to sign in.`)) void setActive(u, !u.isActive);
+              }}
+              style={{
+                width: 38, height: 22, borderRadius: 11, border: 'none', padding: 2, cursor: u.id === me?.id ? 'not-allowed' : 'pointer',
+                background: u.isActive ? '#16a34a' : '#94a3b8', opacity: u.id === me?.id ? 0.5 : 1, transition: 'background .15s',
+                display: 'flex', alignItems: 'center', justifyContent: u.isActive ? 'flex-end' : 'flex-start',
+              }}
+            >
+              <span style={{ width: 18, height: 18, borderRadius: '50%', background: '#fff', display: 'block' }} />
+            </button>
+          )}
+        </span>
+      ),
+    },
     // Users are deactivated, not deleted, so their history in invoices and the audit log stays intact.
     actionsColumn<User>((u) => (
       <RowActions

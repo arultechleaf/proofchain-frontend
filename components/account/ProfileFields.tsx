@@ -5,10 +5,10 @@
  * 14 inputs: first name, last name, date of birth, gender, blood group, mobile, alternate mobile, designation,
  * pincode, state, district, city, landmark, address.
  */
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { FieldErrors, Path, UseFormRegister, UseFormWatch } from 'react-hook-form';
 import type { ComponentType } from 'react';
-import { CitySelect as RawCitySelect, CountrySelect as RawCountrySelect, StateSelect as RawStateSelect } from 'react-country-state-city';
+import { CitySelect as RawCitySelect, CountrySelect as RawCountrySelect, StateSelect as RawStateSelect, GetState } from 'react-country-state-city';
 import type { City, Country, State } from 'react-country-state-city/dist/esm/types';
 import { Field, Grid } from '@/components/ui';
 
@@ -99,10 +99,48 @@ export type ProfileSection = 'personal' | 'contact' | 'address';
 
 export function ProfileFields<T extends ProfileValues>({ register: reg, errors: errs, watch: w, requireMobile = true, sections }: Props<T>) {
   const show = (s: ProfileSection) => !sections || sections.includes(s);
-  const [geo, setGeo] = useState({ countryId: DEFAULT_COUNTRY.id, stateId: 0 });
+  // nonce remounts the state/city pickers when the pincode lookup fills them in
+  const [geo, setGeo] = useState({ countryId: DEFAULT_COUNTRY.id, stateId: 0, nonce: 0 });
+  const [pinNote, setPinNote] = useState('');
+  const lookupId = useRef(0);
+  const nonceRef = useRef(0);
   // Write a value into the form through the field's own change handler (this component has no setValue).
   const setProfileValue = (name: 'state' | 'city', value: string) =>
     void reg(name as Path<T>).onChange({ target: { name, value }, type: 'change' });
+
+  // The district is a plain text input, so its on-screen value has to change as well as the form value.
+  const setDistrict = (value: string) => {
+    const el = document.querySelector<HTMLInputElement>('input[name="district"]');
+    if (!el) return;
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(el, value);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  /** India Post pincode lookup: fills the state, district and city once six digits are typed. */
+  const lookupPincode = async (pin: string) => {
+    const id = ++lookupId.current;
+    if (!/^\d{6}$/.test(pin) || geo.countryId !== DEFAULT_COUNTRY.id) { setPinNote(''); return; }
+    setPinNote('Looking up pincode...');
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+      const json = await res.json();
+      if (id !== lookupId.current) return;
+      const office = json?.[0]?.PostOffice?.[0];
+      if (!office) { setPinNote('Pincode not found. Choose the state and city yourself.'); return; }
+      const stateName = String(office.State ?? '');
+      const district = String(office.District ?? '');
+      const states = await GetState(DEFAULT_COUNTRY.id);
+      if (id !== lookupId.current) return;
+      const match = states.find((st) => st.name.toLowerCase() === stateName.toLowerCase());
+      setProfileValue('state', match?.name ?? stateName);
+      setProfileValue('city', district);
+      setDistrict(district);
+      setGeo(() => ({ countryId: DEFAULT_COUNTRY.id, stateId: match?.id ?? 0, nonce: ++nonceRef.current }));
+      setPinNote(`${district}, ${stateName}`);
+    } catch {
+      if (id === lookupId.current) setPinNote('Could not look up the pincode. Fill in the address yourself.');
+    }
+  };
   // The form hooks are generic over the caller's values; these inputs only ever touch ProfileValues keys.
   const register = reg as unknown as UseFormRegister<ProfileValues>;
   const errors = errs as FieldErrors<ProfileValues>;
@@ -172,9 +210,14 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
       {show('address') && (<>
       <h3 className="form-section">Address</h3>
       <Grid cols={3}>
-        <Field label="Pincode" error={errors.pincode?.message}>
-          <input inputMode="numeric" maxLength={6} className="form-input" autoComplete="postal-code"
-            {...register('pincode', { pattern: { value: /^\d{6}$/, message: 'Pincode must be 6 digits' } })} />
+        <Field label="Pincode" error={errors.pincode?.message} hint={pinNote || undefined}>
+          {(() => {
+            const pin = register('pincode', { pattern: { value: /^\d{6}$/, message: 'Pincode must be 6 digits' } });
+            return (
+              <input inputMode="numeric" maxLength={6} className="form-input" autoComplete="postal-code" {...pin}
+                onChange={(e) => { void pin.onChange(e); void lookupPincode(e.target.value); }} />
+            );
+          })()}
         </Field>
         <Field label="Country">
           <CountrySelect
@@ -183,12 +226,12 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
             defaultValue={{ id: DEFAULT_COUNTRY.id, name: DEFAULT_COUNTRY.name } as Country}
             placeHolder="Select country"
             showFlag={false}
-            onChange={(c: Country) => { setGeo({ countryId: c.id, stateId: 0 }); setProfileValue('state', ''); setProfileValue('city', ''); }}
+            onChange={(c: Country) => { setGeo(() => ({ countryId: c.id, stateId: 0, nonce: ++nonceRef.current })); setProfileValue('state', ''); setProfileValue('city', ''); }}
           />
         </Field>
         <Field label="State">
           <StateSelect
-            key={`state-${geo.countryId}`}
+            key={`state-${geo.countryId}-${geo.nonce}`}
             containerClassName="geo-select"
             inputClassName="form-input"
             countryid={geo.countryId}
@@ -198,10 +241,13 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
           />
         </Field>
       </Grid>
-      <Grid cols={2}>
+      <Grid cols={3}>
+        <Field label="District">
+          <input className="form-input" {...register('district')} />
+        </Field>
         <Field label="City / town">
           <CitySelect
-            key={`city-${geo.countryId}-${geo.stateId}`}
+            key={`city-${geo.countryId}-${geo.stateId}-${geo.nonce}`}
             containerClassName="geo-select"
             inputClassName="form-input"
             countryid={geo.countryId}

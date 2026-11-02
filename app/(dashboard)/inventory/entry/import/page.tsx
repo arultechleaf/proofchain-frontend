@@ -10,6 +10,7 @@ import { formatMoney } from '@/lib/utils';
 export default function ImportInvoicePage() {
   const c = useInvoiceImportController();
   const fileInput = useRef<HTMLInputElement>(null);
+  const isIgst = c.invoice?.taxType === 'igst';
 
   const columns: Column<ImportRow>[] = [
     {
@@ -34,6 +35,20 @@ export default function ImportInvoicePage() {
       },
     },
     { header: 'Rate', align: 'right', cell: (r) => (r.rate != null ? formatMoney(r.rate) : '—') },
+    { header: 'Amount', align: 'right', cell: (r) => (r.amount != null ? formatMoney(r.amount) : '—') },
+    {
+      header: 'GST', align: 'right',
+      cell: (r) => (r.gstRate != null && r.gstAmount != null ? (
+        <span title={isIgst ? `IGST ${r.gstRate}%` : `CGST ${r.gstRate / 2}% + SGST ${r.gstRate / 2}%`}>
+          {r.gstRate}% · {formatMoney(r.gstAmount)}
+        </span>
+      ) : '—'),
+    },
+    ...(isIgst ? [{ header: 'IGST', align: 'right' as const, cell: (r: ImportRow) => (r.gstAmount != null ? formatMoney(r.gstAmount) : '—') }] : [
+      { header: 'CGST', align: 'right' as const, cell: (r: ImportRow) => (r.gstAmount != null ? formatMoney(r.gstAmount / 2) : '—') },
+      { header: 'SGST', align: 'right' as const, cell: (r: ImportRow) => (r.gstAmount != null ? formatMoney(r.gstAmount / 2) : '—') },
+    ]),
+    { header: 'Total with GST', align: 'right', cell: (r) => <strong>{r.lineTotal != null ? formatMoney(r.lineTotal) : r.amount != null ? formatMoney(r.amount) : '—'}</strong> },
     {
       header: 'Stock item', width: 260,
       cell: (r) => {
@@ -49,7 +64,7 @@ export default function ImportInvoicePage() {
   ];
 
   return (
-    <Page narrow>
+    <Page>
       <PageHeader title="Add stock from an invoice PDF" backHref="/inventory/entry" />
 
       {c.message ? <Notice kind={c.message.kind}>{c.message.text}</Notice> : null}
@@ -89,6 +104,20 @@ export default function ImportInvoicePage() {
           <DataTable bare columns={columns} rows={c.rows} rowKey={(r) => c.rows.indexOf(r)}
             empty={<EmptyState icon={FileUp} title="No item lines were found in this PDF" />} />
 
+          {c.rows.length > 0 && (
+            <div className="toolbar" style={{ justifyContent: 'flex-end', gap: 24, flexWrap: 'wrap' }}>
+              <span>Items total <strong>{formatMoney(c.totals.taxable)}</strong></span>
+              {c.totals.gst > 0 && (isIgst
+                ? <span>IGST <strong>{formatMoney(c.totals.gst)}</strong></span>
+                : <><span>CGST <strong>{formatMoney(c.totals.gst / 2)}</strong></span><span>SGST <strong>{formatMoney(c.totals.gst / 2)}</strong></span></>)}
+              <span>Total with GST <strong>{formatMoney(c.totals.total)}</strong></span>
+              {c.invoice.grandTotal != null && <span className="text-muted">Printed on invoice {formatMoney(c.invoice.grandTotal)}</span>}
+            </div>
+          )}
+
+          <p className="form-hint">
+            GST is worked out for each material from the invoice's tax summary, so it can differ from the printed total by a few paise.
+          </p>
           <p className="form-hint">
             Tick only goods you received. Services such as transport or installation do not belong in stock, so leave them unticked.
             Choose an existing item to add to it, or create a new item from the invoice text.

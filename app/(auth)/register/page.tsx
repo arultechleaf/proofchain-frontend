@@ -41,6 +41,11 @@ export default function RegisterPage() {
   const email = watch('email')?.trim().toLowerCase() ?? '';
   const isEmailVerified = email.length > 0 && verifiedEmail === email;
 
+  const [orgs, setOrgs] = useState<Array<{ name: string; organizationCode: string }>>([]);
+  useEffect(() => {
+    authApi.organizations().then((res) => setOrgs(res.data)).catch(() => setOrgs([]));
+  }, []);
+
   useEffect(() => {
     if (resendInSeconds <= 0) return;
     const timer = window.setTimeout(() => setResendInSeconds((seconds) => seconds - 1), 1000);
@@ -58,7 +63,14 @@ export default function RegisterPage() {
       setVerifiedEmail('');
       setResendInSeconds(60);
     } catch (err) {
-      setError(apiError(err, 'Could not send a verification code'));
+      if ((err as { response?: { status?: number } })?.response?.status === 429) {
+        // A code went out less than a minute ago (or before a page reload): show the code box instead of a dead end.
+        setOtpSentFor(email);
+        setResendInSeconds(60);
+        setError('A code was already sent to this email. Enter it below, or resend in a minute.');
+      } else {
+        setError(apiError(err, 'Could not send a verification code'));
+      }
     } finally {
       setOtpLoading(false);
     }
@@ -193,9 +205,16 @@ export default function RegisterPage() {
         {step === 3 && (
           <>
             <h3 className="form-section">Organization and password</h3>
-            <Field label="Organization code" required error={errors.organizationCode?.message} hint="Ask your administrator for your organization's code">
-              <input className="form-input uppercase-input" placeholder="COMP-A"
-                {...register('organizationCode', { required: 'Organization code is required' })} />
+            <Field label="Organization" required error={errors.organizationCode?.message} hint={orgs.length === 0 ? 'Could not load the organization list. Type the code from your administrator.' : undefined}>
+              {orgs.length > 0 ? (
+                <select className="form-input" {...register('organizationCode', { required: 'Choose your organization' })}>
+                  <option value="">Select...</option>
+                  {orgs.map((o) => <option key={o.organizationCode} value={o.organizationCode}>{o.name} ({o.organizationCode})</option>)}
+                </select>
+              ) : (
+                <input className="form-input uppercase-input" placeholder="COMP-A"
+                  {...register('organizationCode', { required: 'Organization code is required' })} />
+              )}
             </Field>
             <Field label="Password" required error={errors.password?.message} hint="At least 8 characters">
               <input type="password" className="form-input" autoComplete="new-password"

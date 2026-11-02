@@ -22,6 +22,10 @@ export interface ImportRow {
   unit: string;
   rate: number | null;
   hsnCode: string | null;
+  amount: number | null;
+  gstRate: number | null;
+  gstAmount: number | null;
+  lineTotal: number | null;
   /** An existing item's id, or NEW_ITEM to create one from the description. */
   itemId: string;
 }
@@ -77,13 +81,20 @@ export function useInvoiceImportController() {
       setInvoice(parsed);
       setRows(parsed.lines.map((l) => {
         const match = matchItem(l.description, items);
+        // No printed quantity: work it out from amount / rate, or treat an amount-only line (a service) as 1.
+        const quantity = l.quantity ?? (l.amount != null ? (l.rate ? Math.round((l.amount / l.rate) * 1000) / 1000 : 1) : null);
         return {
+          // only lines that printed a quantity are ticked: the filled-in ones are usually services, not goods
           include: !!l.quantity && l.quantity > 0,
           description: l.description,
-          quantity: l.quantity != null ? String(l.quantity) : '',
+          quantity: quantity != null ? String(quantity) : '',
           unit: l.unit ?? '',
-          rate: l.rate,
+          rate: l.rate ?? (l.quantity == null ? l.amount : null),
           hsnCode: l.hsnCode,
+          amount: l.amount,
+          gstRate: l.gstRate,
+          gstAmount: l.gstAmount,
+          lineTotal: l.lineTotal,
           itemId: match ? String(match.id) : NEW_ITEM,
         };
       }));
@@ -99,6 +110,10 @@ export function useInvoiceImportController() {
 
   const chosen = rows.filter((r) => r.include);
   const invalid = chosen.some((r) => !(Number(r.quantity) > 0));
+
+  // every material on the invoice, ticked or not, added up the way the invoice prints them
+  const sum = (pick: (r: ImportRow) => number | null) => Math.round(rows.reduce((t, r) => t + (pick(r) ?? 0), 0) * 100) / 100;
+  const totals = { taxable: sum((r) => r.amount), gst: sum((r) => r.gstAmount), total: sum((r) => r.lineTotal ?? r.amount) };
 
   const reset = () => { setInvoice(null); setRows([]); setFileName(''); };
 
@@ -146,7 +161,7 @@ export function useInvoiceImportController() {
   return {
     branches: activeBranches, branchId: effectiveBranch, setBranchId, items,
     fileName, invoice, rows, updateRow, reading, saving, message, readFile, reset,
-    chosenCount: chosen.length, invalid, save,
+    chosenCount: chosen.length, invalid, save, totals,
     ready: !!user?.companyId,
   };
 }
