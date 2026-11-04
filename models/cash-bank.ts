@@ -22,6 +22,7 @@ export interface AccountsResult {
 export interface BankTransaction {
   id: number;
   accountId: number;
+  paymentId?: number | null;
   accountName: string;
   counterAccountName?: string | null;
   type: BankTxType;

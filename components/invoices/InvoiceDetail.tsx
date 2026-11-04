@@ -10,18 +10,18 @@ import { useAuth } from '@/lib/auth';
 import { apiError, formatDay, formatMoney, truncateHash } from '@/lib/utils';
 import { stateName } from '@/lib/gst';
 import {
-  Card, Column, DataTable, Grid, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, canWrite, useAsync,
+  Card, Column, DataTable, Grid, KeyValue, Notice, Page, PageHeader, Spinner, StatusBadge, canWrite, useAsync, useConfirm,
 } from '@/components/ui';
 import { INVOICE_COPY } from './InvoiceList';
 import { companyService, type CompanySettings } from '@/models/company';
 import { PayOnline } from './PayOnline';
 
 export function InvoiceDetail({ type }: { type: InvoiceType }) {
-  const copy = INVOICE_COPY[type];
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const writable = canWrite(user?.role);
 
+  const { confirm, dialog } = useConfirm();
   const [verifying, setVerifying] = useState(false);
   const [verification, setVerification] = useState<InvoiceVerification | null>(null);
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
@@ -33,6 +33,8 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
   if (loading && !invoice) return <Page><Spinner /></Page>;
   if (error || !invoice) return <Page><Notice kind="error">Document not found.</Notice></Page>;
 
+  const nonGst = type === 'sale' && invoice.isGst === false;
+  const copy = INVOICE_COPY[nonGst ? 'non_gst_sale' : type];
   const balance = invoice.status === 'cancelled' ? 0 : invoice.total - invoice.paidAmount;
   const canPay = writable && balance > 0;
   const tx = invoice.transaction;
@@ -50,7 +52,10 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
   };
 
   const cancel = async () => {
-    if (!window.confirm(`Cancel ${invoice.invoiceNumber}? Stock will be restored.`)) return;
+    if (!(await confirm({
+      title: `Cancel ${invoice.invoiceNumber}?`, message: 'Stock will be restored. This cannot be undone.',
+      confirmLabel: 'Yes, cancel it', cancelLabel: 'No, keep it',
+    }))) return;
     try {
       await invoicesApi.cancel(id);
       setMessage({ kind: 'success', text: 'Document cancelled' });
@@ -61,10 +66,18 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
   };
 
   // Invoices made before GST support have no taxable value, so they keep the simple layout.
-  const gst = invoice.taxableValue != null;
+  const gst = !nonGst && invoice.taxableValue != null;
   const intra = (invoice.igst ?? 0) === 0;
 
-  const columns: Column<InvoiceLine>[] = gst
+  const columns: Column<InvoiceLine>[] = nonGst
+    ? [
+        { header: 'Product', cell: (l) => <>{l.description}{l.sku ? <span className="text-muted"> · {l.sku}</span> : null}</>, nowrap: false },
+        { header: 'Qty', align: 'right', cell: (l) => <>{l.quantity}{l.unit ? ` ${l.unit}` : ''}</> },
+        { header: 'Price', align: 'right', cell: (l) => formatMoney(l.rate) },
+        { header: 'Discount', align: 'right', cell: (l) => ((l.discountAmount ?? 0) > 0 ? formatMoney(l.discountAmount) : '—') },
+        { header: 'Total', align: 'right', cell: (l) => <strong>{formatMoney(l.lineTotal ?? l.amount)}</strong> },
+      ]
+    : gst
     ? [
         { header: 'Product', cell: (l) => <>{l.description}{l.sku ? <span className="text-muted"> · {l.sku}</span> : null}</>, nowrap: false },
         { header: 'HSN / SAC', cell: (l) => l.hsnCode || '—' },
@@ -93,16 +106,12 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
           : [['IGST', formatMoney(invoice.igst)]] as Array<[string, React.ReactNode]>),
         ...((invoice.roundOff ?? 0) !== 0 ? [['Round off', formatMoney(invoice.roundOff)]] as Array<[string, React.ReactNode]> : []),
         ['Grand total', <strong key="t">{formatMoney(invoice.total)}</strong>],
-        [type === 'sale' ? 'Amount received' : 'Amount paid', formatMoney(invoice.paidAmount)],
-        ['Balance due', <strong key="b" style={{ color: balance > 0 ? '#fbbf24' : '#34d399' }}>{formatMoney(balance)}</strong>],
       ]
     : [
         ['Subtotal', formatMoney(invoice.subtotal)],
-        ['Tax', formatMoney(invoice.taxTotal)],
+        ...(nonGst ? [] : [['Tax', formatMoney(invoice.taxTotal)]] as Array<[string, React.ReactNode]>),
         ['Discount', formatMoney(invoice.discount)],
         ['Total', <strong key="t">{formatMoney(invoice.total)}</strong>],
-        [type === 'sale' ? 'Received' : 'Paid', formatMoney(invoice.paidAmount)],
-        ['Balance due', <strong key="b" style={{ color: balance > 0 ? '#fbbf24' : '#34d399' }}>{formatMoney(balance)}</strong>],
       ];
 
   return (
@@ -128,70 +137,112 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
         }
       />
 
+      {dialog}
       {message && <Notice kind={message.kind}>{message.text}</Notice>}
       {verification && <VerificationResult v={verification} />}
 
-      <Grid cols="2fr 1fr" gap={18}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <DataTable columns={columns} rows={invoice.lines} rowKey={(l) => l.id} />
-          {invoice.notes && <Card title="Notes"><p style={{ fontSize: 13, color: '#94a3b8', whiteSpace: 'pre-wrap' }}>{invoice.notes}</p></Card>}
-        </div>
+      <div className="invoice-summary">
+        <SummaryTile label="Grand total" value={formatMoney(invoice.total)} />
+        <SummaryTile label={type === 'sale' ? 'Received' : 'Paid'} value={formatMoney(invoice.paidAmount)} />
+        <SummaryTile label="Balance due" value={formatMoney(balance)} tone={balance > 0 ? 'warn' : 'ok'} />
+        <SummaryTile label="Payment type" value={invoice.paymentType ? invoice.paymentType.replace(/^./, (c) => c.toUpperCase()) : '—'} small />
+      </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <Card title={copy.party}>
-            <Link href={`/parties/${invoice.partyId}`} style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>
-              {invoice.party?.name ?? '—'}
-            </Link>
-            <KeyValue rows={[
-              ['Due date', formatDay(invoice.dueDate)],
-              ...(gst ? [
-                ['Payment type', invoice.paymentType ? invoice.paymentType.toUpperCase() : '—'],
-                ['Mobile', invoice.customerMobile || '—'],
-                ['GSTIN', invoice.customerGstin || '—'],
-                ['Place of supply', invoice.placeOfSupply ? `${invoice.placeOfSupply} · ${stateName(invoice.placeOfSupply)}` : '—'],
-                ['Billing address', invoice.billingAddress || '—'],
-              ] as Array<[string, React.ReactNode]> : []),
-            ]} />
-          </Card>
-
-          <Card title="Amounts">
-            <KeyValue rows={amountRows} />
-          </Card>
-
-          {type === 'sale' && canPay && <PayOnline invoice={invoice} balance={balance} onPaid={reload} />}
-
-          {type === 'sale' && company.data && invoice.companyId === user?.companyId && (company.data.bankName || company.data.upiId || company.data.terms) && (
-            <Card title="Pay to">
-              <KeyValue rows={[
-                ...(company.data.bankName ? [['Bank', [company.data.bankName, company.data.bankBranch].filter(Boolean).join(', ')]] : []),
-                ...(company.data.accountHolder ? [['Account holder', company.data.accountHolder]] : []),
-                ...(company.data.accountNumber ? [['Account number', company.data.accountNumber]] : []),
-                ...(company.data.ifscCode ? [['IFSC', company.data.ifscCode]] : []),
-                ...(company.data.upiId ? [['UPI', company.data.upiId]] : []),
-              ] as Array<[string, React.ReactNode]>} />
-              {company.data.terms && <p style={{ fontSize: 12, color: '#94a3b8', whiteSpace: 'pre-wrap', marginTop: 10 }}>{company.data.terms}</p>}
-              {company.data.invoiceFooter && <p style={{ fontSize: 12, color: '#64748b', marginTop: 8 }}>{company.data.invoiceFooter}</p>}
-            </Card>
-          )}
-
-          <Card title="Blockchain proof" icon={ShieldCheck}>
-            <KeyValue rows={[
-              ['Status', <StatusBadge key="s" status={invoice.blockchainStatus} />],
-              ['Block', tx?.blockNumber ?? '—'],
-              ['Transaction', tx?.transactionHash
-                ? <Link key="t" href={`/explorer/${tx.transactionHash}`} className="hash-display" style={{ fontSize: 12 }}>{truncateHash(tx.transactionHash, 10, 8)}</Link>
-                : '—'],
-            ]} />
-            {invoice.payloadHash && (
-              <div style={{ marginTop: 12 }}>
-                <p style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>SHA-256 hash</p>
-                <p className="hash-display" style={{ fontSize: 11, wordBreak: 'break-all' }}>{invoice.payloadHash}</p>
+      <div className="glass-card" style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 18 }}>
+        <DataTable bare columns={columns} rows={invoice.lines} rowKey={(l) => l.id} />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 24px 14px', borderTop: '1px solid rgba(30,41,59,0.6)' }}>
+          <div style={{ width: 'min(100%, 300px)' }}>
+            {amountRows.map(([k, v], i) => (
+              <div key={k} style={{
+                display: 'flex', justifyContent: 'space-between', gap: 24, padding: '7px 0', fontSize: 13,
+                fontVariantNumeric: 'tabular-nums',
+                ...(i === amountRows.length - 1 ? { borderTop: '1px solid rgba(100,116,139,0.35)', marginTop: 4, paddingTop: 10 } : null),
+              }}>
+                <span style={{ color: '#94a3b8' }}>{k}</span>
+                <span style={{ color: '#e2e8f0', textAlign: 'right' }}>{v}</span>
               </div>
-            )}
-          </Card>
+            ))}
+          </div>
         </div>
+      </div>
+
+      <Grid cols="repeat(auto-fit, minmax(320px, 1fr))" gap={18}>
+        <Card title={copy.party}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+            <span style={{
+              width: 40, height: 40, borderRadius: '50%', display: 'grid', placeItems: 'center', flexShrink: 0,
+              background: 'rgba(96,165,250,0.15)', color: '#60a5fa', fontWeight: 700, fontSize: 13,
+            }}>{initials(invoice.party?.name)}</span>
+            <div style={{ minWidth: 0 }}>
+              <Link href={`/parties/${invoice.partyId}`} style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>
+                {invoice.party?.name ?? '—'}
+              </Link>
+              {gst && invoice.customerGstin && <p style={{ fontSize: 12, color: '#64748b', margin: '2px 0 0' }}>GSTIN {invoice.customerGstin}</p>}
+            </div>
+          </div>
+          <KeyValue rows={[
+            ...(gst ? [
+              ['Mobile', invoice.customerMobile || '—'],
+              ['Place of supply', invoice.placeOfSupply ? `${invoice.placeOfSupply} · ${stateName(invoice.placeOfSupply)}` : '—'],
+              ['Billing', invoice.billingAddress || '—'],
+            ] as Array<[string, React.ReactNode]> : []),
+            ['Due date', formatDay(invoice.dueDate)],
+          ]} />
+        </Card>
+
+        <Card title="Blockchain proof" icon={ShieldCheck} action={<StatusBadge status={invoice.blockchainStatus} />}>
+          <KeyValue rows={[
+            ['Block', tx?.blockNumber ?? '—'],
+            ['Transaction', tx?.transactionHash
+              ? <Link key="t" href={`/explorer/${tx.transactionHash}`} className="hash-display" style={{ fontSize: 12 }}>{truncateHash(tx.transactionHash, 10, 8)}</Link>
+              : '—'],
+          ]} />
+          {invoice.payloadHash && (
+            <div style={{ marginTop: 12 }}>
+              <p style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>SHA-256 hash</p>
+              <p className="hash-display" style={{ fontSize: 11, wordBreak: 'break-all' }}>{invoice.payloadHash}</p>
+            </div>
+          )}
+        </Card>
+
+        {type === 'sale' && canPay && <PayOnline invoice={invoice} balance={balance} onPaid={reload} />}
+
+        {type === 'sale' && company.data && invoice.companyId === user?.companyId && (company.data.bankName || company.data.upiId || company.data.terms) && (
+          <Card title="Pay to">
+            <KeyValue rows={[
+              ...(company.data.bankName ? [['Bank', [company.data.bankName, company.data.bankBranch].filter(Boolean).join(', ')]] : []),
+              ...(company.data.accountHolder ? [['Account holder', company.data.accountHolder]] : []),
+              ...(company.data.accountNumber ? [['Account number', company.data.accountNumber]] : []),
+              ...(company.data.ifscCode ? [['IFSC', company.data.ifscCode]] : []),
+              ...(company.data.upiId ? [['UPI', company.data.upiId]] : []),
+            ] as Array<[string, React.ReactNode]>} />
+            {company.data.terms && <p style={{ fontSize: 12, color: '#94a3b8', whiteSpace: 'pre-wrap', marginTop: 10 }}>{company.data.terms}</p>}
+            {company.data.invoiceFooter && <p style={{ fontSize: 12, color: '#64748b', marginTop: 8 }}>{company.data.invoiceFooter}</p>}
+          </Card>
+        )}
+
+        {invoice.notes && <Card title="Notes"><p style={{ fontSize: 13, color: '#94a3b8', whiteSpace: 'pre-wrap' }}>{invoice.notes}</p></Card>}
       </Grid>
     </Page>
+  );
+}
+
+const initials = (name?: string) =>
+  (name ?? '?').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join('') || '?';
+
+function SummaryTile({ label, value, tone, small }: { label: string; value: React.ReactNode; tone?: 'warn' | 'ok'; small?: boolean }) {
+  const warn = tone === 'warn';
+  return (
+    <div className="glass-card" style={{
+      borderRadius: 14, padding: '14px 18px',
+      ...(warn ? { background: 'rgba(251,191,36,0.16)', borderColor: 'rgba(251,191,36,0.45)' } : null),
+    }}>
+      <p style={{ fontSize: 12, color: warn ? '#fbbf24' : '#64748b', margin: 0 }}>{label}</p>
+      <p style={{
+        fontSize: small ? 16 : 22, fontWeight: 700, margin: '4px 0 0', fontVariantNumeric: 'tabular-nums',
+        color: tone === 'ok' ? '#34d399' : '#e2e8f0',
+      }}>{value}</p>
+    </div>
   );
 }
 

@@ -10,7 +10,7 @@ import type { FieldErrors, Path, UseFormRegister, UseFormWatch } from 'react-hoo
 import type { ComponentType } from 'react';
 import { CitySelect as RawCitySelect, CountrySelect as RawCountrySelect, StateSelect as RawStateSelect, GetState } from 'react-country-state-city';
 import type { City, Country, State } from 'react-country-state-city/dist/esm/types';
-import { Field, Grid } from '@/components/ui';
+import { Field, Grid, Select } from '@/components/ui';
 
 // The library types its props as an intersection with the native input props, which rejects its own onChange/defaultValue.
 type Loose = ComponentType<Record<string, unknown>>;
@@ -165,16 +165,16 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
             {...register('dateOfBirth', { validate: (v) => !v || v <= todayIso() || 'Date of birth cannot be in the future' })} />
         </Field>
         <Field label="Gender">
-          <select className="form-input" {...register('gender')}>
+          <Select className="form-input" {...register('gender')}>
             <option value="">Select...</option>
             {GENDERS.map((g) => <option key={g} value={g}>{g}</option>)}
-          </select>
+          </Select>
         </Field>
         <Field label="Blood group">
-          <select className="form-input" {...register('bloodGroup')}>
+          <Select className="form-input" {...register('bloodGroup')}>
             <option value="">Select...</option>
             {BLOOD_GROUPS.map((b) => <option key={b} value={b}>{b}</option>)}
-          </select>
+          </Select>
         </Field>
       </Grid>
       </>)}
@@ -197,12 +197,12 @@ export function ProfileFields<T extends ProfileValues>({ register: reg, errors: 
             })} />
         </Field>
         <Field label="Designation" error={errors.designation?.message}>
-          <select className="form-input" {...register('designation')}>
+          <Select className="form-input" {...register('designation')}>
             <option value="">Select...</option>
             {DESIGNATIONS.map((d) => <option key={d} value={d}>{d}</option>)}
             {/* keep a saved value that is not in the list */}
             {(() => { const cur = watch('designation'); return cur && !DESIGNATIONS.includes(cur) ? <option value={cur}>{cur}</option> : null; })()}
-          </select>
+          </Select>
         </Field>
       </Grid>
       </>)}

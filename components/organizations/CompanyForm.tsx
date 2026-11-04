@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { CheckField, Field, Grid, Form } from '@/components/ui';
+import { CheckField, Field, Grid, Form, Select } from '@/components/ui';
 import type { Company } from '@/models';
 
 export interface CompanyFormValues {
@@ -52,11 +52,11 @@ export function CompanyForm({
             })} />
         </Field>
         <Field label="Type">
-          <select className="form-input" {...register('organizationType')}>
+          <Select className="form-input" {...register('organizationType')}>
             <option value="sender">Sender (ships goods)</option>
             <option value="receiver">Receiver (accepts goods)</option>
             <option value="auditor">Auditor (read-only)</option>
-          </select>
+          </Select>
         </Field>
       </Grid>
       <Field label="GSTIN" error={errors.gstin?.message}

@@ -9,7 +9,7 @@ import { deliveriesApi, companiesApi } from '@/lib/api';
 import type { Company } from '@/models';
 import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
-import { Field } from '@/components/ui';
+import { Field, Select } from '@/components/ui';
 
 interface DeliveryForm {
   deliveryReference: string;
@@ -164,10 +164,10 @@ export default function CreateDeliveryPage() {
               <input className="form-input" placeholder="DEL-2024-001" {...register('deliveryReference', { required: 'Required' })} />
             </Field>
             <Field label="Receiver Organization" required error={errors.receiverCompanyId?.message}>
-              <select className="form-input" {...register('receiverCompanyId', { required: 'Required' })}>
+              <Select className="form-input" {...register('receiverCompanyId', { required: 'Required' })}>
                 <option value="">Select receiver...</option>
                 {companies.map(c => <option key={c.id} value={c.id}>{c.name} ({c.organizationCode})</option>)}
-              </select>
+              </Select>
             </Field>
             <Field label="Description" required error={errors.description?.message}>
               <textarea className="form-input" rows={4} placeholder="Describe the delivery contents..." {...register('description', { required: 'Required', minLength: { value: 5, message: 'Min 5 chars' } })} />

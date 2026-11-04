@@ -8,7 +8,7 @@ import type { Delivery } from '@/models';
 import { formatRelative, statusLabel } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
 import { canUse } from '@/lib/roles';
-import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsColumn, Button } from '@/components/ui';
+import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsColumn, Button, Select } from '@/components/ui';
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   pending:   { bg: 'rgba(245,158,11,0.1)',  color: '#fbbf24', border: 'rgba(245,158,11,0.25)'  },
@@ -105,7 +105,7 @@ export default function DeliveriesPage() {
             small placeholder="Search reference or description..." value={search} onChange={e => setSearch(e.target.value)} />
 
         {/* Status filter */}
-        <select
+        <Select
           className="form-input form-input-sm" style={{ width: 150 }}
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
@@ -114,13 +114,10 @@ export default function DeliveriesPage() {
           {['pending', 'approved', 'rejected', 'draft'].map(s => (
             <option key={s} value={s}>{statusLabel(s)}</option>
           ))}
-        </select>
+        </Select>
 
         {/* Search button */}
         <Button type="submit">Search</Button>
-
-        {/* Refresh */}
-        <Button variant="secondary" iconOnly icon={RefreshCw} iconSpin={loading} aria-label="Refresh" title="Refresh" onClick={fetchDeliveries} />
       </form>
 
 

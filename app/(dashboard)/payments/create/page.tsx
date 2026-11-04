@@ -1,11 +1,12 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { invoicesApi, partiesApi, paymentsApi } from '@/lib/api';
-import type { Invoice, Party } from '@/models';
+import type { Invoice, Party, PaymentAccount } from '@/models';
 import { apiError, formatMoney, todayIso } from '@/lib/utils';
-import { Card, Field, Grid, Page, PageHeader, Spinner, Form, useAsync, Tabs } from '@/components/ui';
+import { Card, Field, Grid, Page, PageHeader, Spinner, Form, useAsync, Tabs, Select } from '@/components/ui';
 
 const METHODS = ['cash', 'bank', 'upi', 'card', 'cheque', 'other'];
 
@@ -18,6 +19,7 @@ function RecordPayment() {
   const [invoiceId, setInvoiceId] = useState(params.get('invoiceId') ?? '');
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState('cash');
+  const [accountId, setAccountId] = useState('');
   const [paymentDate, setPaymentDate] = useState(todayIso());
   const [reference, setReference] = useState('');
   const [notes, setNotes] = useState('');
@@ -26,6 +28,11 @@ function RecordPayment() {
   const [error, setError] = useState('');
 
   const parties = useAsync<Party[]>(async () => (await partiesApi.list({ limit: 200 })).data.data, []);
+  const accounts = useAsync<PaymentAccount[]>(
+    async () => (await paymentsApi.accounts()).data.data,
+    [],
+  );
+  const paymentAccounts = (accounts.data ?? []).filter((a) => a.accountType === method);
 
   // Opening from an invoice: take direction and amount from it.
   useEffect(() => {
@@ -65,6 +72,7 @@ function RecordPayment() {
     if (!partyId) return setError('Select a party');
     if (!(value > 0)) return setError('Enter an amount greater than 0');
     if (due !== null && value > due) return setError(`Amount exceeds the balance due (${formatMoney(due)})`);
+    if ((method === 'cash' || method === 'bank') && !accountId) return setError(`Select a ${method} account`);
 
     setSubmitting(true);
     try {
@@ -74,6 +82,7 @@ function RecordPayment() {
         direction,
         amount: value,
         method,
+        accountId: method === 'cash' || method === 'bank' ? Number(accountId) : undefined,
         paymentDate,
         reference: reference.trim() || undefined,
         notes: notes.trim() || undefined,
@@ -101,19 +110,19 @@ function RecordPayment() {
             options={[{ key: 'in', label: 'Received from customer', tone: 'success' }, { key: 'out', label: 'Paid to supplier', tone: 'danger' }] as const} />
 
           <Field label={direction === 'in' ? 'Customer' : 'Supplier'} required>
-            <select className="form-input" value={partyId} onChange={(e) => { setPartyId(e.target.value); setInvoiceId(''); }}>
+            <Select className="form-input" value={partyId} onChange={(e) => { setPartyId(e.target.value); setInvoiceId(''); }}>
               <option value="">Select...</option>
               {eligibleParties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
+            </Select>
           </Field>
 
           <Field label="Against" hint="Leave as 'On account' for an advance payment">
-            <select className="form-input" value={invoiceId} onChange={(e) => changeInvoice(e.target.value)} disabled={!partyId}>
+            <Select className="form-input" value={invoiceId} onChange={(e) => changeInvoice(e.target.value)} disabled={!partyId}>
               <option value="">On account (no document)</option>
               {openInvoices.map((i) => (
                 <option key={i.id} value={i.id}>{i.invoiceNumber} — due {formatMoney(i.total - i.paidAmount)}</option>
               ))}
-            </select>
+            </Select>
           </Field>
 
           <Grid cols={3}>
@@ -121,14 +130,27 @@ function RecordPayment() {
               <input type="number" step="0.01" min="0.01" className="form-input" value={amount} onChange={(e) => setAmount(e.target.value)} required />
             </Field>
             <Field label="Method">
-              <select className="form-input" value={method} onChange={(e) => setMethod(e.target.value)}>
-                {METHODS.map((m) => <option key={m} value={m} style={{ textTransform: 'capitalize' }}>{m}</option>)}
-              </select>
+              <Select className="form-input" value={method} onChange={(e) => { setMethod(e.target.value); setAccountId(''); }}>
+                {METHODS.map((m) => <option key={m} value={m} style={{ textTransform: 'capitalize' }}>{m === 'bank' ? 'Bank transfer' : m}</option>)}
+              </Select>
             </Field>
             <Field label="Date" required>
               <input type="date" className="form-input" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} required />
             </Field>
           </Grid>
+
+          {(method === 'cash' || method === 'bank') && (
+            <Field label={`${method === 'cash' ? 'Cash' : 'Bank'} account`} required>
+              <Select className="form-input" value={accountId} onChange={(e) => setAccountId(e.target.value)} required>
+                <option value="">{accounts.loading ? 'Loading accounts…' : 'Select account…'}</option>
+                {paymentAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
+              </Select>
+              {!!accounts.error && <p className="form-hint">Could not load accounts. Refresh the page and try again.</p>}
+              {!accounts.loading && !accounts.error && paymentAccounts.length === 0 && (
+                <p className="form-hint">No active {method} account. <Link href="/cash-bank" className="auth-link">Create one in Cash &amp; Bank</Link>.</p>
+              )}
+            </Field>
+          )}
 
           <Field label="Reference" hint="Cheque, UTR or transaction number">
             <input className="form-input" value={reference} onChange={(e) => setReference(e.target.value)} />

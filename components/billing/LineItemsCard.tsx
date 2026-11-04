@@ -3,7 +3,7 @@
 /** VIEW — editable table of document lines. State and totals come from useLineItems. */
 import { Plus, Trash2 } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
-import { Card } from '@/components/ui';
+import { Card, Select } from '@/components/ui';
 import { num, type LineState, type PriceableItem } from '@/controllers/useLineItems';
 
 interface Props {
@@ -36,10 +36,10 @@ export function LineItemsCard({ title = 'Items', items, lines, onUpdate, onPickI
             {lines.map((l) => (
               <tr key={l.key}>
                 <td data-label="Item">
-                  <select className="form-input" value={l.itemId} onChange={(e) => onPickItem(l.key, e.target.value)} aria-label="Item">
+                  <Select className="form-input" value={l.itemId} onChange={(e) => onPickItem(l.key, e.target.value)} aria-label="Item">
                     <option value="">Custom line</option>
                     {items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
-                  </select>
+                  </Select>
                 </td>
                 <td data-label="Description"><input className="form-input" value={l.description} onChange={(e) => onUpdate(l.key, { description: e.target.value })} aria-label="Description" /></td>
                 <td data-label="Qty"><input type="number" step="any" min="0" className="form-input" value={l.quantity} onChange={(e) => onUpdate(l.key, { quantity: e.target.value })} aria-label="Quantity" /></td>

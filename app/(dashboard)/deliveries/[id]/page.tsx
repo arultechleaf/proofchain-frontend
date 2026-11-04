@@ -1,43 +1,52 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Copy, Check, ExternalLink, Shield, Clock, Package, Hash, Blocks } from 'lucide-react';
+import { ArrowRight, Award, Check, CheckCircle2, Copy, Hash, Loader2, Package, ShieldCheck, X, XCircle } from 'lucide-react';
 import { deliveriesApi, approvalsApi, verificationApi } from '@/lib/api';
 import type { Delivery, Approval, ProofRecord, VerificationResult } from '@/models';
-import { formatDate, formatRelative, statusColor, statusLabel, truncateHash, copyToClipboard } from '@/lib/utils';
+import { formatDate, formatRelative, statusColor, statusLabel, copyToClipboard } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
 import { canUse } from '@/lib/roles';
-import { Tabs } from '@/components/ui';
+import { Button, Card, EmptyState, KeyValue, Page, PageHeader, Spinner, StatusBadge, Tabs } from '@/components/ui';
 
-function CopyButton({ text }: { text: string }) {
+/** A long hash or address: monospace, wraps instead of overflowing, with a copy button. */
+function HashValue({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
-  const handleCopy = async () => {
+  const copy = async () => {
     await copyToClipboard(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <button onClick={handleCopy} className="p-1 text-slate-600 hover:text-slate-300 transition-colors">
-      {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-    </button>
+    <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: 6, justifyContent: 'flex-end' }}>
+      <span className="link-mono" style={{ wordBreak: 'break-all', fontWeight: 500 }}>{text}</span>
+      <button type="button" onClick={copy} className="icon-btn" aria-label="Copy" title={copied ? 'Copied' : 'Copy'} style={{ flexShrink: 0 }}>
+        {copied ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
+      </button>
+    </span>
   );
 }
 
-function InfoRow({ label, value, mono, hash }: { label: string; value: React.ReactNode; mono?: boolean; hash?: boolean }) {
-  const valStr = typeof value === 'string' ? value : '';
-  return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-slate-800/60 last:border-0">
-      <span className="text-xs text-slate-500 font-medium uppercase tracking-wider flex-shrink-0 w-36">{label}</span>
-      <div className={`flex-1 flex items-center justify-end gap-1 text-right ${hash ? 'hash-display text-blue-400 break-all' : mono ? 'font-mono text-xs text-slate-300' : 'text-sm text-slate-200'}`}>
-        {value}
-        {hash && valStr && <CopyButton text={valStr} />}
-      </div>
-    </div>
-  );
-}
+/** "pallets" -> "Pallets", "deliveryDate" -> "Delivery date" */
+const humanize = (key: string) => {
+  const spaced = key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').trim().toLowerCase();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+};
+/** "600kg" -> "600 kg"; objects are shown as JSON. */
+const showValue = (v: unknown): string => {
+  if (v !== null && typeof v === 'object') return JSON.stringify(v);
+  const s = String(v ?? '—');
+  return /^\d+(\.\d+)?[a-zA-Z]+$/.test(s) ? s.replace(/^(\d+(?:\.\d+)?)([a-zA-Z]+)$/, '$1 $2') : s;
+};
+/** "Company A — Shipper" -> its name and its role label. */
+const splitCompany = (name: string): { title: string; role: string | null } => {
+  const parts = name.split(/\s+[—–-]\s+/);
+  return { title: parts[0], role: parts.length > 1 ? parts.slice(1).join(' — ') : null };
+};
+
+type Tab = 'details' | 'proof' | 'approvals';
 
 export default function DeliveryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +59,8 @@ export default function DeliveryDetailPage() {
   const [verResult, setVerResult] = useState<VerificationResult | null>(null);
   const [approving, setApproving] = useState(false);
   const [approvalComment, setApprovalComment] = useState('');
-  const [activeTab, setActiveTab] = useState<'details' | 'proof' | 'approvals'>('details');
+  const [activeTab, setActiveTab] = useState<Tab>('details');
+  const [hashCopied, setHashCopied] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -84,150 +94,193 @@ export default function DeliveryDetailPage() {
     } catch { } finally { setApproving(false); }
   };
 
-  if (loading) return (
-    <div className="p-6 max-w-4xl mx-auto space-y-4">
-      <div className="skeleton h-8 w-48 rounded-lg" />
-      <div className="skeleton h-64 rounded-xl" />
-    </div>
-  );
+  if (loading) return <Page><Spinner /></Page>;
 
   if (!delivery) return (
-    <div className="p-6 text-center text-slate-500">
-      <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
-      <p>Delivery not found</p>
-      <Link href="/deliveries" className="btn btn-secondary mt-4 text-xs">Back to list</Link>
-    </div>
+    <Page>
+      <EmptyState icon={Package} title="Delivery not found" action={<Link href="/deliveries" className="btn btn-secondary">Back to deliveries</Link>} />
+    </Page>
   );
 
   const canApprove = canUse('approvals', user?.role);
+  const metadata = delivery.metadata ? Object.entries(delivery.metadata as Record<string, unknown>) : [];
+  const sender = splitCompany(delivery.senderCompany?.name ?? String(delivery.senderCompanyId));
+  const receiver = splitCompany(delivery.receiverCompany?.name ?? String(delivery.receiverCompanyId));
+  const txHash = proof?.blockchainTransaction?.transactionHash ?? null;
+
+  const copyHash = async () => {
+    if (!txHash) return;
+    await copyToClipboard(txHash);
+    setHashCopied(true);
+    setTimeout(() => setHashCopied(false), 2000);
+  };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-5">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Link href="/deliveries" className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-bold text-slate-100 font-mono">{delivery.deliveryReference}</h1>
-            <p className="text-slate-500 text-xs">Created {formatRelative(delivery.createdAt)}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className={`badge ${statusColor(delivery.status)}`}>{statusLabel(delivery.status)}</span>
-          <span className={`badge ${statusColor(delivery.blockchainStatus)}`}>{statusLabel(delivery.blockchainStatus)}</span>
-        </div>
+    <Page>
+      <PageHeader
+        title={delivery.deliveryReference}
+        backHref="/deliveries"
+        actions={
+          <>
+            <span className={`badge ${statusColor(delivery.status)}`} title="Delivery status">{statusLabel(delivery.status)}</span>
+            <span className={`badge ${statusColor(delivery.blockchainStatus)}`} title="Blockchain status">Chain: {statusLabel(delivery.blockchainStatus)}</span>
+          </>
+        }
+      />
+      <p className="text-muted" style={{ margin: '-14px 0 18px 44px', fontSize: 13 }}>Created {formatRelative(delivery.createdAt)}</p>
+
+      <div style={{ marginBottom: 18 }}>
+        <Tabs value={activeTab} onChange={setActiveTab}
+          options={(['details', 'proof', 'approvals'] as const).map((t) => ({ key: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))} />
       </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onChange={setActiveTab}
-        options={(['details', 'proof', 'approvals'] as const).map((t) => ({ key: t, label: t.charAt(0).toUpperCase() + t.slice(1) }))} />
-
       {activeTab === 'details' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 glass-card rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2"><Package className="w-4 h-4 text-blue-400" /> Delivery Details</h2>
-            <InfoRow label="Description" value={delivery.description} />
-            <InfoRow label="Quantity" value={<span className="font-mono">{delivery.quantity.toLocaleString()}</span>} />
-            <InfoRow label="Sender" value={delivery.senderCompany?.name ?? delivery.senderCompanyId} />
-            <InfoRow label="Receiver" value={delivery.receiverCompany?.name ?? delivery.receiverCompanyId} />
-            <InfoRow label="Created" value={formatDate(delivery.createdAt)} />
-            <InfoRow label="Updated" value={formatDate(delivery.updatedAt)} />
-            {delivery.metadata && (
-              <div className="pt-3">
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Metadata</p>
-                <pre className="bg-slate-900/60 rounded-lg p-3 text-xs font-mono text-slate-400 overflow-x-auto">
-                  {JSON.stringify(delivery.metadata, null, 2)}
-                </pre>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.9fr) minmax(280px, 1fr)', gap: 18, alignItems: 'start' }} className="dd-layout">
+          <Card title="Delivery details" icon={Package}>
+            <div className="dd-tiles">
+              <div className="dd-tile">
+                <span className="dd-label">Quantity</span>
+                <span className="dd-qty">{delivery.quantity.toLocaleString()}</span>
               </div>
-            )}
-          </div>
+              <div className="dd-tile">
+                <span className="dd-label">Description</span>
+                <strong>{delivery.description}</strong>
+              </div>
+            </div>
 
-          <div className="space-y-4">
-            {/* Verify button */}
-            <div className="glass-card rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2"><Shield className="w-4 h-4 text-cyan-400" /> Verification</h3>
-              <button onClick={handleVerify} disabled={verifying} className="btn btn-secondary w-full justify-center text-sm">
-                {verifying ? <><span className="animate-spin w-4 h-4 border-2 border-slate-600 border-t-blue-400 rounded-full" /></> : 'Verify Proof'}
+            <div className="dd-parties">
+              <div className="dd-party">
+                <span className="dd-label">Sender</span>
+                <strong>{sender.title}</strong>
+                {sender.role && <span className="dd-role sender">{sender.role}</span>}
+              </div>
+              <span className="dd-arrow"><ArrowRight size={20} /></span>
+              <div className="dd-party">
+                <span className="dd-label">Receiver</span>
+                <strong>{receiver.title}</strong>
+                {receiver.role && <span className="dd-role receiver">{receiver.role}</span>}
+              </div>
+            </div>
+
+            {metadata.length > 0 && (
+              <>
+                <p className="dd-section-label">Metadata</p>
+                <div className="dd-chips">
+                  {metadata.map(([k, v]) => (
+                    <span key={k} className="dd-chip">{humanize(k)} <b>{showValue(v)}</b></span>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="dd-timeline">
+              <p className="dd-section-label">Timeline</p>
+              <div className="dd-timeline-row">
+                <div className="dd-time">
+                  <span className="dd-time-title"><span className="dd-dot" /> Created</span>
+                  <span className="dd-when">{formatDate(delivery.createdAt)}</span>
+                </div>
+                <div className="dd-time">
+                  <span className="dd-time-title"><span className="dd-dot on" /> Last updated</span>
+                  <span className="dd-when">{formatDate(delivery.updatedAt)}</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <div style={{ display: 'grid', gap: 18 }}>
+            <div className="dd-verify">
+              <h3 className="dd-verify-title"><ShieldCheck size={17} color="#34d399" /> Verification</h3>
+              <p className="dd-verify-text">
+                Check this delivery against the proof recorded on the blockchain. Any change to the details above will fail verification.
+              </p>
+              <p className="dd-verify-label">Transaction hash</p>
+              <div className="dd-hash">
+                <span>{txHash ?? '[0x… transaction hash]'}</span>
+                {txHash && (
+                  <button type="button" onClick={copyHash} aria-label="Copy transaction hash" title={hashCopied ? 'Copied' : 'Copy'}>
+                    {hashCopied ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
+                  </button>
+                )}
+              </div>
+              <button type="button" className="dd-btn dd-btn-primary" onClick={handleVerify} disabled={verifying}>
+                {verifying ? <><Loader2 size={15} className="spin" /> Verifying…</> : 'Verify proof'}
               </button>
-              <Link href={`/deliveries/${id}/proof`} className="btn btn-secondary w-full justify-center text-sm mt-2">Proof certificate</Link>
+              <Link href={`/deliveries/${id}/proof`} className="dd-btn dd-btn-outline"><Award size={15} /> Proof certificate</Link>
               {verResult && (
-                <div className={`mt-3 p-3 rounded-lg border text-xs ${verResult.status === 'verified' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                  <p className="font-bold uppercase">{verResult.status}</p>
-                  <p className="mt-1 text-slate-500">Hash match: {verResult.hashMatch ? 'Yes' : 'No'}</p>
-                  {verResult.blockchainMode === 'demo' && <p className="text-amber-400 mt-1">⚠ Demo mode</p>}
+                <div className={`dd-result ${verResult.status === 'verified' ? 'ok' : 'bad'}`} role="status">
+                  <strong style={{ textTransform: 'capitalize' }}>{verResult.status}</strong>
+                  <div>Hash match: {verResult.hashMatch ? 'Yes' : 'No'}</div>
+                  {verResult.blockchainMode === 'demo' && <div>Demo mode: not checked against the live chain</div>}
                 </div>
               )}
             </div>
 
-            {/* Approve/Reject for Company B */}
             {canApprove && delivery.status === 'pending' && (
-              <div className="glass-card rounded-xl p-4">
-                <h3 className="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2"><Check className="w-4 h-4 text-emerald-400" /> Approval</h3>
-                <textarea className="form-input resize-none h-16 text-xs mb-3" placeholder="Optional comment..."
-                  value={approvalComment} onChange={e => setApprovalComment(e.target.value)} />
-                <div className="flex gap-2">
-                  <button onClick={() => handleApprove('approved')} disabled={approving} className="btn btn-primary flex-1 text-xs py-1.5">Approve</button>
-                  <button onClick={() => handleApprove('rejected')} disabled={approving} className="btn btn-danger flex-1 text-xs py-1.5">Reject</button>
+              <Card title="Approval" icon={CheckCircle2}>
+                <textarea className="form-input" rows={3} style={{ resize: 'none', marginBottom: 12 }} placeholder="Optional comment..."
+                  value={approvalComment} onChange={(e) => setApprovalComment(e.target.value)} />
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <Button variant="success" icon={Check} fullWidth disabled={approving} onClick={() => handleApprove('approved')}>Approve</Button>
+                  <Button variant="danger" icon={X} fullWidth disabled={approving} onClick={() => handleApprove('rejected')}>Reject</Button>
                 </div>
-              </div>
+              </Card>
             )}
           </div>
-        </motion.div>
+        </div>
       )}
 
       {activeTab === 'proof' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2"><Hash className="w-4 h-4 text-blue-400" /> Cryptographic Proof</h2>
+        <Card title="Cryptographic proof" icon={Hash}>
           {proof ? (
             <>
-              <InfoRow label="Algorithm" value={proof.algorithm} />
-              <InfoRow label="Payload Hash" value={delivery.payloadHash ?? '—'} hash />
-              {proof.blockchainTransaction && (
-                <>
-                  <InfoRow label="TX Hash" value={proof.blockchainTransaction.transactionHash ?? 'Pending'} hash />
-                  <InfoRow label="Block Number" value={proof.blockchainTransaction.blockNumber ? `#${proof.blockchainTransaction.blockNumber}` : '—'} mono />
-                  <InfoRow label="Contract" value={proof.blockchainTransaction.contractAddress ?? '—'} hash />
-                  <InfoRow label="Status" value={<span className={`badge ${statusColor(proof.blockchainTransaction.status)}`}>{statusLabel(proof.blockchainTransaction.status)}</span>} />
-                </>
-              )}
-              {proof.verifiedAt && <InfoRow label="Last Verified" value={formatDate(proof.verifiedAt)} />}
+              <KeyValue rows={[
+                ['Algorithm', proof.algorithm],
+                ['Payload hash', delivery.payloadHash ? <HashValue key="ph" text={delivery.payloadHash} /> : '—'],
+                ...(proof.blockchainTransaction ? ([
+                  ['Transaction hash', proof.blockchainTransaction.transactionHash ? <HashValue key="th" text={proof.blockchainTransaction.transactionHash} /> : 'Pending'],
+                  ['Block number', proof.blockchainTransaction.blockNumber ? `#${proof.blockchainTransaction.blockNumber}` : '—'],
+                  ['Contract', proof.blockchainTransaction.contractAddress ? <HashValue key="ca" text={proof.blockchainTransaction.contractAddress} /> : '—'],
+                  ['Status', <StatusBadge key="st" status={proof.blockchainTransaction.status} />],
+                ] as Array<[string, React.ReactNode]>) : []),
+                ...(proof.verifiedAt ? ([['Last verified', formatDate(proof.verifiedAt)]] as Array<[string, React.ReactNode]>) : []),
+              ]} />
               {proof.canonicalPayload && (
-                <div className="pt-4">
-                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Canonical Payload (hashed)</p>
-                  <pre className="bg-slate-900/60 rounded-lg p-3 text-xs font-mono text-slate-500 overflow-x-auto max-h-32">
+                <div style={{ marginTop: 18 }}>
+                  <p className="text-muted" style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Canonical payload (hashed)</p>
+                  <pre style={{ background: 'rgba(15,23,42,0.6)', borderRadius: 10, padding: 12, fontSize: 12, overflow: 'auto', maxHeight: 160, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                     {proof.canonicalPayload}
                   </pre>
                 </div>
               )}
             </>
-          ) : <p className="text-slate-500 text-sm">No proof record found for this delivery.</p>}
-        </motion.div>
+          ) : <p className="text-muted">No proof record found for this delivery.</p>}
+        </Card>
       )}
 
       {activeTab === 'approvals' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-slate-300 mb-4">Approval History</h2>
+        <Card title="Approval history" icon={CheckCircle2}>
           {approvals.length === 0 ? (
-            <p className="text-slate-500 text-sm text-center py-8">No approval actions yet</p>
-          ) : approvals.map((a, i) => (
-            <div key={a.id} className="flex gap-4 pb-4 mb-4 border-b border-slate-800/60 last:border-0">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${a.decision === 'approved' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-                <Check className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm text-slate-200">{a.reviewer?.name ?? 'Unknown'}</span>
-                  <span className={`badge ${statusColor(a.decision)}`}>{a.decision}</span>
+            <EmptyState icon={CheckCircle2} title="No approval actions yet" />
+          ) : approvals.map((a) => {
+            const approved = a.decision === 'approved';
+            const Icon = approved ? CheckCircle2 : XCircle;
+            return (
+              <div key={a.id} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: '1px solid rgba(30,41,59,0.6)' }}>
+                <Icon size={22} color={approved ? '#34d399' : '#f87171'} style={{ flexShrink: 0, marginTop: 1 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                    <strong style={{ fontSize: 14 }}>{a.reviewer?.name ?? 'Unknown'}</strong>
+                    <StatusBadge status={a.decision} />
+                    <span className="text-muted" style={{ fontSize: 12, marginLeft: 'auto' }}>{formatDate(a.createdAt)}</span>
+                  </div>
+                  {a.comment && <p className="text-muted" style={{ fontSize: 13, margin: '6px 0 0', fontStyle: 'italic' }}>“{a.comment}”</p>}
                 </div>
-                {a.comment && <p className="text-xs text-slate-500 italic">"{a.comment}"</p>}
-                <p className="text-xs text-slate-600 mt-1">{formatDate(a.createdAt)}</p>
               </div>
-            </div>
-          ))}
-        </motion.div>
+            );
+          })}
+        </Card>
       )}
-    </div>
+    </Page>
   );
 }

@@ -17,12 +17,16 @@ export interface RazorpayOptions {
   notes?: Record<string, string>;
   theme?: { color?: string };
   handler: (response: RazorpaySuccess) => void;
-  modal?: { ondismiss?: () => void };
+  modal?: { ondismiss?: () => void; escape?: boolean };
+}
+
+export interface RazorpayFailure {
+  error: { code?: string; description: string; reason?: string; metadata?: { payment_id?: string } };
 }
 
 export interface RazorpayInstance {
   open: () => void;
-  on: (event: 'payment.failed', cb: (response: { error: { description: string; metadata?: { payment_id?: string } } }) => void) => void;
+  on: (event: 'payment.failed', cb: (response: RazorpayFailure) => void) => void;
 }
 
 declare global {
@@ -31,7 +35,7 @@ declare global {
   }
 }
 
-const CHECKOUT_SRC = 'https://checkout.razorpay.com/v1/checkout.js';
+export const RAZORPAY_SCRIPT_URL = 'https://checkout.razorpay.com/v1/checkout.js';
 let loading: Promise<void> | null = null;
 
 /** Load checkout.js once. Resolves immediately if it is already on the page. */
@@ -41,15 +45,23 @@ export function loadRazorpayCheckout(): Promise<void> {
   if (loading) return loading;
 
   loading = new Promise<void>((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = CHECKOUT_SRC;
-    script.async = true;
-    script.onload = () => (window.Razorpay ? resolve() : reject(new Error('Razorpay failed to initialise')));
-    script.onerror = () => {
+    const fail = (script: HTMLScriptElement) => {
       loading = null; // allow a retry after a network failure
+      script.remove(); // a failed tag would never load again, so the retry adds a fresh one
       reject(new Error('Could not load Razorpay. Check your internet connection.'));
     };
-    document.body.appendChild(script);
+    const done = () => (window.Razorpay ? resolve() : reject(new Error('Razorpay failed to initialise')));
+
+    // reuse a tag that is already on the page (hot reload, another screen) instead of adding a second one
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${RAZORPAY_SCRIPT_URL}"]`);
+    const script = existing ?? document.createElement('script');
+    script.addEventListener('load', done, { once: true });
+    script.addEventListener('error', () => fail(script), { once: true });
+    if (!existing) {
+      script.src = RAZORPAY_SCRIPT_URL;
+      script.async = true;
+      document.body.appendChild(script);
+    }
   });
   return loading;
 }

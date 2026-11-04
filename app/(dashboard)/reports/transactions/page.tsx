@@ -7,7 +7,7 @@ import { reportsApi } from '@/lib/api';
 import type { TransactionKind, TransactionRow, TransactionsReport } from '@/models';
 import { formatDay, formatMoney, todayIso } from '@/lib/utils';
 import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, StatCard, StatusBadge, useAsync,
+  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, StatCard, StatusBadge, useAsync, Select
 } from '@/components/ui';
 
 const KINDS: Array<{ value: 'all' | TransactionKind; label: string }> = [
@@ -73,9 +73,9 @@ export default function TransactionHistoryPage() {
       <Card style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <Field label="Type">
-            <select className="form-input" value={kind} onChange={(e) => change(setKind)(e.target.value as 'all' | TransactionKind)}>
+            <Select className="form-input" value={kind} onChange={(e) => change(setKind)(e.target.value as 'all' | TransactionKind)}>
               {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
-            </select>
+            </Select>
           </Field>
           <Field label="From">
             <input type="date" className="form-input" value={from} max={to} onChange={(e) => change(setFrom)(e.target.value)} />

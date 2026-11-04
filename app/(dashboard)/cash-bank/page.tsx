@@ -4,7 +4,7 @@
 import { ArrowLeftRight, Banknote, Landmark, Plus, Wallet } from 'lucide-react';
 import { formatDay, formatMoney } from '@/lib/utils';
 import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, Form, actionsColumn,
+  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, Form, actionsColumn, Select
 } from '@/components/ui';
 import { useCashBankController } from '@/controllers/cash-bank.controller';
 import { TX_LABEL, type BankTransaction } from '@/models/cash-bank';
@@ -34,6 +34,7 @@ function buildColumns(writable: boolean, remove: (t: BankTransaction) => void): 
           ? `Delete this transfer of ${formatMoney(t.amount)}? Both accounts are corrected.`
           : `Delete this ${TX_LABEL[t.type].label.toLowerCase()} of ${formatMoney(t.amount)}?`,
         onConfirm: () => remove(t),
+        disabled: t.paymentId ? 'Delete the linked payment from the Payments screen' : undefined,
       } : undefined}
     />
   ), 80),
@@ -83,10 +84,10 @@ export default function CashBankPage() {
                 <input className="form-input" value={c.account.name} onChange={(e) => c.setAccount({ ...c.account, name: e.target.value })} placeholder="HDFC Current" required />
               </Field>
               <Field label="Type">
-                <select className="form-input" disabled={!!c.editingAccountId} value={c.account.accountType} onChange={(e) => c.setAccount({ ...c.account, accountType: e.target.value as 'cash' | 'bank' })}>
+                <Select className="form-input" disabled={!!c.editingAccountId} value={c.account.accountType} onChange={(e) => c.setAccount({ ...c.account, accountType: e.target.value as 'cash' | 'bank' })}>
                   <option value="bank">Bank account</option>
                   <option value="cash">Cash</option>
-                </select>
+                </Select>
               </Field>
               <Field label="Account number">
                 <input className="form-input" value={c.account.accountNumber} onChange={(e) => c.setAccount({ ...c.account, accountNumber: e.target.value })} />
@@ -104,16 +105,16 @@ export default function CashBankPage() {
           <Form onSubmit={() => c.submitMovement()} loading={c.saving} submitLabel={"Save"} onCancel={c.closeForm}>
             <Grid cols={4}>
               <Field label="Account" required>
-                <select className="form-input" value={c.movement.accountId} onChange={(e) => c.setMovement({ ...c.movement, accountId: e.target.value })} required>
+                <Select className="form-input" value={c.movement.accountId} onChange={(e) => c.setMovement({ ...c.movement, accountId: e.target.value })} required>
                   <option value="">Select…</option>
                   {c.activeAccounts.map((x) => <option key={x.id} value={x.id}>{x.name} ({formatMoney(x.balance)})</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label="Type">
-                <select className="form-input" value={c.movement.type} onChange={(e) => c.setMovement({ ...c.movement, type: e.target.value as 'deposit' | 'withdrawal' })}>
+                <Select className="form-input" value={c.movement.type} onChange={(e) => c.setMovement({ ...c.movement, type: e.target.value as 'deposit' | 'withdrawal' })}>
                   <option value="deposit">Deposit (money in)</option>
                   <option value="withdrawal">Withdrawal (money out)</option>
-                </select>
+                </Select>
               </Field>
               <Field label="Amount" required>
                 <input type="number" step="0.01" min="0.01" className="form-input" value={c.movement.amount} onChange={(e) => c.setMovement({ ...c.movement, amount: e.target.value })} required />
@@ -134,16 +135,16 @@ export default function CashBankPage() {
           <Form onSubmit={() => c.submitTransfer()} loading={c.saving} submitLabel={"Transfer"} onCancel={c.closeForm}>
             <Grid cols={4}>
               <Field label="From" required>
-                <select className="form-input" value={c.transfer.fromAccountId} onChange={(e) => c.setTransfer({ ...c.transfer, fromAccountId: e.target.value })} required>
+                <Select className="form-input" value={c.transfer.fromAccountId} onChange={(e) => c.setTransfer({ ...c.transfer, fromAccountId: e.target.value })} required>
                   <option value="">Select…</option>
                   {c.activeAccounts.map((x) => <option key={x.id} value={x.id}>{x.name} ({formatMoney(x.balance)})</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label="To" required>
-                <select className="form-input" value={c.transfer.toAccountId} onChange={(e) => c.setTransfer({ ...c.transfer, toAccountId: e.target.value })} required>
+                <Select className="form-input" value={c.transfer.toAccountId} onChange={(e) => c.setTransfer({ ...c.transfer, toAccountId: e.target.value })} required>
                   <option value="">Select…</option>
                   {c.activeAccounts.filter((x) => String(x.id) !== c.transfer.fromAccountId).map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label="Amount" required>
                 <input type="number" step="0.01" min="0.01" className="form-input" value={c.transfer.amount} onChange={(e) => c.setTransfer({ ...c.transfer, amount: e.target.value })} required />

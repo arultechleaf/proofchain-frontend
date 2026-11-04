@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AlertTriangle, Boxes, Coins, Download, Package, Warehouse } from 'lucide-react';
 import { formatDate, formatMoney } from '@/lib/utils';
 import {
-  Button, Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, StatCard,
+  Button, Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, StatCard, Select
 } from '@/components/ui';
 import { MOVE_PAGE_SIZE, useInventoryController } from '@/controllers/inventory.controller';
 import { REASON_LABEL, type Movement, type StockItem } from '@/models/inventory';
@@ -66,15 +66,15 @@ export default function InventoryPage() {
       {/* who and where */}
       <div className="toolbar">
         {c.acrossCompanies && (
-          <select className="form-input" style={{ width: 220 }} value={c.companyId} onChange={(e) => c.setCompanyId(e.target.value)} aria-label="Company">
+          <Select className="form-input" style={{ width: 220 }} value={c.companyId} onChange={(e) => c.setCompanyId(e.target.value)} aria-label="Company">
             <option value="">All companies</option>
             {c.companies.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
-          </select>
+          </Select>
         )}
-        <select className="form-input" style={{ width: 220 }} value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)} aria-label="Branch">
+        <Select className="form-input" style={{ width: 220 }} value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)} aria-label="Branch">
           <option value="">All branches / godowns</option>
           {c.branches.map((b) => <option key={b.id} value={b.id}>{b.name} ({b.code})</option>)}
-        </select>
+        </Select>
       </div>
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
@@ -108,14 +108,14 @@ export default function InventoryPage() {
 
       <Card title="Stock history">
         <div className="toolbar">
-          <select className="form-input" style={{ width: 170 }} value={c.reason} onChange={(e) => c.setReason(e.target.value)} aria-label="Reason">
+          <Select className="form-input" style={{ width: 170 }} value={c.reason} onChange={(e) => c.setReason(e.target.value)} aria-label="Reason">
             <option value="">All reasons</option>
             {Object.entries(REASON_LABEL).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
-          </select>
-          <select className="form-input" style={{ width: 200 }} value={c.itemId} onChange={(e) => c.setItemId(e.target.value)} aria-label="Item">
+          </Select>
+          <Select className="form-input" style={{ width: 200 }} value={c.itemId} onChange={(e) => c.setItemId(e.target.value)} aria-label="Item">
             <option value="">All items</option>
             {c.items.map((i) => <option key={i.id} value={i.id}>{i.name}</option>)}
-          </select>
+          </Select>
           <input type="date" className="form-input" style={{ width: 150 }} value={c.from} max={c.to || undefined} onChange={(e) => c.setFrom(e.target.value)} aria-label="From" />
           <input type="date" className="form-input" style={{ width: 150 }} value={c.to} min={c.from || undefined} onChange={(e) => c.setTo(e.target.value)} aria-label="To" />
           {(c.reason || c.itemId || c.from || c.to) && <Button variant="ghost" size="sm" onClick={c.clearFilters}>Clear</Button>}

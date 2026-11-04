@@ -2,6 +2,7 @@
 
 /** VIEW — billing overview: money in and out, what is overdue, and the latest documents. */
 import Link from 'next/link';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { AlertTriangle, ArrowDownLeft, ArrowUpRight, Plus, Receipt, RefreshCw, ShoppingCart, Wallet } from 'lucide-react';
 import type { Invoice, Payment } from '@/models';
 import { formatDay, formatMoney } from '@/lib/utils';
@@ -49,7 +50,6 @@ export default function BillingPage() {
         actions={
           <>
             <Tabs value={c.days} onChange={c.setDays} options={BILLING_PERIODS.map((p) => ({ key: p.days, label: p.label }))} />
-            <Button variant="ghost" iconOnly icon={RefreshCw} iconSpin={c.loading} aria-label="Refresh" onClick={c.reload} />
           </>
         }
       />
@@ -80,11 +80,39 @@ export default function BillingPage() {
           <p style={{ color: '#64748b', fontSize: 13 }}>Nothing outstanding right now.</p>
         ) : (
           <>
-            <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', background: 'rgba(30,41,59,0.7)', marginBottom: 14 }}>
-              {AGING_LABELS.map((b) => (
-                <div key={b.key} title={`${b.label}: ${formatMoney(d?.buckets[b.key])}`}
-                  style={{ width: `${((d?.buckets[b.key] ?? 0) / agingTotal) * 100}%`, background: b.color }} />
-              ))}
+            <div style={{ width: '100%', height: 220, marginBottom: 14 }}>
+              <ResponsiveContainer>
+                <AreaChart data={AGING_LABELS.map((b) => ({ label: b.label, amount: d?.buckets[b.key] ?? 0 }))} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="agingFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="4 4" stroke="rgba(100,116,139,0.3)" />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <YAxis tickLine={false} axisLine={false} width={56} tick={{ fontSize: 12, fill: '#64748b' }}
+                    tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))} />
+                  <Tooltip
+                    cursor={{ stroke: '#94a3b8', strokeWidth: 1 }}
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.length) return null;
+                      const p = payload[0].payload as { label: string; amount: number };
+                      return (
+                        <div style={{ background: '#fff', color: '#0f172a', border: '1px solid #e2e8f0', borderRadius: 8, padding: '10px 14px', boxShadow: '0 4px 16px rgba(0,0,0,0.12)', fontSize: 13 }}>
+                          <p style={{ margin: '0 0 6px', fontWeight: 600 }}>{p.label}</p>
+                          <div style={{ borderLeft: '3px solid #2563eb', paddingLeft: 8 }}>
+                            <span style={{ background: '#f1f5f9', borderRadius: 4, padding: '1px 6px', marginRight: 6 }}>{formatMoney(p.amount)}</span>
+                            Outstanding
+                          </div>
+                        </div>
+                      );
+                    }}
+                  />
+                  <Area type="monotone" dataKey="amount" stroke="#2563eb" strokeWidth={2} fill="url(#agingFill)"
+                    dot={false} activeDot={{ r: 5, fill: '#2563eb', stroke: '#fff', strokeWidth: 2 }} />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
             <Grid cols="repeat(auto-fit, minmax(130px, 1fr))" gap={12}>
               {AGING_LABELS.map((b) => (

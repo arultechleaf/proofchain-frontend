@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { roleLabel } from '@/lib/utils';
+import { isRecordSegment, useCrumbLabels } from '@/lib/breadcrumb';
 import { NotificationBell } from '@/components/layout/NotificationBell';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
@@ -18,6 +19,7 @@ const BREADCRUMBS: Record<string, string> = {
   '/organizations': 'Organizations',
   '/settings': 'Settings',
   '/sales': 'Sales',
+  '/non-gst-sales': 'Non-GST Sales',
   '/purchases': 'Purchases',
   '/payments': 'Payments',
   '/parties': 'Customers & Suppliers',
@@ -49,8 +51,6 @@ const BREADCRUMBS: Record<string, string> = {
   '/profile': 'My Profile',
 };
 
-/** Path segments that are record IDs or hashes rather than page names. */
-const isIdSegment = (s: string) => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(s) || /^0x[0-9a-f]{16,}$/i.test(s);
 
 const ROLE_COLORS: Record<string, string> = {
   admin: '#a78bfa',
@@ -76,13 +76,15 @@ interface TopNavProps {
 export function TopNav({ onMenuToggle }: TopNavProps) {
   const { user } = useAuth();
   const pathname = usePathname();
+  const crumbLabels = useCrumbLabels();
 
   const crumbs = pathname
     .split('/')
     .filter(Boolean)
     .reduce<Array<{ label: string; href: string }>>((acc, segment, i, arr) => {
       const href = '/' + arr.slice(0, i + 1).join('/');
-      const label = BREADCRUMBS[href] ?? (isIdSegment(segment) ? 'Details' : segment.charAt(0).toUpperCase() + segment.slice(1));
+      const label = BREADCRUMBS[href]
+        ?? (isRecordSegment(segment) ? (crumbLabels[href] ?? 'Details') : segment.charAt(0).toUpperCase() + segment.slice(1));
       acc.push({ label, href });
       return acc;
     }, []);

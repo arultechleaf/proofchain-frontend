@@ -10,7 +10,7 @@ import { formatMoney } from '@/lib/utils';
 import { exportRows, type ExportFormat } from '@/lib/export';
 import { ExportButtons } from '@/components/ui/ExportButtons';
 import {
-  Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, useAsync,
+  Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, StatCard, useAsync, Select
 } from '@/components/ui';
 
 export default function StockReportPage() {
@@ -73,15 +73,15 @@ export default function StockReportPage() {
 
       <div className="toolbar">
         {acrossCompanies && (
-          <select className="form-input" style={{ width: 220 }} value={companyId} onChange={(e) => { setCompanyId(e.target.value); setBranchId(''); }} aria-label="Company">
+          <Select className="form-input" style={{ width: 220 }} value={companyId} onChange={(e) => { setCompanyId(e.target.value); setBranchId(''); }} aria-label="Company">
             <option value="">All companies</option>
             {(data?.companies ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+          </Select>
         )}
-        <select className="form-input" style={{ width: 220 }} value={branchId} onChange={(e) => setBranchId(e.target.value)} aria-label="Branch">
+        <Select className="form-input" style={{ width: 220 }} value={branchId} onChange={(e) => setBranchId(e.target.value)} aria-label="Branch">
           <option value="">All branches / godowns</option>
           {branches.map((b) => <option key={b.id} value={b.id}>{b.name} ({b.code})</option>)}
-        </select>
+        </Select>
       </div>
 
       <Grid cols={4} style={{ marginBottom: 20 }}>

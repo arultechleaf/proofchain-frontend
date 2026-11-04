@@ -3,7 +3,7 @@
 /** VIEW — the company's branches and godowns (warehouses). */
 import { MapPin, Plus, Warehouse } from 'lucide-react';
 import {
-  Button, Card, Column, DataTable, EmptyState, Field, Form, Grid, Notice, Page, PageHeader, RowActions, StatusBadge, actionsColumn,
+  Button, Card, Column, DataTable, EmptyState, Field, Form, Grid, Notice, Page, PageHeader, RowActions, StatusBadge, actionsColumn, Select
 } from '@/components/ui';
 import { useBranchesController } from '@/controllers/company.controller';
 import { GST_STATES } from '@/lib/gst';
@@ -48,10 +48,10 @@ export default function BranchesPage() {
                 <input className="form-input" value={c.form.code} maxLength={20} onChange={(e) => set('code', e.target.value.toUpperCase())} required />
               </Field>
               <Field label="Type">
-                <select className="form-input" value={c.form.kind} onChange={(e) => set('kind', e.target.value)}>
+                <Select className="form-input" value={c.form.kind} onChange={(e) => set('kind', e.target.value)}>
                   <option value="branch">Branch / shop / office</option>
                   <option value="godown">Godown / warehouse</option>
-                </select>
+                </Select>
               </Field>
             </Grid>
             <Field label="Address">
@@ -60,10 +60,10 @@ export default function BranchesPage() {
             <Grid cols={3}>
               <Field label="City / town"><input className="form-input" value={c.form.city} onChange={(e) => set('city', e.target.value)} /></Field>
               <Field label="State">
-                <select className="form-input" value={c.form.state} onChange={(e) => set('state', e.target.value)}>
+                <Select className="form-input" value={c.form.state} onChange={(e) => set('state', e.target.value)}>
                   <option value="">Select...</option>
                   {GST_STATES.map(([code, name]) => <option key={code} value={name}>{name}</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label="Pincode"><input className="form-input" inputMode="numeric" maxLength={6} value={c.form.pincode} onChange={(e) => set('pincode', e.target.value)} /></Field>
             </Grid>

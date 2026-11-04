@@ -101,6 +101,8 @@ export interface Invoice {
   customerGstin?: string | null;
   billingAddress?: string | null;
   placeOfSupply?: string | null;
+  /** false for a Non-GST sale (no tax, own number series). */
+  isGst?: boolean;
   /** null on invoices made before GST support. */
   taxableValue?: number | null;
   cgst?: number;
@@ -125,9 +127,17 @@ export interface Payment {
   amount: number;
   method: string;
   paymentDate: string;
+  /** The cash/bank account the money went into or came out of, when one was chosen. */
+  accountName?: string | null;
   reference?: string | null;
   notes?: string | null;
   createdAt: string;
+}
+
+export interface PaymentAccount {
+  id: number;
+  name: string;
+  accountType: 'cash' | 'bank';
 }
 
 export interface InvoiceVerification {

@@ -200,12 +200,15 @@ export const itemsApi = {
   },
 };
 
+/** The screen a sale/purchase form or list belongs to: Non-GST sales are sales with their own list and number series. */
+export type InvoiceScreen = 'sale' | 'purchase' | 'non_gst_sale';
+const INVOICE_PATH: Record<InvoiceScreen, string> = { sale: '/sales', purchase: '/purchases', non_gst_sale: '/non-gst-sales' };
+
 export const invoicesApi = {
-  list: (type: 'sale' | 'purchase', params?: Params) =>
-    api.get(type === 'sale' ? '/sales' : '/purchases', { params }),
-  create: (type: 'sale' | 'purchase', data: unknown) =>
-    api.post(type === 'sale' ? '/sales' : '/purchases', data),
-  nextNumber: (type: 'sale' | 'purchase') => api.get('/invoices/next-number', { params: { type } }),
+  list: (type: InvoiceScreen, params?: Params) => api.get(INVOICE_PATH[type], { params }),
+  create: (type: InvoiceScreen, data: unknown) => api.post(INVOICE_PATH[type], data),
+  nextNumber: (type: InvoiceScreen) =>
+    api.get('/invoices/next-number', { params: { type: type === 'purchase' ? 'purchase' : 'sale', gst: type === 'non_gst_sale' ? 'false' : undefined } }),
   get: (id: Id) => api.get(`/invoices/${id}`),
   verify: (id: Id) => api.post(`/invoices/${id}/verify`),
   cancel: (id: Id) => api.patch(`/invoices/${id}/cancel`),
@@ -215,12 +218,17 @@ export const paymentsApi = {
   list: (params?: Params) => api.get('/payments', { params }),
   remove: (id: Id) => api.delete(`/payments/${id}`),
   create: (data: unknown) => api.post('/payments', data),
+  accounts: (type?: 'cash' | 'bank') =>
+    api.get<{ data: Array<{ id: number; name: string; accountType: 'cash' | 'bank' }> }>('/payments/accounts', { params: { type } }),
 };
 
 export const razorpayApi = {
   config: () => api.get('/payments/razorpay/config'),
-  createOrder: (invoiceId: Id, amount?: number) =>
-    api.post('/payments/razorpay/order', { invoiceId, amount }),
+  createOrder: (invoiceId: Id, accountId: number, amount?: number) =>
+    api.post('/payments/razorpay/order', { invoiceId, accountId, amount }),
+  /** Pay first: an order for a sale that is saved only after it is paid. */
+  createDraftOrder: (data: { partyId: number; accountId: number; amount: number }) =>
+    api.post('/payments/razorpay/draft-order', data),
   verify: (data: { orderId: string; paymentId: string; signature: string }) =>
     api.post('/payments/razorpay/verify', data),
 };

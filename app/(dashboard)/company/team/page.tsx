@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Check, Copy, KeyRound, Plus, UserCheck, UserX, Users } from 'lucide-react';
 import {
-  Button, Card, Column, DataTable, EmptyState, Field, Form, Grid, KeyValue, Notice, Page, PageHeader, RowActions, StatusBadge, Tabs, actionsColumn,
+  Button, Card, Column, DataTable, EmptyState, Field, Form, Grid, KeyValue, Notice, Page, PageHeader, RowActions, StatusBadge, Tabs, actionsColumn, Select
 } from '@/components/ui';
 import { useTeamController } from '@/controllers/company.controller';
 import { UserAccessPanel } from '@/components/roles/UserAccessPanel';
@@ -30,9 +30,9 @@ function AddPersonForm({ roles, saving, error, onAdd, onCancel }: {
           <input type="email" className="form-input" {...register('email', { required: 'Email is required', pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email' } })} />
         </Field>
         <Field label="Role">
-          <select className="form-input" {...register('role')}>
+          <Select className="form-input" {...register('role')}>
             {roles.map((r) => <option key={r.key} value={r.key}>{r.name}</option>)}
-          </select>
+          </Select>
         </Field>
       </Grid>
       <Field label="Temporary password" error={errors.password?.message}

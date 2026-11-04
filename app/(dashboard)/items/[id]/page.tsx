@@ -10,7 +10,8 @@ import { useAuth } from '@/lib/auth';
 import { apiError, formatDate, formatMoney } from '@/lib/utils';
 import {
   Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Spinner, StatCard,
-  Form, canWrite, useAsync, KeyValue } from '@/components/ui';
+  Form, canWrite, useAsync, KeyValue, Select
+} from '@/components/ui';
 import { ItemForm, formToItemPayload, itemToForm } from '@/components/items/ItemForm';
 
 const REASON_LABEL: Record<string, string> = {
@@ -116,10 +117,10 @@ export default function ItemDetailPage() {
             <Card title="Adjust stock" icon={Boxes}>
               <Form onSubmit={adjust} loading={adjusting} submitLabel="Update Stock">
                 <Field label="Branch / godown">
-                  <select className="form-input" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
+                  <Select className="form-input" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
                     <option value="">Default branch</option>
                     {(byBranch.data?.branches ?? []).filter((b) => b.isActive).map((b) => <option key={b.branchId} value={b.branchId}>{b.name} ({b.code}) — {b.quantity} {it.unit}</option>)}
-                  </select>
+                  </Select>
                 </Field>
                 <Field label="Quantity change" hint="e.g. 10 to add, -3 to remove">
                   <input type="number" step="any" className="form-input" value={change} onChange={(e) => setChange(e.target.value)} />

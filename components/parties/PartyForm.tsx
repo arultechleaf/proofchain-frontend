@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Field, Grid, Form } from '@/components/ui';
+import { Field, Grid, Form, Select } from '@/components/ui';
 import type { PartyFormValues } from '@/models/party';
 
 export function PartyForm({
@@ -23,11 +23,11 @@ export function PartyForm({
               {...register('name', { required: 'Name is required', maxLength: { value: 150, message: 'Max 150 characters' } })} />
           </Field>
           <Field label="Type">
-            <select className="form-input" {...register('partyType')}>
+            <Select className="form-input" {...register('partyType')}>
               <option value="customer">Customer</option>
               <option value="supplier">Supplier</option>
               <option value="both">Customer &amp; Supplier</option>
-            </select>
+            </Select>
           </Field>
         </Grid>
         <Grid cols={2}>

@@ -7,7 +7,7 @@ import { Check, CheckCircle2 } from 'lucide-react';
 import { authApi, emailOtpApi } from '@/lib/api';
 import { apiError } from '@/lib/utils';
 import { AuthShell } from '@/components/auth/AuthShell';
-import { Field, Notice, SubmitButton } from '@/components/ui';
+import { Field, Notice, SubmitButton, Select } from '@/components/ui';
 import { ProfileFields, emptyProfile, profilePayload, type ProfileValues } from '@/components/account/ProfileFields';
 
 const STEPS = ['Email', 'Personal', 'Address', 'Account'];
@@ -207,10 +207,10 @@ export default function RegisterPage() {
             <h3 className="form-section">Organization and password</h3>
             <Field label="Organization" required error={errors.organizationCode?.message} hint={orgs.length === 0 ? 'Could not load the organization list. Type the code from your administrator.' : undefined}>
               {orgs.length > 0 ? (
-                <select className="form-input" {...register('organizationCode', { required: 'Choose your organization' })}>
+                <Select className="form-input" {...register('organizationCode', { required: 'Choose your organization' })}>
                   <option value="">Select...</option>
                   {orgs.map((o) => <option key={o.organizationCode} value={o.organizationCode}>{o.name} ({o.organizationCode})</option>)}
-                </select>
+                </Select>
               ) : (
                 <input className="form-input uppercase-input" placeholder="COMP-A"
                   {...register('organizationCode', { required: 'Organization code is required' })} />

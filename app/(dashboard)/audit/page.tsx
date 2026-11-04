@@ -5,7 +5,7 @@ import { ClipboardList, Download, RefreshCw } from 'lucide-react';
 import { auditApi } from '@/lib/api';
 import type { AuditLog } from '@/models';
 import { formatDate, downloadBlob } from '@/lib/utils';
-import { Column, DataTable, EmptyState, Pager, Button, Page, PageHeader } from '@/components/ui';
+import { Column, DataTable, EmptyState, Pager, Button, Page, PageHeader, Select } from '@/components/ui';
 
 const ACTION_STYLE: Record<string, { color: string; bg: string; border: string }> = {
   CREATE_DELIVERY:    { color: '#60a5fa', bg: 'rgba(37,99,235,0.1)',  border: 'rgba(59,130,246,0.25)' },
@@ -21,37 +21,52 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 8, color: '#e2e8f0', fontSize: 13, outline: 'none',
 };
 
+const humanize = (s: string) =>
+  s.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase());
+
+const detailValue = (v: unknown): string =>
+  v == null ? '—' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+
+/** One readable line per entry: "Delivery reference: DEL-001 · Status: approved". */
+function Details({ value }: { value: unknown }) {
+  if (value == null || value === '') return <span className="text-muted">—</span>;
+  const text = typeof value !== 'object' || Array.isArray(value)
+    ? detailValue(value)
+    : Object.entries(value as Record<string, unknown>)
+        .filter(([, v]) => v != null && v !== '')
+        .map(([k, v]) => `${humanize(k)}: ${detailValue(v)}`)
+        .join(' · ');
+  return <span className="audit-detail-text">{text || '—'}</span>;
+}
+
 const columns: Column<AuditLog>[] = [
-  { header: 'Time', cell: (l) => <span style={{ color: '#64748b' }}>{formatDate(l.createdAt)}</span> },
-  { header: 'Actor', cell: (l) => l.actor?.name ?? (l.actorId ? '#' + l.actorId : 'System') },
   {
-    header: 'Action',
+    header: 'When', width: 170,
+    cell: (l) => <span style={{ color: '#94a3b8', whiteSpace: 'nowrap' }}>{formatDate(l.createdAt)}</span>,
+  },
+  {
+    header: 'Who', width: 150,
+    cell: (l) => <strong style={{ fontWeight: 600, color: '#e2e8f0' }}>{l.actor?.name ?? (l.actorId ? '#' + l.actorId : 'System')}</strong>,
+  },
+  {
+    header: 'What happened', width: 240,
+    nowrap: false,
     cell: (l) => {
       const as = ACTION_STYLE[l.action] ?? ACTION_STYLE.LOGOUT;
       return (
-        <span style={{ ...as, padding: '2px 8px', borderRadius: 9999, border: `1px solid ${as.border}`, fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fontWeight: 600 }}>
-          {l.action}
-        </span>
+        <div>
+          <span style={{ ...as, padding: '3px 10px', borderRadius: 9999, border: `1px solid ${as.border}`, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
+            {humanize(l.action)}
+          </span>
+          <p style={{ margin: '6px 0 0', fontSize: 12, color: '#94a3b8' }}>
+            <span style={{ textTransform: 'capitalize' }}>{l.resourceType}</span>
+            {l.resourceId ? <span title={l.resourceId} style={{ fontFamily: 'JetBrains Mono, monospace' }}> · {l.resourceId.length > 12 ? l.resourceId.slice(0, 8) + '…' : l.resourceId}</span> : null}
+          </p>
+        </div>
       );
     },
   },
-  { header: 'Type', cell: (l) => <span style={{ color: '#94a3b8', textTransform: 'capitalize' }}>{l.resourceType}</span> },
-  {
-    header: 'Resource ID',
-    cell: (l) => (
-      <span style={{ fontFamily: 'JetBrains Mono, monospace', color: '#475569', fontSize: 11 }}>
-        {l.resourceId ? l.resourceId.slice(0, 8) + '…' : '—'}
-      </span>
-    ),
-  },
-  {
-    header: 'Details',
-    cell: (l) => (
-      <span className="audit-details">
-        {l.details ? JSON.stringify(l.details).slice(0, 80) : '—'}
-      </span>
-    ),
-  },
+  { header: 'Details', nowrap: false, cell: (l) => <Details value={l.details} /> },
 ];
 
 export default function AuditPage() {
@@ -88,9 +103,10 @@ export default function AuditPage() {
       <PageHeader
         title="Audit Logs"
         subtitle={`${total} total entries`}
+        backHref="/dashboard"
         actions={
           <>
-            <select
+            <Select
               className="form-input form-input-sm" style={{ width: 140 }}
               value={resourceType} aria-label="Resource type"
               onChange={e => { setResourceType(e.target.value); setPage(1); }}
@@ -99,7 +115,8 @@ export default function AuditPage() {
               <option value="delivery">Delivery</option>
               <option value="user">User</option>
               <option value="auth">Auth</option>
-            </select>
+            </Select>
+            {resourceType && <Button variant="secondary" size="sm" onClick={() => { setResourceType(''); setPage(1); }}>Clear</Button>}
             <Button variant="secondary" size="sm" iconOnly icon={RefreshCw} iconSpin={loading} aria-label="Refresh" title="Refresh" onClick={fetchLogs} />
             <Button variant="secondary" size="sm" icon={Download} loading={exporting} onClick={handleExport}>Export CSV</Button>
           </>
@@ -107,7 +124,6 @@ export default function AuditPage() {
       />
 
       <DataTable
-        compact
         columns={columns}
         rows={logs}
         loading={loading}

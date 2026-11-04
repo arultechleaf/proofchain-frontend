@@ -3,7 +3,7 @@
 /** VIEW — the signed-in user's own company: business details printed on invoices. */
 import { useForm } from 'react-hook-form';
 import { Building2 } from 'lucide-react';
-import { Card, Field, Form, Grid, KeyValue, Notice, Page, PageHeader, Spinner } from '@/components/ui';
+import { Card, Field, Form, Grid, KeyValue, Notice, Page, PageHeader, Spinner, Select } from '@/components/ui';
 import { useCompanyProfileController } from '@/controllers/company.controller';
 import { GST_STATES } from '@/lib/gst';
 import type { CompanyProfile } from '@/models/company';
@@ -62,10 +62,10 @@ function ProfileForm({ profile, saving, writable, onSave }: { profile: CompanyPr
       <Grid cols={3}>
         <Field label="City / town"><input className="form-input" {...register('city')} /></Field>
         <Field label="State">
-          <select className="form-input" {...register('state')}>
+          <Select className="form-input" {...register('state')}>
             <option value="">Select...</option>
             {GST_STATES.map(([code, name]) => <option key={code} value={name}>{name}</option>)}
-          </select>
+          </Select>
         </Field>
         <Field label="Pincode" error={errors.pincode?.message}>
           <input inputMode="numeric" maxLength={6} className="form-input" {...register('pincode', { pattern: { value: /^(\d{6})?$/, message: 'Pincode must be 6 digits' } })} />

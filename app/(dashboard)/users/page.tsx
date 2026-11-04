@@ -7,9 +7,10 @@ import { usersApi } from '@/lib/api';
 import type { User } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatRelative, roleLabel } from '@/lib/utils';
-import { Column, DataTable, EmptyState, Notice, Page, PageHeader, RowActions, StatusBadge, actionsColumn, useAsync, Button } from '@/components/ui';
+import { Column, DataTable, EmptyState, Notice, Page, PageHeader, RowActions, StatusBadge, actionsColumn, useAsync, Button, useConfirm } from '@/components/ui';
 
 export default function UsersPage() {
+  const { confirm, dialog } = useConfirm();
   const { user: me } = useAuth();
   const [search, setSearch] = useState('');
   const [pendingOnly, setPendingOnly] = useState(false);
@@ -63,8 +64,11 @@ export default function UsersPage() {
               aria-label={u.isActive ? `Deactivate ${u.name}` : `Activate ${u.name}`}
               title={u.id === me?.id ? 'You cannot deactivate your own account' : u.isActive ? 'Click to deactivate' : 'Click to activate'}
               disabled={u.id === me?.id}
-              onClick={() => {
-                if (!u.isActive || window.confirm(`Deactivate ${u.name}? They will no longer be able to sign in.`)) void setActive(u, !u.isActive);
+              onClick={async () => {
+                if (!u.isActive || await confirm({
+                  title: `Deactivate ${u.name}?`, message: 'They will no longer be able to sign in.',
+                  confirmLabel: 'Yes, deactivate',
+                })) void setActive(u, !u.isActive);
               }}
               style={{
                 width: 38, height: 22, borderRadius: 11, border: 'none', padding: 2, cursor: u.id === me?.id ? 'not-allowed' : 'pointer',
@@ -105,6 +109,7 @@ export default function UsersPage() {
 
   return (
     <Page>
+      {dialog}
       <PageHeader
         title="Users"
         subtitle={`${all.length} users`}

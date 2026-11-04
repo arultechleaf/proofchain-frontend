@@ -4,7 +4,7 @@
 import { Plus, Receipt, TrendingDown } from 'lucide-react';
 import { formatDay, formatMoney } from '@/lib/utils';
 import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatCard, Form, actionsColumn,
+  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, SearchInput, StatCard, Form, actionsColumn, Select, Combobox
 } from '@/components/ui';
 import { useExpenseController } from '@/controllers/expense.controller';
 import { EXPENSE_METHODS, type Expense } from '@/models/expense';
@@ -48,8 +48,8 @@ export default function ExpensesPage() {
           <Form onSubmit={() => c.submit()} loading={c.saving} submitLabel={c.editingId ? 'Save changes' : 'Save expense'} onCancel={c.toggleForm}>
             <Grid cols={4}>
               <Field label="Category" required hint="Pick an existing one or type a new one">
-                <input className="form-input" list="expense-categories" value={c.form.category}
-                  onChange={(e) => c.setForm({ ...c.form, category: e.target.value })} placeholder="Rent" required />
+                <Combobox className="form-input" value={c.form.category} options={c.categories.map((x) => ({ value: x }))}
+                  onChange={(text) => c.setForm({ ...c.form, category: text })} placeholder="Rent" required />
               </Field>
               <Field label="Amount" required>
                 <input type="number" step="0.01" min="0.01" className="form-input" value={c.form.amount}
@@ -60,12 +60,11 @@ export default function ExpensesPage() {
                   onChange={(e) => c.setForm({ ...c.form, expenseDate: e.target.value })} />
               </Field>
               <Field label="Paid by">
-                <select className="form-input" value={c.form.paymentMethod} onChange={(e) => c.setForm({ ...c.form, paymentMethod: e.target.value })}>
+                <Select className="form-input" value={c.form.paymentMethod} onChange={(e) => c.setForm({ ...c.form, paymentMethod: e.target.value })}>
                   {EXPENSE_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
-                </select>
+                </Select>
               </Field>
             </Grid>
-            <datalist id="expense-categories">{c.categories.map((x) => <option key={x} value={x} />)}</datalist>
             <Grid cols={2}>
               <Field label="Description">
                 <input className="form-input" value={c.form.description} onChange={(e) => c.setForm({ ...c.form, description: e.target.value })} />
@@ -84,10 +83,10 @@ export default function ExpensesPage() {
         </div>
         <input type="date" className="form-input" style={{ width: 160 }} value={c.from} max={c.to} onChange={(e) => c.setFrom(e.target.value)} aria-label="From" />
         <input type="date" className="form-input" style={{ width: 160 }} value={c.to} min={c.from} onChange={(e) => c.setTo(e.target.value)} aria-label="To" />
-        <select className="form-input" style={{ width: 180 }} value={c.category} onChange={(e) => c.setCategory(e.target.value)} aria-label="Category">
+        <Select className="form-input" style={{ width: 180 }} value={c.category} onChange={(e) => c.setCategory(e.target.value)} aria-label="Category">
           <option value="">All categories</option>
           {c.categories.map((x) => <option key={x} value={x}>{x}</option>)}
-        </select>
+        </Select>
         <form className="toolbar-grow" onSubmit={(e) => { e.preventDefault(); c.submitSearch(); }}>
           <SearchInput placeholder="Search description or reference…" value={c.search} onChange={(e) => c.setSearch(e.target.value)} />
         </form>

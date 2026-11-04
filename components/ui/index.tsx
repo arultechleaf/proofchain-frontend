@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { setCrumbLabel } from '@/lib/breadcrumb';
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { AlertCircle, ArrowLeft, CheckCircle2, Eye, Info, Loader2, Pencil, Search, Trash2 } from 'lucide-react';
 import { statusColor, statusLabel } from '@/lib/utils';
@@ -21,6 +23,9 @@ export function PageHeader({
   backHref?: string;
   actions?: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  // On a record page (/sales/6) the title — e.g. the bill number — becomes the breadcrumb label.
+  useEffect(() => { setCrumbLabel(pathname, title); }, [pathname, title]);
   return (
     <div className="page-header">
       <div className="page-header-main">
@@ -302,6 +307,7 @@ export function RowActions({ view, edit, remove, extra }: {
   remove?: { label?: string; confirm: string; onConfirm: () => void | Promise<void>; disabled?: string };
   extra?: React.ReactNode;
 }) {
+  const { confirm, dialog } = useConfirm();
   const icon = (kind: 'view' | 'edit', label: string, target: ActionTarget, Icon: React.ElementType) =>
     typeof target === 'string' ? (
       <Link href={target} className={`icon-btn icon-${kind}`} title={label} aria-label={label}><Icon size={15} /></Link>
@@ -320,11 +326,14 @@ export function RowActions({ view, edit, remove, extra }: {
           title={remove.disabled ?? remove.label ?? 'Delete'}
           aria-label={remove.label ?? 'Delete'}
           disabled={!!remove.disabled}
-          onClick={() => { if (window.confirm(remove.confirm)) void remove.onConfirm(); }}
+          onClick={async () => {
+            if (await confirm({ title: 'Delete this record?', message: remove.confirm, confirmLabel: 'Yes, delete' })) void remove.onConfirm();
+          }}
         >
           <Trash2 size={15} />
         </button>
       )}
+      {dialog}
     </span>
   );
 }
@@ -452,3 +461,86 @@ export function KeyValue({ rows }: { rows: Array<[string, React.ReactNode]> }) {
 
 export { useAsync } from '@/controllers/useAsync';
 export { canWrite, canUse } from '@/lib/roles';
+
+/* ── Confirm dialog (replaces window.confirm) ───────────────────────────── */
+
+export type ConfirmOptions = {
+  title?: string;
+  message: React.ReactNode;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  /** Red confirm button for destructive actions (default true). */
+  danger?: boolean;
+};
+
+function ConfirmDialog({ title, message, confirmLabel, cancelLabel, danger = true, onClose }: ConfirmOptions & { onClose: (ok: boolean) => void }) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    cancelRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+  return (
+    <div className="modal-overlay" onClick={() => onClose(false)}>
+      <div className={`modal ${danger ? 'modal-error' : ''}`} role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"
+        onClick={(e) => e.stopPropagation()}>
+        {danger && <span className="status-icon"><AlertCircle size={26} /></span>}
+        <h3 id="confirm-title" className="modal-title">{title ?? 'Are you sure?'}</h3>
+        <p className="modal-text">{message}</p>
+        <div className="modal-actions">
+          <button ref={cancelRef} type="button" className="btn btn-secondary" onClick={() => onClose(false)}>{cancelLabel ?? 'No, keep it'}</button>
+          <button type="button" className={`btn ${danger ? 'btn-danger' : 'btn-primary'}`} onClick={() => onClose(true)}>{confirmLabel ?? 'Yes, continue'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Promise-based confirmation: `const { confirm, dialog } = useConfirm();` render `{dialog}` once,
+ * then `if (await confirm({ message: '…' })) doIt();`
+ */
+export function useConfirm() {
+  const [req, setReq] = useState<(ConfirmOptions & { resolve: (ok: boolean) => void }) | null>(null);
+  const confirm = useCallback((o: ConfirmOptions) => new Promise<boolean>((resolve) => setReq({ ...o, resolve })), []);
+  const close = useCallback((ok: boolean) => { setReq((r) => { r?.resolve(ok); return null; }); }, []);
+  const dialog = req ? <ConfirmDialog {...req} onClose={close} /> : null;
+  return { confirm, dialog };
+}
+
+/** Mouse drag-to-scroll for a sideways-scrolling box whose scrollbar is hidden (touch already swipes). */
+function useDragScroll() {
+  const state = useRef({ down: false, moved: false, startX: 0, startLeft: 0 });
+  return {
+    onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      const el = e.currentTarget;
+      if (el.scrollWidth <= el.clientWidth) return;
+      state.current = { down: true, moved: false, startX: e.clientX, startLeft: el.scrollLeft };
+    },
+    onPointerMove(e: React.PointerEvent<HTMLDivElement>) {
+      const st = state.current;
+      if (!st.down) return;
+      const dx = e.clientX - st.startX;
+      if (!st.moved && Math.abs(dx) < 5) return;
+      if (!st.moved) { st.moved = true; e.currentTarget.classList.add('is-dragging'); }
+      e.currentTarget.scrollLeft = st.startLeft - dx;
+    },
+    onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
+      state.current.down = false;
+      e.currentTarget.classList.remove('is-dragging');
+    },
+    onPointerLeave(e: React.PointerEvent<HTMLDivElement>) {
+      state.current.down = false;
+      e.currentTarget.classList.remove('is-dragging');
+    },
+    onClickCapture(e: React.MouseEvent<HTMLDivElement>) {
+      // a drag must not also count as a click on a link or button under the pointer
+      if (state.current.moved) { e.preventDefault(); e.stopPropagation(); state.current.moved = false; }
+    },
+  };
+}
+
+export { Select } from "./Select";
+export { Combobox } from "./Combobox";

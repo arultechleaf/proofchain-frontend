@@ -7,7 +7,7 @@ import { partiesApi } from '@/lib/api';
 import type { Invoice, Party, PartySummary, Payment } from '@/models';
 import { formatDay, formatMoney } from '@/lib/utils';
 import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, StatCard, useAsync,
+  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, StatCard, useAsync, Select
 } from '@/components/ui';
 
 interface Ledger {
@@ -99,12 +99,12 @@ export default function PartyLedgerPage() {
       <Card style={{ marginBottom: 20 }}>
         <div style={{ maxWidth: 420 }}>
           <Field label="Customer / supplier">
-            <select className="form-input" value={partyId} onChange={(e) => setPartyId(e.target.value)}>
+            <Select className="form-input" value={partyId} onChange={(e) => setPartyId(e.target.value)}>
               <option value="">Select a party…</option>
               {(parties.data ?? []).map((p) => (
                 <option key={p.id} value={p.id}>{p.name} ({p.partyType})</option>
               ))}
-            </select>
+            </Select>
           </Field>
         </div>
       </Card>

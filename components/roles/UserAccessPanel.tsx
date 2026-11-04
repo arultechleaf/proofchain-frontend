@@ -5,7 +5,7 @@
  * each one. Screens that match what the role gives are not stored; ticking more or fewer overrides the role for that user.
  */
 import { CheckSquare, Save, Search, Square, Undo2, Users } from 'lucide-react';
-import { Button, Card, EmptyState, Notice, SearchInput, Spinner } from '@/components/ui';
+import { Button, Card, EmptyState, Notice, SearchInput, Spinner, Select } from '@/components/ui';
 import { useUserAccessController, type AccessScope } from '@/controllers/user-access.controller';
 import { LEVEL_INFO, type AccessLevel } from '@/models/role-permission';
 import { roleLabel } from '@/lib/utils';
@@ -93,13 +93,13 @@ export function UserAccessPanel({ scope = 'all' }: { scope?: AccessScope }) {
                           <span className="access-role-default" title="What this user's role gives">
                             Role: <span style={{ color: LEVEL_INFO[s.roleLevel].color }}>{LEVEL_INFO[s.roleLevel].label}</span>
                           </span>
-                          <select
+                          <Select
                             className="form-input access-level" value={on ? level : ''} disabled={!on || locked} aria-label={`Access level for ${s.label}`}
                             onChange={(e) => c.setLevel(s, e.target.value as AccessLevel)}
                           >
                             {!on && <option value="">No access</option>}
                             {LEVELS.map((l) => <option key={l} value={l}>{LEVEL_INFO[l].label}</option>)}
-                          </select>
+                          </Select>
                         </div>
                       );
                     })}

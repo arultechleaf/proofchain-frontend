@@ -3,7 +3,7 @@
 /** VIEW — add stock from an invoice PDF: upload, review the lines the server found, confirm. */
 import { useRef } from 'react';
 import { FileUp, PackagePlus } from 'lucide-react';
-import { Button, Card, Column, DataTable, EmptyState, Notice, Page, PageHeader, Spinner } from '@/components/ui';
+import { Button, Card, Column, DataTable, EmptyState, Notice, Page, PageHeader, Spinner, Select } from '@/components/ui';
 import { NEW_ITEM, useInvoiceImportController, type ImportRow } from '@/controllers/invoice-import.controller';
 import { formatMoney } from '@/lib/utils';
 
@@ -54,10 +54,10 @@ export default function ImportInvoicePage() {
       cell: (r) => {
         const index = c.rows.indexOf(r);
         return (
-          <select className="form-input" value={r.itemId} aria-label={`Stock item for ${r.description}`} onChange={(e) => c.updateRow(index, { itemId: e.target.value })}>
+          <Select className="form-input" value={r.itemId} aria-label={`Stock item for ${r.description}`} onChange={(e) => c.updateRow(index, { itemId: e.target.value })}>
             <option value={NEW_ITEM}>+ Create as a new item</option>
             {c.items.map((i) => <option key={i.id} value={i.id}>{i.name}{i.sku ? ` (${i.sku})` : ''}</option>)}
-          </select>
+          </Select>
         );
       },
     },
@@ -96,9 +96,9 @@ export default function ImportInvoicePage() {
           {c.invoice.warnings.map((w) => <Notice key={w} kind="error">{w}</Notice>)}
 
           <div className="toolbar">
-            <select className="form-input" style={{ width: 260 }} value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)} aria-label="Branch">
+            <Select className="form-input" style={{ width: 260 }} value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)} aria-label="Branch">
               {c.branches.map((b) => <option key={b.id} value={b.id}>{b.name} ({b.code}){b.isDefault ? ' · default' : ''}</option>)}
-            </select>
+            </Select>
           </div>
 
           <DataTable bare columns={columns} rows={c.rows} rowKey={(r) => c.rows.indexOf(r)}

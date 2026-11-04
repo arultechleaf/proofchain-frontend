@@ -3,7 +3,7 @@
 /** VIEW — bank details printed on invoices, invoice numbering and defaults. */
 import { useForm } from 'react-hook-form';
 import { Banknote, FileText } from 'lucide-react';
-import { Card, Field, Form, Grid, Notice, Page, PageHeader, Spinner } from '@/components/ui';
+import { Card, Field, Form, Grid, Notice, Page, PageHeader, Spinner, Select } from '@/components/ui';
 import { useCompanySettingsController } from '@/controllers/company.controller';
 import { GST_RATES } from '@/lib/gst';
 import type { CompanySettings } from '@/models/company';
@@ -59,9 +59,9 @@ function SettingsForm({ settings, saving, writable, onSave }: { settings: Compan
       </Grid>
       <Grid cols={2}>
         <Field label="Default GST % on a new invoice line" error={errors.defaultTaxRate?.message}>
-          <select className="form-input" {...register('defaultTaxRate', { valueAsNumber: true })}>
+          <Select className="form-input" {...register('defaultTaxRate', { valueAsNumber: true })}>
             {(GST_RATES.includes(settings.defaultTaxRate) ? GST_RATES : [...GST_RATES, settings.defaultTaxRate]).map((r) => <option key={r} value={r}>{r}%</option>)}
-          </select>
+          </Select>
         </Field>
         <Field label="Payment due after (days)" error={errors.paymentTermsDays?.message} hint="0 = due on the invoice date">
           <input type="number" min={0} max={365} className="form-input" {...register('paymentTermsDays', { valueAsNumber: true, min: { value: 0, message: 'Cannot be negative' }, max: { value: 365, message: 'Max 365' } })} />

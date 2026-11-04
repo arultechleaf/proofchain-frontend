@@ -17,6 +17,7 @@ import {
   Users,
   Boxes,
   Receipt,
+  ReceiptText,
   ShoppingCart,
   Wallet,
   Scale,
@@ -70,6 +71,11 @@ const NAV_ITEMS: NavItem[] = [
     href: '/sales',
     icon: Receipt,
     label: 'Sales',
+  },
+  {
+    href: '/non-gst-sales',
+    icon: ReceiptText,
+    label: 'Non-GST Sales',
   },
   {
     href: '/quotations',

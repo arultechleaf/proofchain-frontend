@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { CheckField, Field, Grid, Form, useAsync } from '@/components/ui';
+import { CheckField, Field, Grid, Form, useAsync, Select } from '@/components/ui';
 import { companiesApi } from '@/lib/api';
 import type { Company, User } from '@/models';
 import { rolePermissionService } from '@/models/role-permission';
@@ -71,16 +71,16 @@ export function UserForm({
       </Grid>
       <Grid cols={2}>
         <Field label="Role" hint={isSelf ? 'You cannot change your own role' : undefined}>
-          <select className="form-input" disabled={isSelf} {...register('role')}>
+          <Select className="form-input" disabled={isSelf} {...register('role')}>
             {roleOptions.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
-          </select>
+          </Select>
         </Field>
         <Field label="Organization" required={role !== 'admin'} error={errors.companyId?.message}>
-          <select className="form-input"
+          <Select className="form-input"
             {...register('companyId', { validate: (v) => role === 'admin' || !!v || 'Select an organization' })}>
             <option value="">{role === 'admin' ? 'None' : 'Select...'}</option>
             {(companies.data ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+          </Select>
         </Field>
       </Grid>
       <Field label={isNew ? 'Temporary password' : 'New temporary password'} error={errors.password?.message}

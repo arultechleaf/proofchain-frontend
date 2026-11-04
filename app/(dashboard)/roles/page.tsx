@@ -3,7 +3,7 @@
 /** VIEW — role → screen permission matrix, read from MySQL; administrators can change it and add roles. */
 import { useState } from 'react';
 import { Plus, Save, ShieldCheck, Trash2, UserCog } from 'lucide-react';
-import { Button, Card, Column, DataTable, Field, Form, Notice, Page, PageHeader, Tabs } from '@/components/ui';
+import { Button, Card, Column, DataTable, Field, Form, Notice, Page, PageHeader, Tabs, useConfirm, Select } from '@/components/ui';
 import { UserAccessPanel } from '@/components/roles/UserAccessPanel';
 import { useRolePermissionController } from '@/controllers/role-permission.controller';
 import { LEVEL_INFO, type AccessLevel } from '@/models/role-permission';
@@ -11,6 +11,7 @@ import { LEVEL_INFO, type AccessLevel } from '@/models/role-permission';
 type Row = { area: string; label: string; group: string; path: string; levels: Record<string, AccessLevel> };
 
 export default function RolesPage() {
+  const { confirm, dialog } = useConfirm();
   const c = useRolePermissionController();
   const [tab, setTab] = useState<'role' | 'user'>(() =>
     typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('user') ? 'user' : 'role');
@@ -30,11 +31,11 @@ export default function RolesPage() {
             }
             return (
               <span className="perm-cell">
-                <select className="form-input" value={level} aria-label={`${c.roleName(role)} — ${r.label}`}
+                <Select className="form-input" value={level} aria-label={`${c.roleName(role)} — ${r.label}`}
                   style={{ color: LEVEL_INFO[level].color }}
                   onChange={(e) => c.setLevel(role, r.area, e.target.value as AccessLevel)}>
                   {matrix.levels.map((l) => <option key={l} value={l}>{LEVEL_INFO[l].label}</option>)}
-                </select>
+                </Select>
               </span>
             );
           },
@@ -46,6 +47,7 @@ export default function RolesPage() {
 
   return (
     <Page>
+      {dialog}
       <PageHeader
         title="Roles & Permissions"
         actions={c.isAdmin && tab === 'role' && (
@@ -112,7 +114,9 @@ export default function RolesPage() {
                   <span key={r.key} className="badge badge-pending" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                     {r.name}
                     <Button variant="link" size="sm" iconOnly icon={Trash2} aria-label={`Delete ${r.name}`} disabled={c.busy}
-                      onClick={() => { if (window.confirm(`Delete the role "${r.name}"?`)) void c.deleteRole(r.key); }} />
+                      onClick={async () => {
+                        if (await confirm({ title: 'Delete this role?', message: `Delete the role "${r.name}"?`, confirmLabel: 'Yes, delete' })) void c.deleteRole(r.key);
+                      }} />
                   </span>
                 ))}
               </div>

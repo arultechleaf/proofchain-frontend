@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeftRight, ClipboardList, FileUp, Undo2 } from 'lucide-react';
-import { Card, Field, Form, Grid, Notice, Page, PageHeader, SearchInput, Spinner, Tabs } from '@/components/ui';
+import { Card, Field, Form, Grid, Notice, Page, PageHeader, SearchInput, Spinner, Tabs, Select } from '@/components/ui';
 import { useStockEntryController } from '@/controllers/stock-entry.controller';
 
 type Tab = 'entry' | 'transfer' | 'returns';
@@ -20,9 +20,9 @@ export default function StockEntryPage() {
         actions={<Link href="/inventory/entry/import" className="btn btn-secondary"><FileUp size={15} /> Add from invoice PDF</Link>} />
 
       <div className="toolbar">
-        <select className="form-input" style={{ width: 260 }} value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)} aria-label="Branch">
+        <Select className="form-input" style={{ width: 260 }} value={c.branchId} onChange={(e) => c.setBranchId(e.target.value)} aria-label="Branch">
           {c.branches.map((b) => <option key={b.id} value={b.id}>{b.name} ({b.code}){b.isDefault ? ' · default' : ''}</option>)}
-        </select>
+        </Select>
         <Tabs<Tab> value={tab} onChange={(k) => { setTab(k); c.clearMessage(); }}
           options={[{ key: 'entry', label: 'Stock entry' }, { key: 'transfer', label: 'Transfer' }, { key: 'returns', label: 'Returns' }]} />
       </div>
@@ -37,11 +37,11 @@ export default function StockEntryPage() {
             readOnly={false}>
             <Grid cols={2}>
               <Field label="Reason">
-                <select className="form-input" value={c.reason} onChange={(e) => c.setReason(e.target.value as 'purchase' | 'adjustment' | 'opening')}>
+                <Select className="form-input" value={c.reason} onChange={(e) => c.setReason(e.target.value as 'purchase' | 'adjustment' | 'opening')}>
                   <option value="purchase">Stock received (adds)</option>
                   <option value="adjustment">Count correction (add or remove)</option>
                   <option value="opening">Opening stock (adds)</option>
-                </select>
+                </Select>
               </Field>
               <Field label="Note"><input className="form-input" value={c.note} placeholder="Supplier, GRN number…" onChange={(e) => c.setNote(e.target.value)} /></Field>
             </Grid>
@@ -70,16 +70,16 @@ export default function StockEntryPage() {
           <Form onSubmit={async () => { await c.saveTransfer(); }} loading={c.saving} submitLabel="Move stock">
             <Grid cols={2}>
               <Field label="Item" required>
-                <select className="form-input" required value={c.tr.itemId} onChange={(e) => c.setTr({ ...c.tr, itemId: e.target.value })}>
+                <Select className="form-input" required value={c.tr.itemId} onChange={(e) => c.setTr({ ...c.tr, itemId: e.target.value })}>
                   <option value="">Select…</option>
                   {c.items.filter((i) => i.stock > 0).map((i) => <option key={i.id} value={i.id}>{i.name} — {i.stock} {i.unit} here</option>)}
-                </select>
+                </Select>
               </Field>
               <Field label="Move to" required>
-                <select className="form-input" required value={c.tr.toBranchId} onChange={(e) => c.setTr({ ...c.tr, toBranchId: e.target.value })}>
+                <Select className="form-input" required value={c.tr.toBranchId} onChange={(e) => c.setTr({ ...c.tr, toBranchId: e.target.value })}>
                   <option value="">Select…</option>
                   {c.branches.filter((b) => String(b.id) !== c.branchId).map((b) => <option key={b.id} value={b.id}>{b.name} ({b.code})</option>)}
-                </select>
+                </Select>
               </Field>
             </Grid>
             <Grid cols={2}>
@@ -99,16 +99,16 @@ export default function StockEntryPage() {
           <Form onSubmit={async () => { await c.saveReturn(); }} loading={c.saving} submitLabel="Record return">
             <Grid cols={2}>
               <Field label="Type">
-                <select className="form-input" value={c.rt.kind} onChange={(e) => c.setRt({ ...c.rt, kind: e.target.value as 'sale' | 'purchase' })}>
+                <Select className="form-input" value={c.rt.kind} onChange={(e) => c.setRt({ ...c.rt, kind: e.target.value as 'sale' | 'purchase' })}>
                   <option value="sale">Sale return: a customer sends goods back (stock goes up)</option>
                   <option value="purchase">Purchase return: goods go back to a supplier (stock goes down)</option>
-                </select>
+                </Select>
               </Field>
               <Field label="Item" required>
-                <select className="form-input" required value={c.rt.itemId} onChange={(e) => c.setRt({ ...c.rt, itemId: e.target.value })}>
+                <Select className="form-input" required value={c.rt.itemId} onChange={(e) => c.setRt({ ...c.rt, itemId: e.target.value })}>
                   <option value="">Select…</option>
                   {c.items.map((i) => <option key={i.id} value={i.id}>{i.name} — {i.stock} {i.unit} here</option>)}
-                </select>
+                </Select>
               </Field>
             </Grid>
             <Grid cols={3}>

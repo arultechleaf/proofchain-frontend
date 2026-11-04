@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { FileText } from 'lucide-react';
 import { formatMoney } from '@/lib/utils';
-import { Card, Field, Grid, Notice, Page, PageHeader, Spinner, SubmitButton } from '@/components/ui';
+import { Card, Field, Grid, Notice, Page, PageHeader, Spinner, SubmitButton, Select } from '@/components/ui';
 import { LineItemsCard } from '@/components/billing/LineItemsCard';
 import { useCreateQuotationController } from '@/controllers/quotation.controller';
 
@@ -24,10 +24,10 @@ function CreateQuotationForm() {
         <Card style={{ marginBottom: 18 }}>
           <Grid cols={3}>
             <Field label="Customer" required>
-              <select className="form-input" value={c.partyId} onChange={(e) => c.setPartyId(e.target.value)}>
+              <Select className="form-input" value={c.partyId} onChange={(e) => c.setPartyId(e.target.value)}>
                 <option value="">Select…</option>
                 {c.parties.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </select>
+              </Select>
               {c.parties.length === 0 && (
                 <p className="form-hint">No customers yet — <Link href="/parties/create" className="auth-link">add one</Link></p>
               )}

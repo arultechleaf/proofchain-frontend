@@ -2,6 +2,7 @@
 
 import React from "react";
 import styles from "./CustomPagination.module.css";
+import { Select } from '@/components/ui';
 
 type PaginationProps = {
   /** Current page, starting at 1 */
@@ -90,7 +91,7 @@ const CustomPagination = ({
       <div className={`${styles.custom_pagination_rows}`}>
         <label htmlFor="custom-pagination-size">Rows per page:</label>
         <div className={`${styles.custom_pagination_select_wrap}`}>
-          <select
+          <Select
             id="custom-pagination-size"
             className={`${styles.custom_pagination_select}`}
             value={pageSize}
@@ -101,7 +102,7 @@ const CustomPagination = ({
                 {size}
               </option>
             ))}
-          </select>
+          </Select>
           <ChevronDown />
         </div>
       </div>

@@ -54,8 +54,14 @@ export default function PaymentsPage() {
         ? <Link href={`/${p.invoice.type === 'sale' ? 'sales' : 'purchases'}/${p.invoice.id}`} style={{ color: '#94a3b8', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>{p.invoice.invoiceNumber}</Link>
         : <span style={{ color: '#475569' }}>On account</span>,
     },
-    { header: 'Method', cell: (p) => <span style={{ textTransform: 'capitalize' }}>{p.method}</span> },
-    { header: 'Reference', cell: (p) => p.reference || '—' },
+    { header: 'Method', cell: (p) => (p.method === 'upi' ? 'UPI' : <span style={{ textTransform: 'capitalize' }}>{p.method}</span>) },
+    { header: 'Account', cell: (p) => p.accountName || '—' },
+    {
+      header: 'Reference',
+      cell: (p) => (p.reference
+        ? <span title={p.reference} style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>{p.reference.length > 16 ? p.reference.slice(0, 14) + '…' : p.reference}</span>
+        : '—'),
+    },
     {
       header: 'Amount', align: 'right',
       cell: (p) => (

@@ -3,22 +3,23 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { FileText, Plus, Search } from 'lucide-react';
-import { invoicesApi } from '@/lib/api';
-import type { Invoice, InvoiceType } from '@/models';
+import { invoicesApi, type InvoiceScreen } from '@/lib/api';
+import type { Invoice } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDay, formatMoney } from '@/lib/utils';
 import { exportRows, type ExportFormat } from '@/lib/export';
 import { ExportButtons } from '@/components/ui/ExportButtons';
 import {
-  Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, StatusBadge, actionsColumn, canUse, canWrite, useAsync,
+  Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, StatusBadge, actionsColumn, canUse, canWrite, useAsync, Select
 } from '@/components/ui';
 
-export const INVOICE_COPY: Record<InvoiceType, { base: string; title: string; noun: string; newLabel: string; party: string }> = {
+export const INVOICE_COPY: Record<InvoiceScreen, { base: string; title: string; noun: string; newLabel: string; party: string }> = {
   sale: { base: '/sales', title: 'Sales Invoices', noun: 'invoices', newLabel: 'New Sale', party: 'Customer' },
+  non_gst_sale: { base: '/non-gst-sales', title: 'Non-GST Sales', noun: 'sales', newLabel: 'New Non-GST Sale', party: 'Customer' },
   purchase: { base: '/purchases', title: 'Purchase Bills', noun: 'bills', newLabel: 'New Purchase', party: 'Supplier' },
 };
 
-export function InvoiceList({ type }: { type: InvoiceType }) {
+export function InvoiceList({ type }: { type: InvoiceScreen }) {
   const copy = INVOICE_COPY[type];
   const { user } = useAuth();
   const [status, setStatus] = useState('');
@@ -58,7 +59,7 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
     }
     await exportRows(format, {
       title: copy.title,
-      filename: type === 'sale' ? 'sales-invoices' : 'purchase-bills',
+      filename: type === 'sale' ? 'sales-invoices' : type === 'non_gst_sale' ? 'non-gst-sales' : 'purchase-bills',
       rows: all,
       notes: [`Status: ${status || 'All'}${query ? ` · Search: ${query}` : ''} · ${all.length} ${copy.noun}`],
       columns: [
@@ -113,7 +114,7 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
         actions={(
           <>
             <ExportButtons onExport={exportInvoices} disabled={loading || !total} />
-            {canUse(type === 'sale' ? 'sales_create' : 'purchases_create', user?.role) && (
+            {canUse(type === 'sale' ? 'sales_create' : type === 'non_gst_sale' ? 'non_gst_sales_create' : 'purchases_create', user?.role) && (
               <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={15} /> {copy.newLabel}</Link>
             )}
           </>
@@ -127,13 +128,13 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
           <input className="form-input" style={{ paddingLeft: 34 }} placeholder={`Search number or ${copy.party.toLowerCase()}...`}
             value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <select className="form-input" style={{ width: 160 }} value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
+        <Select className="form-input" style={{ width: 160 }} value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
           <option value="">All statuses</option>
           <option value="issued">Issued</option>
           <option value="partial">Partially paid</option>
           <option value="paid">Paid</option>
           <option value="cancelled">Cancelled</option>
-        </select>
+        </Select>
         <button type="submit" className="btn btn-secondary">Search</button>
       </form>
 
@@ -147,7 +148,7 @@ export function InvoiceList({ type }: { type: InvoiceType }) {
         rowKey={(i) => i.id}
         empty={
           <EmptyState icon={FileText} title={`No ${copy.noun} found`}
-            action={canUse(type === 'sale' ? 'sales_create' : 'purchases_create', user?.role) ? <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={14} /> {copy.newLabel}</Link> : undefined} />
+            action={canUse(type === 'sale' ? 'sales_create' : type === 'non_gst_sale' ? 'non_gst_sales_create' : 'purchases_create', user?.role) ? <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={14} /> {copy.newLabel}</Link> : undefined} />
         }
         startIndex={(page - 1) * limit}
         footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
