@@ -15,11 +15,11 @@ import type { AppNotification, NotificationType } from '@/models';
 const POPUP_SIZE = 8;
 
 const TYPE_ICON: Record<NotificationType, { icon: React.ElementType; color: string }> = {
-  delivery: { icon: Package, color: '#2dd4bf' },
+  delivery: { icon: Package, color: '#3ddc84' },
   approval: { icon: CheckCircle2, color: '#4ade80' },
   invoice: { icon: FileText, color: '#a78bfa' },
   payment: { icon: CreditCard, color: '#fbbf24' },
-  system: { icon: Bell, color: '#94b2bd' },
+  system: { icon: Bell, color: '#9aa9a1' },
 };
 
 export function NotificationBell({ enabled }: { enabled: boolean }) {

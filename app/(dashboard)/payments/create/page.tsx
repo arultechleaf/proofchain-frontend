@@ -89,7 +89,7 @@ function RecordPayment() {
         const checkout = new window.Razorpay!({
           key: order.keyId, amount: order.amount, currency: order.currency, order_id: order.orderId,
           name: order.merchantName || 'ProofChain', description: `Invoice ${order.invoiceNumber}`,
-          prefill: order.customer, notes: { invoiceNumber: order.invoiceNumber }, theme: { color: '#0d9488' },
+          prefill: order.customer, notes: { invoiceNumber: order.invoiceNumber }, theme: { color: '#16a34a' },
           handler: (response) => {
             paid = true;
             razorpayApi.verify({ orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id, signature: response.razorpay_signature })

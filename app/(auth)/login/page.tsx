@@ -36,7 +36,7 @@ function ConnectionLine({ x1, y1, x2, y2, delay }: { x1: number; y1: number; x2:
   return (
     <motion.line
       x1={`${x1}%`} y1={`${y1}%`} x2={`${x2}%`} y2={`${y2}%`}
-      stroke="rgba(20, 184, 166,0.15)" strokeWidth="1"
+      stroke="rgba(34, 197, 94,0.15)" strokeWidth="1"
       initial={{ pathLength: 0, opacity: 0 }}
       animate={{ pathLength: 1, opacity: [0, 0.6, 0] }}
       transition={{ duration: 4, repeat: Infinity, delay, repeatDelay: 2 }}

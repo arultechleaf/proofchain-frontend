@@ -34,7 +34,7 @@ export function SalesReportView({ lockType }: { lockType?: 'sale' | 'purchase' }
     [type, from, to],
   );
   const word = type === 'sale' ? 'Sales' : 'Purchases';
-  const accent = type === 'sale' ? '#2dd4bf' : '#2dd4bf';
+  const accent = type === 'sale' ? '#3ddc84' : '#3ddc84';
   const t = data?.totals;
 
   const partyColumns: Column<SalesReport['topParties'][number]>[] = [
@@ -83,13 +83,13 @@ export function SalesReportView({ lockType }: { lockType?: 'sale' | 'purchase' }
         <div style={{ width: '100%', height: 260 }}>
           <ResponsiveContainer>
             <BarChart data={data?.daily ?? []} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke="rgba(38, 70, 84,0.4)" vertical={false} />
-              <XAxis dataKey="date" tickFormatter={(d: string) => d.slice(5)} stroke="#6b8a96" fontSize={11} tickLine={false} minTickGap={16} />
-              <YAxis stroke="#6b8a96" fontSize={11} tickLine={false} axisLine={false} width={56}
+              <CartesianGrid stroke="rgba(40, 56, 48,0.4)" vertical={false} />
+              <XAxis dataKey="date" tickFormatter={(d: string) => d.slice(5)} stroke="#7b8a82" fontSize={11} tickLine={false} minTickGap={16} />
+              <YAxis stroke="#7b8a82" fontSize={11} tickLine={false} axisLine={false} width={56}
                 tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))} />
               <Tooltip
-                cursor={{ fill: 'rgba(20, 184, 166,0.08)' }}
-                contentStyle={{ background: '#0a1a21', border: '1px solid rgba(20, 184, 166,0.25)', borderRadius: 8, fontSize: 12 }}
+                cursor={{ fill: 'rgba(34, 197, 94,0.08)' }}
+                contentStyle={{ background: '#0f1512', border: '1px solid rgba(34, 197, 94,0.25)', borderRadius: 8, fontSize: 12 }}
                 labelFormatter={(d) => formatDay(String(d))}
                 formatter={(v) => [formatMoney(Number(v)), word]}
               />

@@ -299,8 +299,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         flexDirection: 'column',
         flexShrink: 0,
         background:
-          'linear-gradient(180deg, #06141a 0%, #080f1f 100%)',
-        borderRight: '1px solid rgba(20, 184, 166,0.12)',
+          'linear-gradient(180deg, #0b0f0d 0%, #080f1f 100%)',
+        borderRight: '1px solid rgba(34, 197, 94,0.12)',
         overflow: 'hidden',
         transition:
           'width 0.3s cubic-bezier(.4,0,.2,1), min-width 0.3s cubic-bezier(.4,0,.2,1)',
@@ -314,7 +314,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           alignItems: 'center',
           gap: 10,
           padding: '18px 14px 16px',
-          borderBottom: '1px solid rgba(20, 184, 166,0.1)',
+          borderBottom: '1px solid rgba(34, 197, 94,0.1)',
           flexShrink: 0,
         }}
       >
@@ -347,7 +347,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </p>
             <p
               style={{
-                color: '#6b8a96',
+                color: '#7b8a82',
                 fontSize: 11,
                 margin: 0,
                 lineHeight: 1.4,
@@ -389,7 +389,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   <div
                     style={{
                       height: 1,
-                      background: 'rgba(20, 184, 166,0.1)',
+                      background: 'rgba(34, 197, 94,0.1)',
                       margin: '8px 10px',
                     }}
                   />
@@ -400,7 +400,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                       fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      color: '#2d4b58',
+                      color: '#2d3b34',
                       margin: '12px 10px 4px',
                     }}
                   >
@@ -429,12 +429,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                       ? 'center'
                       : 'flex-start',
                     background: isActive
-                      ? 'rgba(13, 148, 136,0.15)'
+                      ? 'rgba(22, 163, 74,0.15)'
                       : 'transparent',
                     border: isActive
-                      ? '1px solid rgba(20, 184, 166,0.25)'
+                      ? '1px solid rgba(34, 197, 94,0.25)'
                       : '1px solid transparent',
-                    color: isActive ? '#2dd4bf' : '#6b8a96',
+                    color: isActive ? '#3ddc84' : '#7b8a82',
                     transition: 'all 0.15s',
                     cursor: 'pointer',
                     position: 'relative',
@@ -442,14 +442,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                   onMouseEnter={(event) => {
                     if (!isActive) {
                       event.currentTarget.style.background =
-                        'rgba(20, 48, 58,0.7)';
-                      event.currentTarget.style.color = '#e0eef2';
+                        'rgba(24, 34, 29,0.7)';
+                      event.currentTarget.style.color = '#e8efeb';
                     }
                   }}
                   onMouseLeave={(event) => {
                     if (!isActive) {
                       event.currentTarget.style.background = 'transparent';
-                      event.currentTarget.style.color = '#6b8a96';
+                      event.currentTarget.style.color = '#7b8a82';
                     }
                   }}
                 >
@@ -479,7 +479,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       <div
         style={{
           padding: 6,
-          borderTop: '1px solid rgba(20, 184, 166,0.08)',
+          borderTop: '1px solid rgba(34, 197, 94,0.08)',
           flexShrink: 0,
         }}
       >
@@ -496,7 +496,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             borderRadius: 8,
             background: 'transparent',
             border: 'none',
-            color: '#4a6672',
+            color: '#55655d',
             cursor: 'pointer',
             justifyContent: collapsed ? 'center' : 'flex-start',
             fontSize: 13,
@@ -510,7 +510,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           }}
           onMouseLeave={(event) => {
             event.currentTarget.style.background = 'transparent';
-            event.currentTarget.style.color = '#4a6672';
+            event.currentTarget.style.color = '#55655d';
           }}
         >
           <LogOut size={16} style={{ flexShrink: 0 }} />

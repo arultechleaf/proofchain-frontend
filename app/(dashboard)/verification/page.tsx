@@ -12,12 +12,12 @@ const STATUS_CONFIG: Record<string, { icon: React.ElementType; color: string; bg
   verified:  { icon: CheckCircle2, color: '#4ade80', bg: 'rgba(22, 163, 74,0.12)',   border: 'rgba(34, 197, 94,0.3)',  label: 'VERIFIED' },
   mismatch:  { icon: XCircle,      color: '#f87171', bg: 'rgba(185,28,28,0.12)',   border: 'rgba(239,68,68,0.3)',   label: 'HASH MISMATCH' },
   not_found: { icon: AlertCircle,  color: '#fbbf24', bg: 'rgba(180,83,9,0.12)',    border: 'rgba(245,158,11,0.3)',  label: 'NOT FOUND' },
-  pending:   { icon: Clock,        color: '#2dd4bf', bg: 'rgba(13, 148, 136,0.12)',   border: 'rgba(20, 184, 166,0.3)',  label: 'PENDING' },
+  pending:   { icon: Clock,        color: '#3ddc84', bg: 'rgba(22, 163, 74,0.12)',   border: 'rgba(34, 197, 94,0.3)',  label: 'PENDING' },
   error:     { icon: AlertCircle,  color: '#f87171', bg: 'rgba(185,28,28,0.12)',   border: 'rgba(239,68,68,0.3)',   label: 'ERROR' },
 };
 
 const card: React.CSSProperties = {
-  background: 'rgba(6, 20, 26,0.85)', border: '1px solid rgba(20, 184, 166,0.12)',
+  background: 'rgba(11, 15, 13,0.85)', border: '1px solid rgba(34, 197, 94,0.12)',
   borderRadius: 14, padding: '20px 24px', marginBottom: 16,
 };
 
@@ -59,13 +59,13 @@ export default function VerificationPage() {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#ecf5f8', margin: 0 }}>Verification</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#eef3f0', margin: 0 }}>Verification</h1>
       </div>
 
       {/* Search card */}
       <div style={card}>
-        <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: '#c3d9e0', margin: '0 0 14px' }}>
-          <Search size={15} color="#2dd4bf" /> Find Delivery
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: '#c5d1ca', margin: '0 0 14px' }}>
+          <Search size={15} color="#3ddc84" /> Find Delivery
         </h2>
         <form onSubmit={searchDelivery} style={{ display: 'flex', gap: 10 }}>
           <input
@@ -88,10 +88,10 @@ export default function VerificationPage() {
         <div style={card}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 16 }}>
             <div>
-              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#2dd4bf', fontWeight: 700, margin: '0 0 4px' }}>
+              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#3ddc84', fontWeight: 700, margin: '0 0 4px' }}>
                 {delivery.deliveryReference}
               </p>
-              <p style={{ color: '#94b2bd', fontSize: 13, margin: 0 }}>{delivery.description}</p>
+              <p style={{ color: '#9aa9a1', fontSize: 13, margin: 0 }}>{delivery.description}</p>
             </div>
             <Button icon={Shield} loading={verifying} onClick={runVerification}>{verifying ? 'Verifying...' : 'Verify Now'}</Button>
           </div>
@@ -102,9 +102,9 @@ export default function VerificationPage() {
               ['Status',     delivery.status],
               ['Blockchain', delivery.blockchainStatus],
             ].map(([k, v]) => (
-              <div key={k} style={{ background: 'rgba(12, 30, 38,0.6)', borderRadius: 8, padding: '10px 14px' }}>
-                <p style={{ color: '#4a6672', fontSize: 11, margin: '0 0 3px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{k}</p>
-                <p style={{ color: '#e0eef2', fontSize: 13, fontWeight: 500, margin: 0, textTransform: 'capitalize' }}>{v}</p>
+              <div key={k} style={{ background: 'rgba(17, 24, 21,0.6)', borderRadius: 8, padding: '10px 14px' }}>
+                <p style={{ color: '#55655d', fontSize: 11, margin: '0 0 3px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{k}</p>
+                <p style={{ color: '#e8efeb', fontSize: 13, fontWeight: 500, margin: 0, textTransform: 'capitalize' }}>{v}</p>
               </div>
             ))}
           </div>
@@ -118,7 +118,7 @@ export default function VerificationPage() {
             <sc.icon size={32} color={sc.color} />
             <div>
               <p style={{ fontSize: 20, fontWeight: 800, color: sc.color, margin: 0 }}>{sc.label}</p>
-              <p style={{ color: '#6b8a96', fontSize: 12, margin: 0 }}>Verified at {formatDate(result.verifiedAt)} · <Link href={`/verification/${result.deliveryId}`} style={{ color: '#2dd4bf' }}>Full report</Link></p>
+              <p style={{ color: '#7b8a82', fontSize: 12, margin: 0 }}>Verified at {formatDate(result.verifiedAt)} · <Link href={`/verification/${result.deliveryId}`} style={{ color: '#3ddc84' }}>Full report</Link></p>
             </div>
             {result.blockchainMode === 'demo' && (
               <span style={{ marginLeft: 'auto', padding: '3px 10px', borderRadius: 9999, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#fbbf24', fontSize: 11 }}>
@@ -133,7 +133,7 @@ export default function VerificationPage() {
             { label: 'On-Chain Match', ok: result.blockchainMode === 'demo' || result.blockchainRecord?.onChainMatch, value: result.blockchainMode === 'demo' ? 'N/A (Demo Mode)' : result.blockchainRecord?.onChainMatch ? '✓ Confirmed on-chain' : '✗ Not found on chain' },
           ].map(r => (
             <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <span style={{ color: '#94b2bd', fontSize: 13 }}>{r.label}</span>
+              <span style={{ color: '#9aa9a1', fontSize: 13 }}>{r.label}</span>
               <span style={{ color: r.ok ? '#4ade80' : '#f87171', fontSize: 13, fontWeight: 600 }}>{r.value}</span>
             </div>
           ))}
@@ -141,14 +141,14 @@ export default function VerificationPage() {
           {/* Hashes */}
           {result.expectedHash && (
             <div style={{ marginTop: 14 }}>
-              <p style={{ color: '#6b8a96', fontSize: 11, marginBottom: 4, textTransform: 'uppercase' }}>Expected Hash</p>
-              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#2dd4bf', wordBreak: 'break-all', margin: 0 }}>{result.expectedHash}</p>
+              <p style={{ color: '#7b8a82', fontSize: 11, marginBottom: 4, textTransform: 'uppercase' }}>Expected Hash</p>
+              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#3ddc84', wordBreak: 'break-all', margin: 0 }}>{result.expectedHash}</p>
             </div>
           )}
           {result.blockchainRecord?.transactionHash && (
             <div style={{ marginTop: 10 }}>
-              <p style={{ color: '#6b8a96', fontSize: 11, marginBottom: 4, textTransform: 'uppercase' }}>Transaction Hash</p>
-              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#2dd4bf', wordBreak: 'break-all', margin: 0 }}>{result.blockchainRecord.transactionHash}</p>
+              <p style={{ color: '#7b8a82', fontSize: 11, marginBottom: 4, textTransform: 'uppercase' }}>Transaction Hash</p>
+              <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#3ddc84', wordBreak: 'break-all', margin: 0 }}>{result.blockchainRecord.transactionHash}</p>
             </div>
           )}
         </div>
@@ -156,7 +156,7 @@ export default function VerificationPage() {
 
       {/* Legend */}
       <div style={card}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, color: '#94b2bd', margin: '0 0 14px' }}>Verification Status Guide</h3>
+        <h3 style={{ fontSize: 13, fontWeight: 600, color: '#9aa9a1', margin: '0 0 14px' }}>Verification Status Guide</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
           {Object.entries(STATUS_CONFIG).map(([k, v]) => {
             const Icon = v.icon;
@@ -168,7 +168,7 @@ export default function VerificationPage() {
             );
           })}
         </div>
-        <p style={{ color: '#2d4b58', fontSize: 12, margin: 0, paddingTop: 12, borderTop: '1px solid rgba(20, 48, 58,0.8)', lineHeight: 1.6 }}>
+        <p style={{ color: '#2d3b34', fontSize: 12, margin: 0, paddingTop: 12, borderTop: '1px solid rgba(24, 34, 29,0.8)', lineHeight: 1.6 }}>
           Note: Blockchain timestamps prove when a record was registered, not the physical truth of a delivery.
           A VERIFIED status means the payload hash matches the registered proof — it does not guarantee physical delivery occurred.
         </p>

@@ -39,7 +39,7 @@
 }
 
 .startButton {
-  background: #0f766e;
+  background: #15803d;
 }
 
 .stopButton {
@@ -65,7 +65,7 @@
 }
 
 .status {
-  color: #0f766e;
+  color: #15803d;
   font-weight: 600;
 }
 
@@ -76,5 +76,5 @@
 
 .info {
   margin: 12px 0;
-  color: #0f766e;
+  color: #15803d;
 }

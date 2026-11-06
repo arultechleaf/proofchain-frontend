@@ -19,7 +19,7 @@ export function ThemeToggle() {
 
   const toggle = () => {
     document.documentElement.dataset.theme = next;
-    try { localStorage.setItem('theme', next); } catch { /* private mode: still switches for this visit */ }
+    try { localStorage.setItem('theme-v2', next); } catch { /* private mode: still switches for this visit */ }
     window.dispatchEvent(new Event(EVENT));
   };
 

@@ -56,11 +56,11 @@ const BREADCRUMBS: Record<string, string> = {
 
 const ROLE_COLORS: Record<string, string> = {
   admin: '#a78bfa',
-  company_a: '#2dd4bf',
-  company_b: '#2dd4bf',
+  company_a: '#3ddc84',
+  company_b: '#3ddc84',
   auditor: '#fbbf24',
   manager: '#4ade80',
-  user: '#94b2bd',
+  user: '#9aa9a1',
 };
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Administrator',
@@ -100,8 +100,8 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
       alignItems: 'center',
       gap: 16,
       padding: '0 24px',
-      borderBottom: '1px solid rgba(20, 184, 166,0.1)',
-      background: 'rgba(6, 20, 26,0.85)',
+      borderBottom: '1px solid rgba(34, 197, 94,0.1)',
+      background: 'rgba(11, 15, 13,0.85)',
       backdropFilter: 'blur(12px)',
       flexShrink: 0,
     }}>
@@ -112,9 +112,9 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
       <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, flex: 1, overflow: 'hidden' }}>
         {crumbs.map((crumb, i) => (
           <span key={crumb.href} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {i > 0 && <ChevronRight size={12} color="#2d4b58" />}
+            {i > 0 && <ChevronRight size={12} color="#2d3b34" />}
             <span style={{
-              color: i === crumbs.length - 1 ? '#e0eef2' : '#4a6672',
+              color: i === crumbs.length - 1 ? '#e8efeb' : '#55655d',
               fontWeight: i === crumbs.length - 1 ? 600 : 400,
               whiteSpace: 'nowrap',
             }}>
@@ -148,16 +148,16 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 8 }}>
             <div style={{
               width: 36, height: 36, borderRadius: 9, flexShrink: 0,
-              background: 'linear-gradient(135deg, #0d9488, #115e59)',
+              background: 'linear-gradient(135deg, #16a34a, #166534)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: '#fff', fontSize: 14, fontWeight: 700,
             }}>
               {user.name[0]?.toUpperCase()}
             </div>
             <div className="topnav-user-text" style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 1, textAlign: "left", whiteSpace: "nowrap" }}>
-              <p style={{ color: '#e0eef2', fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{user.name}</p>
-              <p style={{ color: ROLE_COLORS[user.role] ?? '#6b8a96', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</p>
-              <LiveClock style={{ color: '#6b8a96', fontSize: 10, margin: 0, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }} />
+              <p style={{ color: '#e8efeb', fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{user.name}</p>
+              <p style={{ color: ROLE_COLORS[user.role] ?? '#7b8a82', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</p>
+              <LiveClock style={{ color: '#7b8a82', fontSize: 10, margin: 0, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }} />
             </div>
           </div>
         )}

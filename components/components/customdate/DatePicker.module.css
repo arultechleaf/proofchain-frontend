@@ -13,7 +13,7 @@
 .label {
   font-size: 14px;
   font-weight: 600;
-  color: #0d222b;
+  color: #121a16;
 }
 
 .inputWrapper {
@@ -30,7 +30,7 @@
   border: 1px solid #d1dbea;
   border-radius: 10px;
   background-color: #ffffff;
-  color: #0d222b;
+  color: #121a16;
   font: inherit;
   font-size: 16px;
   outline: none;
@@ -39,7 +39,7 @@
 }
 
 .dateInput:focus {
-  border-color: #0f766e;
+  border-color: #15803d;
   box-shadow: 0 0 0 3px rgb(49 91 232 / 12%);
 }
 

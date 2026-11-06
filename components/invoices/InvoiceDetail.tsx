@@ -150,16 +150,16 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
 
       <div className="glass-card" style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 18 }}>
         <DataTable bare columns={columns} rows={invoice.lines} rowKey={(l) => l.id} />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 24px 14px', borderTop: '1px solid rgba(20, 48, 58,0.6)' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 24px 14px', borderTop: '1px solid rgba(24, 34, 29,0.6)' }}>
           <div style={{ width: 'min(100%, 300px)' }}>
             {amountRows.map(([k, v], i) => (
               <div key={k} style={{
                 display: 'flex', justifyContent: 'space-between', gap: 24, padding: '7px 0', fontSize: 13,
                 fontVariantNumeric: 'tabular-nums',
-                ...(i === amountRows.length - 1 ? { borderTop: '1px solid rgba(100, 138, 150,0.35)', marginTop: 4, paddingTop: 10 } : null),
+                ...(i === amountRows.length - 1 ? { borderTop: '1px solid rgba(123, 138, 130,0.35)', marginTop: 4, paddingTop: 10 } : null),
               }}>
-                <span style={{ color: '#94b2bd' }}>{k}</span>
-                <span style={{ color: '#e0eef2', textAlign: 'right' }}>{v}</span>
+                <span style={{ color: '#9aa9a1' }}>{k}</span>
+                <span style={{ color: '#e8efeb', textAlign: 'right' }}>{v}</span>
               </div>
             ))}
           </div>
@@ -171,13 +171,13 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
             <span style={{
               width: 40, height: 40, borderRadius: '50%', display: 'grid', placeItems: 'center', flexShrink: 0,
-              background: 'rgba(45, 212, 191,0.15)', color: '#2dd4bf', fontWeight: 700, fontSize: 13,
+              background: 'rgba(61, 220, 132,0.15)', color: '#3ddc84', fontWeight: 700, fontSize: 13,
             }}>{initials(invoice.party?.name)}</span>
             <div style={{ minWidth: 0 }}>
-              <Link href={`/parties/${invoice.partyId}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>
+              <Link href={`/parties/${invoice.partyId}`} style={{ color: '#3ddc84', textDecoration: 'none', fontWeight: 600 }}>
                 {invoice.party?.name ?? '—'}
               </Link>
-              {gst && invoice.customerGstin && <p style={{ fontSize: 12, color: '#6b8a96', margin: '2px 0 0' }}>GSTIN {invoice.customerGstin}</p>}
+              {gst && invoice.customerGstin && <p style={{ fontSize: 12, color: '#7b8a82', margin: '2px 0 0' }}>GSTIN {invoice.customerGstin}</p>}
             </div>
           </div>
           <KeyValue rows={[
@@ -199,7 +199,7 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
           ]} />
           {invoice.payloadHash && (
             <div style={{ marginTop: 12 }}>
-              <p style={{ fontSize: 11, color: '#6b8a96', marginBottom: 4 }}>SHA-256 hash</p>
+              <p style={{ fontSize: 11, color: '#7b8a82', marginBottom: 4 }}>SHA-256 hash</p>
               <p className="hash-display" style={{ fontSize: 11, wordBreak: 'break-all' }}>{invoice.payloadHash}</p>
             </div>
           )}
@@ -216,12 +216,12 @@ export function InvoiceDetail({ type }: { type: InvoiceType }) {
               ...(company.data.ifscCode ? [['IFSC', company.data.ifscCode]] : []),
               ...(company.data.upiId ? [['UPI', company.data.upiId]] : []),
             ] as Array<[string, React.ReactNode]>} />
-            {company.data.terms && <p style={{ fontSize: 12, color: '#94b2bd', whiteSpace: 'pre-wrap', marginTop: 10 }}>{company.data.terms}</p>}
-            {company.data.invoiceFooter && <p style={{ fontSize: 12, color: '#6b8a96', marginTop: 8 }}>{company.data.invoiceFooter}</p>}
+            {company.data.terms && <p style={{ fontSize: 12, color: '#9aa9a1', whiteSpace: 'pre-wrap', marginTop: 10 }}>{company.data.terms}</p>}
+            {company.data.invoiceFooter && <p style={{ fontSize: 12, color: '#7b8a82', marginTop: 8 }}>{company.data.invoiceFooter}</p>}
           </Card>
         )}
 
-        {invoice.notes && <Card title="Notes"><p style={{ fontSize: 13, color: '#94b2bd', whiteSpace: 'pre-wrap' }}>{invoice.notes}</p></Card>}
+        {invoice.notes && <Card title="Notes"><p style={{ fontSize: 13, color: '#9aa9a1', whiteSpace: 'pre-wrap' }}>{invoice.notes}</p></Card>}
       </Grid>
     </Page>
   );
@@ -237,10 +237,10 @@ function SummaryTile({ label, value, tone, small }: { label: string; value: Reac
       borderRadius: 14, padding: '14px 18px',
       ...(warn ? { background: 'rgba(251,191,36,0.16)', borderColor: 'rgba(251,191,36,0.45)' } : null),
     }}>
-      <p style={{ fontSize: 12, color: warn ? '#fbbf24' : '#6b8a96', margin: 0 }}>{label}</p>
+      <p style={{ fontSize: 12, color: warn ? '#fbbf24' : '#7b8a82', margin: 0 }}>{label}</p>
       <p style={{
         fontSize: small ? 16 : 22, fontWeight: 700, margin: '4px 0 0', fontVariantNumeric: 'tabular-nums',
-        color: tone === 'ok' ? '#4ade80' : '#e0eef2',
+        color: tone === 'ok' ? '#4ade80' : '#e8efeb',
       }}>{value}</p>
     </div>
   );
@@ -258,14 +258,14 @@ function VerificationResult({ v }: { v: InvoiceVerification }) {
       <Icon size={22} color={color} style={{ flexShrink: 0 }} />
       <div style={{ minWidth: 0 }}>
         <p style={{ fontWeight: 700, color, fontSize: 15, textTransform: 'uppercase' }}>{v.status.replace('_', ' ')}</p>
-        <p style={{ fontSize: 13, color: '#94b2bd', marginTop: 2 }}>
+        <p style={{ fontSize: 13, color: '#9aa9a1', marginTop: 2 }}>
           {ok
             ? 'The document matches the hash registered on the blockchain. It has not been changed since it was issued.'
             : v.status === 'mismatch'
               ? 'The stored document no longer matches its registered hash — it may have been altered.'
               : 'No complete proof is available to verify against.'}
         </p>
-        <p style={{ fontSize: 11, color: '#6b8a96', marginTop: 6 }}>
+        <p style={{ fontSize: 11, color: '#7b8a82', marginTop: 6 }}>
           Hash match: {v.hashMatch ? 'yes' : 'no'} · Mode: {v.blockchainMode}
           {v.blockchainMode === 'demo' && ' (simulated chain — hash comparison only)'}
         </p>

@@ -46,13 +46,13 @@ export default function PaymentsPage() {
     { header: 'Date', cell: (p) => formatDay(p.paymentDate) },
     {
       header: 'Party',
-      cell: (p) => <Link href={`/parties/${p.partyId}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{p.party?.name ?? '—'}</Link>,
+      cell: (p) => <Link href={`/parties/${p.partyId}`} style={{ color: '#3ddc84', textDecoration: 'none', fontWeight: 600 }}>{p.party?.name ?? '—'}</Link>,
     },
     {
       header: 'Invoice',
       cell: (p) => p.invoice
-        ? <Link href={`/${p.invoice.type === 'sale' ? 'sales' : 'purchases'}/${p.invoice.id}`} style={{ color: '#94b2bd', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>{p.invoice.invoiceNumber}</Link>
-        : <span style={{ color: '#4a6672' }}>On account</span>,
+        ? <Link href={`/${p.invoice.type === 'sale' ? 'sales' : 'purchases'}/${p.invoice.id}`} style={{ color: '#9aa9a1', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>{p.invoice.invoiceNumber}</Link>
+        : <span style={{ color: '#55655d' }}>On account</span>,
     },
     { header: 'Method', cell: (p) => (p.method === 'upi' ? 'UPI' : <span style={{ textTransform: 'capitalize' }}>{p.method}</span>) },
     { header: 'Account', cell: (p) => p.accountName || '—' },
@@ -93,7 +93,7 @@ export default function PaymentsPage() {
       <Grid cols={3} style={{ marginBottom: 20 }}>
         <StatCard label="Received" value={formatMoney(data?.totals?.received)} color="#4ade80" icon={ArrowDownLeft} loading={loading && !data} />
         <StatCard label="Paid out" value={formatMoney(data?.totals?.paid)} color="#f87171" icon={ArrowUpRight} loading={loading && !data} />
-        <StatCard label="Net cash flow" value={formatMoney((data?.totals?.received ?? 0) - (data?.totals?.paid ?? 0))} color="#2dd4bf" icon={Wallet} loading={loading && !data} />
+        <StatCard label="Net cash flow" value={formatMoney((data?.totals?.received ?? 0) - (data?.totals?.paid ?? 0))} color="#3ddc84" icon={Wallet} loading={loading && !data} />
       </Grid>
 
       <div style={{ marginBottom: 16 }}>

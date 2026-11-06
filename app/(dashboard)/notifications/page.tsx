@@ -15,11 +15,11 @@ interface NotificationList {
 }
 
 const TYPE_ICON: Record<NotificationType, { icon: React.ElementType; color: string }> = {
-  delivery: { icon: Package, color: '#2dd4bf' },
+  delivery: { icon: Package, color: '#3ddc84' },
   approval: { icon: CheckCircle2, color: '#4ade80' },
   invoice: { icon: FileText, color: '#a78bfa' },
   payment: { icon: CreditCard, color: '#fbbf24' },
-  system: { icon: Bell, color: '#94b2bd' },
+  system: { icon: Bell, color: '#9aa9a1' },
 };
 
 const LIMIT = 15;
@@ -90,8 +90,8 @@ export default function NotificationsPage() {
             return (
               <div key={n.id} style={{
                 display: 'flex', gap: 12, alignItems: 'flex-start', padding: '14px 18px',
-                borderBottom: '1px solid rgba(20, 48, 58,0.6)',
-                background: n.isRead ? 'transparent' : 'rgba(13, 148, 136,0.06)',
+                borderBottom: '1px solid rgba(24, 34, 29,0.6)',
+                background: n.isRead ? 'transparent' : 'rgba(22, 163, 74,0.06)',
               }}>
                 <span style={{
                   width: 34, height: 34, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -100,15 +100,15 @@ export default function NotificationsPage() {
                   <Icon size={16} color={t.color} />
                 </span>
                 <button onClick={() => open(n)} style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 0, cursor: n.link ? 'pointer' : 'default', padding: 0 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: n.isRead ? 500 : 700, color: n.isRead ? '#c3d9e0' : '#ecf5f8' }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: n.isRead ? 500 : 700, color: n.isRead ? '#c5d1ca' : '#eef3f0' }}>
                     {n.title}
-                    {!n.isRead && <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#2dd4bf', marginLeft: 8 }} />}
+                    {!n.isRead && <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#3ddc84', marginLeft: 8 }} />}
                   </p>
-                  <p style={{ margin: '3px 0 0', fontSize: 12, color: '#94b2bd', wordBreak: 'break-word' }}>{n.message}</p>
-                  <p style={{ margin: '4px 0 0', fontSize: 11, color: '#4a6672' }}>{formatRelative(n.createdAt)}</p>
+                  <p style={{ margin: '3px 0 0', fontSize: 12, color: '#9aa9a1', wordBreak: 'break-word' }}>{n.message}</p>
+                  <p style={{ margin: '4px 0 0', fontSize: 11, color: '#55655d' }}>{formatRelative(n.createdAt)}</p>
                 </button>
                 <button aria-label="Delete notification" onClick={() => run(() => notificationsApi.remove(n.id))}
-                  style={{ background: 'none', border: 0, cursor: 'pointer', color: '#4a6672', padding: 4 }}>
+                  style={{ background: 'none', border: 0, cursor: 'pointer', color: '#55655d', padding: 4 }}>
                   <X size={14} />
                 </button>
               </div>

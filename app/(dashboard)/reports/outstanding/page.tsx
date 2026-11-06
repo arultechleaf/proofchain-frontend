@@ -46,7 +46,7 @@ export default function OutstandingReportPage() {
       header: 'Number',
       cell: (r) => (
         <Link href={`/${r.type === 'sale' ? 'sales' : 'purchases'}/${r.id}`}
-          style={{ color: '#2dd4bf', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+          style={{ color: '#3ddc84', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
           {r.invoiceNumber}
         </Link>
       ),

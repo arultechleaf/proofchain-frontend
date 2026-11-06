@@ -76,7 +76,7 @@ export default function PartyLedgerPage() {
     { header: 'Date', cell: (e) => formatDay(e.date) },
     {
       header: 'Description',
-      cell: (e) => <Link href={e.href} style={{ color: '#2dd4bf', textDecoration: 'none' }}>{e.description}</Link>,
+      cell: (e) => <Link href={e.href} style={{ color: '#3ddc84', textDecoration: 'none' }}>{e.description}</Link>,
       nowrap: false,
     },
     { header: 'Debit', align: 'right', cell: (e) => (e.debit ? formatMoney(e.debit) : '—') },
@@ -84,7 +84,7 @@ export default function PartyLedgerPage() {
     {
       header: 'Balance', align: 'right',
       cell: (e) => (
-        <strong style={{ color: e.balance > 0 ? '#4ade80' : e.balance < 0 ? '#f87171' : '#94b2bd' }}>
+        <strong style={{ color: e.balance > 0 ? '#4ade80' : e.balance < 0 ? '#f87171' : '#9aa9a1' }}>
           {formatMoney(Math.abs(e.balance))} {e.balance > 0 ? 'Dr' : e.balance < 0 ? 'Cr' : ''}
         </strong>
       ),
@@ -114,7 +114,7 @@ export default function PartyLedgerPage() {
       ) : (
         <>
           <Grid cols={3} style={{ marginBottom: 20 }}>
-            <StatCard label="Total billed" value={formatMoney(l?.summary.totalSales)} color="#2dd4bf" icon={ArrowUpRight} loading={ledger.loading}
+            <StatCard label="Total billed" value={formatMoney(l?.summary.totalSales)} color="#3ddc84" icon={ArrowUpRight} loading={ledger.loading}
               hint={`Opening balance ${formatMoney(l?.summary.openingBalance)}`} />
             <StatCard label="Received / paid" value={formatMoney((l?.summary.received ?? 0) + (l?.summary.paid ?? 0))} color="#4ade80" icon={ArrowDownLeft} loading={ledger.loading} />
             <StatCard

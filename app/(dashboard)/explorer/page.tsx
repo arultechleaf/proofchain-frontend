@@ -14,8 +14,8 @@ import { formatRelative, truncateHash, statusColor, statusLabel } from '@/lib/ut
 /* --- Network Topology SVG ------------------------------------------------- */
 function NetworkTopology({ connected }: { connected: boolean }) {
   const nodes = [
-    { id: 'company-a', label: 'Company A', x: 200, y: 80,  r: 36, color: '#14b8a6', glow: 'rgba(20, 184, 166,0.5)' },
-    { id: 'company-b', label: 'Company B', x: 370, y: 200, r: 36, color: '#14b8a6', glow: 'rgba(20, 184, 166,0.5)' },
+    { id: 'company-a', label: 'Company A', x: 200, y: 80,  r: 36, color: '#22c55e', glow: 'rgba(34, 197, 94,0.5)' },
+    { id: 'company-b', label: 'Company B', x: 370, y: 200, r: 36, color: '#22c55e', glow: 'rgba(34, 197, 94,0.5)' },
     { id: 'auditor',   label: 'Auditor',   x: 30,  y: 200, r: 36, color: '#f59e0b', glow: 'rgba(245,158,11,0.5)' },
   ];
   const edges = [
@@ -43,7 +43,7 @@ function NetworkTopology({ connected }: { connected: boolean }) {
           return (
             <g key={i}>
               <line x1={na.x} y1={na.y} x2={nb.x} y2={nb.y}
-                stroke="rgba(20, 184, 166,0.18)" strokeWidth="1.5" strokeDasharray="6 5" />
+                stroke="rgba(34, 197, 94,0.18)" strokeWidth="1.5" strokeDasharray="6 5" />
               {connected && (
                 <motion.circle r="3.5" fill={na.color}
                   style={{ filter: `drop-shadow(0 0 5px ${na.color})` }}
@@ -66,7 +66,7 @@ function NetworkTopology({ connected }: { connected: boolean }) {
             />
             <circle cx={n.x} cy={n.y} r={n.r + 4} fill={`url(#rg-${n.id})`} />
             <circle cx={n.x} cy={n.y} r={n.r}
-              fill="rgba(6, 20, 26,0.88)" stroke={n.color} strokeWidth="2"
+              fill="rgba(11, 15, 13,0.88)" stroke={n.color} strokeWidth="2"
               style={{ filter: `drop-shadow(0 0 12px ${n.glow})` }}
             />
             <motion.circle cx={n.x} cy={n.y} r="9" fill={n.color}
@@ -76,9 +76,9 @@ function NetworkTopology({ connected }: { connected: boolean }) {
               style={{ filter: `drop-shadow(0 0 8px ${n.color})` }}
             />
             <circle cx={n.x + n.r - 7} cy={n.y - n.r + 7} r="5"
-              fill={connected ? '#22c55e' : '#4b5563'} stroke="rgba(6, 20, 26,0.9)" strokeWidth="2" />
+              fill={connected ? '#22c55e' : '#4b5563'} stroke="rgba(11, 15, 13,0.9)" strokeWidth="2" />
             <text x={n.x} y={n.y + n.r + 20}
-              textAnchor="middle" fill="#94b2bd" fontSize="11"
+              textAnchor="middle" fill="#9aa9a1" fontSize="11"
               fontFamily="Inter, sans-serif" fontWeight="600">
               {n.label}
             </text>
@@ -120,7 +120,7 @@ function StatCard({ label, value, color, icon: Icon, loading }: {
           ? <div className="skeleton" style={{ height: 28, width: 80, borderRadius: 8, marginBottom: 4 }} />
           : <p style={{ fontSize: 22, fontWeight: 700, color, lineHeight: 1 }}>{value}</p>
         }
-        <p style={{ fontSize: 12, color: '#4a6672', marginTop: 4 }}>{label}</p>
+        <p style={{ fontSize: 12, color: '#55655d', marginTop: 4 }}>{label}</p>
       </div>
     </motion.div>
   );
@@ -133,14 +133,14 @@ function TxRow({ tx, i }: { tx: BlockchainTransaction; i: number }) {
     <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}
       transition={{ delay: i * 0.04, duration: 0.22 }}
       style={{
-        background: 'rgba(12, 30, 38,0.5)', border: '1px solid rgba(38, 70, 84,0.45)',
+        background: 'rgba(17, 24, 21,0.5)', border: '1px solid rgba(40, 56, 48,0.45)',
         borderRadius: 12, padding: '10px 14px', cursor: 'default',
         transition: 'border-color 0.2s',
       }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ width: 7, height: 7, borderRadius: '50%', background: dot, display: 'inline-block', boxShadow: `0 0 6px ${dot}` }} />
-          <span style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: '#99f6e4' }}>
+          <span style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: '#a7f3c0' }}>
             {tx.transactionHash
               ? <Link href={`/explorer/${tx.transactionHash}`} style={{ color: 'inherit', textDecoration: 'none' }}>{truncateHash(tx.transactionHash, 10, 8)}</Link>
               : 'Pending…'}
@@ -148,7 +148,7 @@ function TxRow({ tx, i }: { tx: BlockchainTransaction; i: number }) {
         </div>
         <span className={`badge text-xs ${statusColor(tx.status)}`}>{statusLabel(tx.status)}</span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#4a6672' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#55655d' }}>
         <span>{tx.transactionType?.replace(/_/g, ' ') ?? '—'}</span>
         <span>{tx.blockNumber && `Block #${tx.blockNumber}  `}{formatRelative(tx.createdAt)}</span>
       </div>
@@ -187,8 +187,8 @@ export default function ExplorerPage() {
 
   const stats = [
     { label: 'Connection',   value: connected ? 'Live' : 'Demo',                          color: connected ? '#22c55e' : '#f59e0b', icon: connected ? Wifi : WifiOff },
-    { label: 'Chain ID',     value: status?.chainId ? `#${status.chainId}` : '—',         color: '#14b8a6', icon: Hash },
-    { label: 'Block Height', value: status?.blockNumber?.toLocaleString() ?? '—',          color: '#14b8a6', icon: Blocks },
+    { label: 'Chain ID',     value: status?.chainId ? `#${status.chainId}` : '—',         color: '#22c55e', icon: Hash },
+    { label: 'Block Height', value: status?.blockNumber?.toLocaleString() ?? '—',          color: '#22c55e', icon: Blocks },
     { label: 'Peer Count',   value: status?.peerCount ?? '—',                              color: '#8b5cf6', icon: Network },
   ];
 
@@ -200,15 +200,15 @@ export default function ExplorerPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{
             width: 44, height: 44, borderRadius: 13,
-            background: 'linear-gradient(135deg,#0d9488,#7c3aed)',
+            background: 'linear-gradient(135deg,#16a34a,#7c3aed)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 24px rgba(13, 148, 136,0.4)',
+            boxShadow: '0 0 24px rgba(22, 163, 74,0.4)',
             flexShrink: 0,
           }}>
             <Activity style={{ width: 20, height: 20, color: '#fff' }} />
           </div>
           <div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e0eef2', lineHeight: 1.2 }}>Blockchain Explorer</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e8efeb', lineHeight: 1.2 }}>Blockchain Explorer</h1>
           </div>
         </div>
         <button onClick={() => load(true)} disabled={refreshing} className="btn btn-secondary"
@@ -229,8 +229,8 @@ export default function ExplorerPage() {
         {/* Network Topology */}
         <div className="glass-card" style={{ borderRadius: 20, padding: '22px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <Network style={{ width: 15, height: 15, color: '#14b8a6' }} />
-            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#e0eef2' }}>Network Topology</h2>
+            <Network style={{ width: 15, height: 15, color: '#22c55e' }} />
+            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#e8efeb' }}>Network Topology</h2>
             <span style={{
               marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 5,
               fontSize: 11, color: connected ? '#22c55e' : '#f59e0b',
@@ -254,18 +254,18 @@ export default function ExplorerPage() {
               {nodes.map((n) => (
                 <div key={n.id} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  background: 'rgba(12, 30, 38,0.5)', border: '1px solid rgba(38, 70, 84,0.4)',
+                  background: 'rgba(17, 24, 21,0.5)', border: '1px solid rgba(40, 56, 48,0.4)',
                   borderRadius: 10, padding: '8px 12px',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{
                       width: 7, height: 7, borderRadius: '50%',
-                      background: n.status === 'online' ? '#22c55e' : '#4a6672',
+                      background: n.status === 'online' ? '#22c55e' : '#55655d',
                       boxShadow: n.status === 'online' ? '0 0 6px #22c55e' : 'none',
                     }} />
-                    <span style={{ fontSize: 12, fontWeight: 500, color: '#c3d9e0' }}>{n.name}</span>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: '#c5d1ca' }}>{n.name}</span>
                   </div>
-                  <div style={{ display: 'flex', gap: 12, fontSize: 11, color: '#4a6672' }}>
+                  <div style={{ display: 'flex', gap: 12, fontSize: 11, color: '#55655d' }}>
                     <span>RPC :{n.rpcPort}</span><span>P2P :{n.p2pPort}</span>
                   </div>
                 </div>
@@ -275,10 +275,10 @@ export default function ExplorerPage() {
 
           {status?.contractAddress && (
             <div style={{
-              marginTop: 12, background: 'rgba(12, 30, 38,0.5)',
-              border: '1px solid rgba(38, 70, 84,0.4)', borderRadius: 10, padding: '10px 12px',
+              marginTop: 12, background: 'rgba(17, 24, 21,0.5)',
+              border: '1px solid rgba(40, 56, 48,0.4)', borderRadius: 10, padding: '10px 12px',
             }}>
-              <p style={{ fontSize: 11, color: '#4a6672', marginBottom: 4 }}>Contract Address</p>
+              <p style={{ fontSize: 11, color: '#55655d', marginBottom: 4 }}>Contract Address</p>
               <p className="hash-display" style={{ fontSize: 11, wordBreak: 'break-all' }}>{status.contractAddress}</p>
             </div>
           )}
@@ -287,12 +287,12 @@ export default function ExplorerPage() {
         {/* Transactions */}
         <div className="glass-card" style={{ borderRadius: 20, padding: '22px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <Clock style={{ width: 15, height: 15, color: '#14b8a6' }} />
-            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#e0eef2' }}>Recent Transactions</h2>
+            <Clock style={{ width: 15, height: 15, color: '#22c55e' }} />
+            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#e8efeb' }}>Recent Transactions</h2>
             {!loading && (
               <span style={{
-                marginLeft: 'auto', fontSize: 11, color: '#4a6672',
-                background: 'rgba(38, 70, 84,0.4)', borderRadius: 20, padding: '2px 10px',
+                marginLeft: 'auto', fontSize: 11, color: '#55655d',
+                background: 'rgba(40, 56, 48,0.4)', borderRadius: 20, padding: '2px 10px',
               }}>{transactions.length} tx</span>
             )}
           </div>
@@ -304,8 +304,8 @@ export default function ExplorerPage() {
               : transactions.length === 0
               ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '56px 0', gap: 10 }}>
-                  <Blocks style={{ width: 30, height: 30, color: '#2d4b58' }} />
-                  <p style={{ fontSize: 13, color: '#2d4b58' }}>No transactions yet</p>
+                  <Blocks style={{ width: 30, height: 30, color: '#2d3b34' }} />
+                  <p style={{ fontSize: 13, color: '#2d3b34' }}>No transactions yet</p>
                 </div>
               )
               : transactions.map((tx, i) => <TxRow key={tx.id} tx={tx} i={i} />)
@@ -322,9 +322,9 @@ export default function ExplorerPage() {
         <p style={{ fontSize: 12, color: 'rgba(251,191,36,0.75)', lineHeight: 1.65 }}>
           <strong>Important:</strong> In demo mode, transaction hashes are simulated and not registered on a real blockchain.
           To activate live mode: deploy the smart contract, set{' '}
-          <code style={{ background: 'rgba(38, 70, 84,0.6)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>CONTRACT_ADDRESS</code>
+          <code style={{ background: 'rgba(40, 56, 48,0.6)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>CONTRACT_ADDRESS</code>
           {' '}and{' '}
-          <code style={{ background: 'rgba(38, 70, 84,0.6)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>BLOCKCHAIN_MODE=live</code>
+          <code style={{ background: 'rgba(40, 56, 48,0.6)', padding: '1px 5px', borderRadius: 4, fontSize: 11 }}>BLOCKCHAIN_MODE=live</code>
           {' '}in the backend environment, then restart the server.
         </p>
       </div>

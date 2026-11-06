@@ -78,8 +78,8 @@ export default function ItemDetailPage() {
       <Grid cols={4} style={{ marginBottom: 20 }}>
         <StatCard label="In stock" value={`${it.stock} ${it.unit}`} color={low ? '#f87171' : '#4ade80'} icon={Boxes}
           hint={low ? `Low — alert level ${it.lowStockLevel}` : `Alert level ${it.lowStockLevel}`} />
-        <StatCard label="Sale price" value={formatMoney(it.salePrice)} color="#2dd4bf" />
-        <StatCard label="Purchase price" value={formatMoney(it.purchasePrice)} color="#2dd4bf" />
+        <StatCard label="Sale price" value={formatMoney(it.salePrice)} color="#3ddc84" />
+        <StatCard label="Purchase price" value={formatMoney(it.purchasePrice)} color="#3ddc84" />
         <StatCard label="Stock value" value={formatMoney(it.stock * it.purchasePrice)} color="#a78bfa" hint="At purchase price" />
       </Grid>
 
@@ -135,7 +135,7 @@ export default function ItemDetailPage() {
       </Grid>
 
       <h2 style={{ fontSize: 15, fontWeight: 600, margin: '24px 0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <History size={15} color="#2dd4bf" /> Stock history
+        <History size={15} color="#3ddc84" /> Stock history
       </h2>
       <DataTable columns={columns} rows={moves.data ?? []} loading={moves.loading} rowKey={(m) => m.id}
         empty={<EmptyState icon={History} title="No stock movements yet" />} />

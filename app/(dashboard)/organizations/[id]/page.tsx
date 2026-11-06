@@ -25,7 +25,7 @@ export default function OrganizationDetailPage() {
     {
       header: 'Name',
       cell: (u) => user?.role === 'admin'
-        ? <Link href={`/users/${u.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{u.name}</Link>
+        ? <Link href={`/users/${u.id}`} style={{ color: '#3ddc84', textDecoration: 'none', fontWeight: 600 }}>{u.name}</Link>
         : u.name,
     },
     { header: 'Email', cell: (u) => u.email },
@@ -52,7 +52,7 @@ export default function OrganizationDetailPage() {
             ['Created', formatDate(company.createdAt)],
             ['Members', company.users.length],
           ]} />
-          {company.description && <p style={{ fontSize: 13, color: '#94b2bd', marginTop: 14, lineHeight: 1.5 }}>{company.description}</p>}
+          {company.description && <p style={{ fontSize: 13, color: '#9aa9a1', marginTop: 14, lineHeight: 1.5 }}>{company.description}</p>}
         </Card>
 
         <Card title="Members" icon={Users}>

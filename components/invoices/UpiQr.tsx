@@ -32,8 +32,8 @@ export function UpiQr({ upiId, payee, amount, note }: { upiId: string | null; pa
     <div style={{ textAlign: 'center' }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {image ? <img src={image} alt={`UPI QR code for ${formatMoney(amount)}`} width={180} height={180} style={{ borderRadius: 8, background: '#fff' }} /> : <div style={{ width: 180, height: 180 }} />}
-      <p style={{ margin: '6px 0 0', fontSize: 12, color: '#6b8a96' }}>Scan with any UPI app · {formatMoney(amount)}</p>
-      <p style={{ margin: 0, fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: '#94b2bd' }}>{upiId}</p>
+      <p style={{ margin: '6px 0 0', fontSize: 12, color: '#7b8a82' }}>Scan with any UPI app · {formatMoney(amount)}</p>
+      <p style={{ margin: 0, fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: '#9aa9a1' }}>{upiId}</p>
     </div>
   );
 }

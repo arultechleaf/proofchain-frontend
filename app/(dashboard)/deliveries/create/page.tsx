@@ -83,14 +83,14 @@ export default function CreateDeliveryPage() {
         {STEPS.map((s, i) => (
           <div key={s} className="flex items-center flex-1">
             <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium border-2 transition-all ${
-              i < step ? 'bg-teal-600 border-teal-600 text-white' :
-              i === step ? 'border-teal-500 text-teal-400' :
+              i < step ? 'bg-green-600 border-green-600 text-white' :
+              i === step ? 'border-green-500 text-green-400' :
               'border-slate-700 text-slate-600'
             }`}>
               {i < step ? <Check className="w-3.5 h-3.5" /> : i + 1}
             </div>
-            <span className={`ml-2 text-xs font-medium ${i === step ? 'text-teal-400' : i < step ? 'text-slate-300' : 'text-slate-600'}`}>{s}</span>
-            {i < STEPS.length - 1 && <div className={`flex-1 h-px mx-3 ${i < step ? 'bg-teal-600' : 'bg-slate-800'}`} />}
+            <span className={`ml-2 text-xs font-medium ${i === step ? 'text-green-400' : i < step ? 'text-slate-300' : 'text-slate-600'}`}>{s}</span>
+            {i < STEPS.length - 1 && <div className={`flex-1 h-px mx-3 ${i < step ? 'bg-green-600' : 'bg-slate-800'}`} />}
           </div>
         ))}
       </div>
@@ -108,8 +108,8 @@ export default function CreateDeliveryPage() {
 
         {step === 2 && result ? (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-6">
-            <div className="w-16 h-16 rounded-full bg-teal-500/10 border-2 border-teal-500/30 flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-teal-400" />
+            <div className="w-16 h-16 rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center mx-auto mb-4">
+              <Check className="w-8 h-8 text-green-400" />
             </div>
             <h2 className="text-xl font-bold text-slate-100 mb-2">Delivery Created!</h2>
             <p className="text-slate-400 text-sm mb-6">Proof has been registered on the blockchain.</p>
@@ -186,9 +186,9 @@ export default function CreateDeliveryPage() {
       </div>
 
       {/* Info panel */}
-      <div className="glass-card rounded-xl p-4 border border-teal-500/10">
+      <div className="glass-card rounded-xl p-4 border border-green-500/10">
         <div className="flex gap-3 items-start">
-          <Package className="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5" />
+          <Package className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-medium text-slate-300 mb-1">How it works</p>
             <ul className="text-xs text-slate-500 space-y-1 list-disc list-inside">

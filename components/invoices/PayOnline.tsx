@@ -101,7 +101,7 @@ export function PayOnline({ invoice, balance, onPaid }: { invoice: Invoice; bala
   if (!config.data?.enabled) {
     return (
       <Card title="Pay online" icon={CreditCard}>
-        <p style={{ fontSize: 13, color: '#94b2bd', lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: '#9aa9a1', lineHeight: 1.6 }}>
           Online payments are not set up yet. Add <code>RAZORPAY_KEY_ID</code> and <code>RAZORPAY_KEY_SECRET</code> to the
           backend <code>.env</code> and restart it.
         </p>
@@ -126,7 +126,7 @@ export function PayOnline({ invoice, balance, onPaid }: { invoice: Invoice; bala
         description: `Invoice ${order.invoiceNumber}`,
         prefill: order.customer,
         notes: { invoiceNumber: order.invoiceNumber },
-        theme: { color: '#0d9488' },
+        theme: { color: '#16a34a' },
         handler: (response) => {
           paid = true;
           // Save before verifying: if the page is closed mid-request the payment is not lost.

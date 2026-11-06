@@ -80,7 +80,7 @@ export function InvoiceList({ type }: { type: InvoiceScreen }) {
     {
       header: 'Number',
       cell: (i) => (
-        <Link href={`${copy.base}/${i.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+        <Link href={`${copy.base}/${i.id}`} style={{ color: '#3ddc84', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
           {i.invoiceNumber}
         </Link>
       ),
@@ -124,7 +124,7 @@ export function InvoiceList({ type }: { type: InvoiceScreen }) {
       <form onSubmit={(e) => { e.preventDefault(); setQuery(search); setPage(1); }}
         style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
-          <Search size={14} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#4a6672' }} />
+          <Search size={14} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#55655d' }} />
           <input className="form-input" style={{ paddingLeft: 34 }} placeholder={`Search number or ${copy.party.toLowerCase()}...`}
             value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>

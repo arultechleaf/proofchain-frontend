@@ -67,24 +67,24 @@ export default function DeliveryProofPage() {
                   : '—'],
                 ['Last verified', proof.verifiedAt ? formatDate(proof.verifiedAt) : 'Never'],
               ]} />
-              <p style={{ fontSize: 11, color: '#6b8a96', margin: '12px 0 4px' }}>Payload hash</p>
+              <p style={{ fontSize: 11, color: '#7b8a82', margin: '12px 0 4px' }}>Payload hash</p>
               <p className="hash-display" style={{ fontSize: 11, wordBreak: 'break-all' }}>{proof.payloadHash}</p>
             </>
           ) : (
-            <p style={{ fontSize: 13, color: '#6b8a96' }}>No proof has been registered for this delivery.</p>
+            <p style={{ fontSize: 13, color: '#7b8a82' }}>No proof has been registered for this delivery.</p>
           )}
         </Card>
 
         <Card title="Approvals">
           {approvals.length === 0 ? (
-            <p style={{ fontSize: 13, color: '#6b8a96' }}>No decisions recorded yet.</p>
+            <p style={{ fontSize: 13, color: '#7b8a82' }}>No decisions recorded yet.</p>
           ) : approvals.map((a) => (
-            <div key={a.id} style={{ padding: '10px 0', borderBottom: '1px solid rgba(20, 48, 58,0.6)' }}>
+            <div key={a.id} style={{ padding: '10px 0', borderBottom: '1px solid rgba(24, 34, 29,0.6)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <StatusBadge status={a.decision} />
-                <span style={{ fontSize: 11, color: '#6b8a96' }}>{formatDate(a.createdAt)}</span>
+                <span style={{ fontSize: 11, color: '#7b8a82' }}>{formatDate(a.createdAt)}</span>
               </div>
-              <p style={{ fontSize: 12, color: '#94b2bd', marginTop: 6 }}>
+              <p style={{ fontSize: 12, color: '#9aa9a1', marginTop: 6 }}>
                 {a.reviewer?.name ?? 'Reviewer'}{a.comment ? ` — “${a.comment}”` : ''}
               </p>
             </div>

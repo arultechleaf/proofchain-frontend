@@ -41,7 +41,7 @@ export default function UsersPage() {
     {
       header: 'Name',
       cell: (u) => isAdmin
-        ? <Link href={`/users/${u.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{u.name}</Link>
+        ? <Link href={`/users/${u.id}`} style={{ color: '#3ddc84', textDecoration: 'none', fontWeight: 600 }}>{u.name}</Link>
         : <strong>{u.name}</strong>,
     },
     { header: 'Code', cell: (u) => u.userCode ?? '—' },
@@ -72,7 +72,7 @@ export default function UsersPage() {
               }}
               style={{
                 width: 38, height: 22, borderRadius: 11, border: 'none', padding: 2, cursor: u.id === me?.id ? 'not-allowed' : 'pointer',
-                background: u.isActive ? '#16a34a' : '#94b2bd', opacity: u.id === me?.id ? 0.5 : 1, transition: 'background .15s',
+                background: u.isActive ? '#16a34a' : '#9aa9a1', opacity: u.id === me?.id ? 0.5 : 1, transition: 'background .15s',
                 display: 'flex', alignItems: 'center', justifyContent: u.isActive ? 'flex-end' : 'flex-start',
               }}
             >
@@ -131,7 +131,7 @@ export default function UsersPage() {
       {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
 
       <div style={{ position: 'relative', maxWidth: 420, marginBottom: 16 }}>
-        <Search size={14} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#4a6672' }} />
+        <Search size={14} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#55655d' }} />
         <input className="form-input" style={{ paddingLeft: 34 }} placeholder="Search name or email..."
           value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>

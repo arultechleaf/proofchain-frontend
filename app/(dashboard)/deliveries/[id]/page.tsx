@@ -248,7 +248,7 @@ export default function DeliveryDetailPage() {
               {proof.canonicalPayload && (
                 <div style={{ marginTop: 18 }}>
                   <p className="text-muted" style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Canonical payload (hashed)</p>
-                  <pre style={{ background: 'rgba(12, 30, 38,0.6)', borderRadius: 10, padding: 12, fontSize: 12, overflow: 'auto', maxHeight: 160, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  <pre style={{ background: 'rgba(17, 24, 21,0.6)', borderRadius: 10, padding: 12, fontSize: 12, overflow: 'auto', maxHeight: 160, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                     {proof.canonicalPayload}
                   </pre>
                 </div>
@@ -266,7 +266,7 @@ export default function DeliveryDetailPage() {
             const approved = a.decision === 'approved';
             const Icon = approved ? CheckCircle2 : XCircle;
             return (
-              <div key={a.id} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: '1px solid rgba(20, 48, 58,0.6)' }}>
+              <div key={a.id} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: '1px solid rgba(24, 34, 29,0.6)' }}>
                 <Icon size={22} color={approved ? '#4ade80' : '#f87171'} style={{ flexShrink: 0, marginTop: 1 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>

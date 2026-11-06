@@ -22,7 +22,7 @@ export default function AccountsPage() {
   const columns: Column<Row>[] = [
     {
       header: 'Party',
-      cell: (r) => <Link href={`/parties/${r.party.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{r.party.name}</Link>,
+      cell: (r) => <Link href={`/parties/${r.party.id}`} style={{ color: '#3ddc84', textDecoration: 'none', fontWeight: 600 }}>{r.party.name}</Link>,
     },
     { header: 'Sales', align: 'right', cell: (r) => formatMoney(r.totalSales) },
     { header: 'Received', align: 'right', cell: (r) => formatMoney(r.received) },
@@ -31,7 +31,7 @@ export default function AccountsPage() {
     {
       header: 'Balance', align: 'right',
       cell: (r) => (
-        <strong style={{ color: r.balance > 0 ? '#4ade80' : r.balance < 0 ? '#f87171' : '#94b2bd' }}>
+        <strong style={{ color: r.balance > 0 ? '#4ade80' : r.balance < 0 ? '#f87171' : '#9aa9a1' }}>
           {formatMoney(Math.abs(r.balance))}
           <span style={{ fontWeight: 500, fontSize: 11, marginLeft: 6 }}>
             {r.balance > 0 ? 'to receive' : r.balance < 0 ? 'to pay' : 'settled'}
@@ -50,7 +50,7 @@ export default function AccountsPage() {
         <StatCard label="To receive" value={formatMoney(data?.totals.toReceive)} color="#4ade80" icon={ArrowDownLeft} loading={loading} />
         <StatCard label="To pay" value={formatMoney(data?.totals.toPay)} color="#f87171" icon={ArrowUpRight} loading={loading} />
         <StatCard label="Net position" value={formatMoney((data?.totals.toReceive ?? 0) - (data?.totals.toPay ?? 0))}
-          color="#2dd4bf" icon={Scale} loading={loading} hint="Receivable minus payable" />
+          color="#3ddc84" icon={Scale} loading={loading} hint="Receivable minus payable" />
       </Grid>
 
       <DataTable columns={columns} rows={rows} loading={loading} rowKey={(r) => r.party.id}

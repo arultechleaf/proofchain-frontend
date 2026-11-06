@@ -12,7 +12,7 @@ const STATUS: Record<string, { icon: React.ElementType; color: string; label: st
   verified: { icon: CheckCircle2, color: '#4ade80', label: 'Verified', text: 'The delivery matches the proof registered on the blockchain. Nothing has changed since it was recorded.' },
   mismatch: { icon: XCircle, color: '#f87171', label: 'Hash mismatch', text: 'The delivery data no longer matches its registered proof. The record may have been altered.' },
   not_found: { icon: AlertCircle, color: '#fbbf24', label: 'Not found', text: 'No proof was found for this delivery, so there is nothing to compare against.' },
-  pending: { icon: Clock, color: '#2dd4bf', label: 'Pending', text: 'The on-chain check could not be completed yet. Try again shortly.' },
+  pending: { icon: Clock, color: '#3ddc84', label: 'Pending', text: 'The on-chain check could not be completed yet. Try again shortly.' },
   error: { icon: AlertCircle, color: '#f87171', label: 'Error', text: 'The verification could not be completed.' },
 };
 
@@ -51,16 +51,16 @@ export default function VerificationReportPage() {
         <Icon size={38} color={s.color} style={{ flexShrink: 0 }} />
         <div>
           <p style={{ fontSize: 20, fontWeight: 800, color: s.color, textTransform: 'uppercase' }}>{s.label}</p>
-          <p style={{ fontSize: 13, color: '#94b2bd', marginTop: 4 }}>{s.text}</p>
+          <p style={{ fontSize: 13, color: '#9aa9a1', marginTop: 4 }}>{s.text}</p>
         </div>
       </div>
 
       <Grid cols={2}>
         <Card title="Hash comparison">
           <KeyValue rows={[['Hashes match', result.hashMatch ? 'Yes' : 'No']]} />
-          <p style={{ fontSize: 11, color: '#6b8a96', margin: '12px 0 4px' }}>Stored hash</p>
+          <p style={{ fontSize: 11, color: '#7b8a82', margin: '12px 0 4px' }}>Stored hash</p>
           <p className="hash-display" style={{ fontSize: 11, wordBreak: 'break-all' }}>{result.expectedHash ?? '—'}</p>
-          <p style={{ fontSize: 11, color: '#6b8a96', margin: '12px 0 4px' }}>Recalculated hash</p>
+          <p style={{ fontSize: 11, color: '#7b8a82', margin: '12px 0 4px' }}>Recalculated hash</p>
           <p className="hash-display" style={{ fontSize: 11, wordBreak: 'break-all' }}>{result.calculatedHash ?? '—'}</p>
         </Card>
 

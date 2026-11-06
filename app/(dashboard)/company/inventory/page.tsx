@@ -41,7 +41,7 @@ export default function CompanyInventoryPage() {
       {c.failed ? <Notice kind="error">Could not load your inventory.</Notice> : null}
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
-        <StatCard label="Active items" value={totals?.itemCount ?? 0} icon={Package} color="#2dd4bf" loading={c.loading} />
+        <StatCard label="Active items" value={totals?.itemCount ?? 0} icon={Package} color="#3ddc84" loading={c.loading} />
         <StatCard label="Stock value" value={formatMoney(totals?.stockValue)} icon={Coins} color="#4ade80" hint="At purchase price" loading={c.loading} />
         <StatCard label="Retail value" value={formatMoney(totals?.retailValue)} icon={Boxes} color="#a78bfa" hint="At sale price" loading={c.loading} />
         <StatCard label="Low stock" value={totals?.lowStockCount ?? 0} icon={AlertTriangle} color={totals?.lowStockCount ? '#f87171' : '#4ade80'} loading={c.loading} />

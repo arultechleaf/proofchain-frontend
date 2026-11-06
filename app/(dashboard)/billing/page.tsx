@@ -15,7 +15,7 @@ const invoiceColumns: Column<Invoice>[] = [
     header: 'Number',
     cell: (i) => (
       <Link href={`/${i.type === 'sale' ? 'sales' : 'purchases'}/${i.id}`}
-        style={{ color: '#2dd4bf', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+        style={{ color: '#3ddc84', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
         {i.invoiceNumber}
       </Link>
     ),
@@ -65,9 +65,9 @@ export default function BillingPage() {
       )}
 
       <div className="stat-grid" style={{ marginBottom: 24 }}>
-        <StatCard label="Sales" value={formatMoney(d?.sales.total)} color="#2dd4bf" icon={Receipt} loading={c.loading}
+        <StatCard label="Sales" value={formatMoney(d?.sales.total)} color="#3ddc84" icon={Receipt} loading={c.loading}
           hint={`${d?.sales.count ?? 0} invoices · received ${formatMoney(d?.sales.paid)}`} />
-        <StatCard label="Purchases" value={formatMoney(d?.purchases.total)} color="#2dd4bf" icon={ShoppingCart} loading={c.loading}
+        <StatCard label="Purchases" value={formatMoney(d?.purchases.total)} color="#3ddc84" icon={ShoppingCart} loading={c.loading}
           hint={`${d?.purchases.count ?? 0} bills · paid ${formatMoney(d?.purchases.paid)}`} />
         <StatCard label="To receive" value={formatMoney(d?.receivable)} color="#4ade80" icon={ArrowDownLeft} loading={c.loading} hint="Unpaid sales" />
         <StatCard label="To pay" value={formatMoney(d?.payable)} color="#f87171" icon={ArrowUpRight} loading={c.loading} hint="Unpaid purchases" />
@@ -77,7 +77,7 @@ export default function BillingPage() {
 
       <Card title="Outstanding by age" icon={AlertTriangle} style={{ marginBottom: 24 }}>
         {agingTotal === 0 ? (
-          <p style={{ color: '#6b8a96', fontSize: 13 }}>Nothing outstanding right now.</p>
+          <p style={{ color: '#7b8a82', fontSize: 13 }}>Nothing outstanding right now.</p>
         ) : (
           <>
             <div style={{ width: '100%', height: 130, marginBottom: 12 }}>
@@ -85,33 +85,33 @@ export default function BillingPage() {
                 <AreaChart data={AGING_LABELS.map((b) => ({ label: b.label, amount: d?.buckets[b.key] ?? 0 }))} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="agingFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#14b8a6" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="#14b8a6" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#22c55e" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid vertical={false} strokeDasharray="4 4" stroke="rgba(100, 138, 150,0.3)" />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#6b8a96' }} />
-                  <YAxis tickLine={false} axisLine={false} width={40} tickCount={3} tick={{ fontSize: 11, fill: '#6b8a96' }}
+                  <CartesianGrid vertical={false} strokeDasharray="4 4" stroke="rgba(123, 138, 130,0.3)" />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#7b8a82' }} />
+                  <YAxis tickLine={false} axisLine={false} width={40} tickCount={3} tick={{ fontSize: 11, fill: '#7b8a82' }}
                     tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))} />
                   <Tooltip
-                    cursor={{ stroke: '#94b2bd', strokeWidth: 1 }}
+                    cursor={{ stroke: '#9aa9a1', strokeWidth: 1 }}
                     formatter={(v) => [formatMoney(Number(v)), 'Outstanding']}
                     contentStyle={{ fontSize: 12, borderRadius: 8 }}
                   />
-                  <Area type="monotone" dataKey="amount" stroke="#14b8a6" strokeWidth={2} fill="url(#agingFill)"
-                    dot={{ r: 3, fill: '#14b8a6', strokeWidth: 0 }} activeDot={{ r: 5, fill: '#14b8a6', stroke: '#fff', strokeWidth: 2 }} />
+                  <Area type="monotone" dataKey="amount" stroke="#22c55e" strokeWidth={2} fill="url(#agingFill)"
+                    dot={{ r: 3, fill: '#22c55e', strokeWidth: 0 }} activeDot={{ r: 5, fill: '#22c55e', stroke: '#fff', strokeWidth: 2 }} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
             <Grid cols="repeat(auto-fit, minmax(130px, 1fr))" gap={12}>
               {AGING_LABELS.map((b) => (
                 <div key={b.key}>
-                  <p style={{ fontSize: 11, color: '#6b8a96', margin: 0 }}>
+                  <p style={{ fontSize: 11, color: '#7b8a82', margin: 0 }}>
                     <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: 2, background: b.color, marginRight: 6 }} />
                     {b.label}
                   </p>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: '#e0eef2', margin: '2px 0 0' }}>{formatMoney(d?.buckets[b.key])}</p>
-                  <p style={{ fontSize: 11, color: '#6b8a96', margin: '2px 0 0' }}>{Math.round(((d?.buckets[b.key] ?? 0) / agingTotal) * 100)}% of total</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#e8efeb', margin: '2px 0 0' }}>{formatMoney(d?.buckets[b.key])}</p>
+                  <p style={{ fontSize: 11, color: '#7b8a82', margin: '2px 0 0' }}>{Math.round(((d?.buckets[b.key] ?? 0) / agingTotal) * 100)}% of total</p>
                 </div>
               ))}
             </Grid>

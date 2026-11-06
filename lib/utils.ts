@@ -78,7 +78,7 @@ export function roleLabel(role: string): string {
 export function roleColor(role: string): string {
   const map: Record<string, string> = {
     admin: 'text-violet-400',
-    company_a: 'text-teal-400',
+    company_a: 'text-green-400',
     company_b: 'text-cyan-400',
     auditor: 'text-amber-400',
   };

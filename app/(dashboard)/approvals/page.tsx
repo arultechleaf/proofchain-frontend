@@ -11,7 +11,7 @@ import { useAuth } from '@/lib/auth';
 
 const BC_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   pending:   { bg: 'rgba(245,158,11,0.1)',  color: '#fbbf24', border: 'rgba(245,158,11,0.25)' },
-  confirmed: { bg: 'rgba(20, 184, 166,0.1)',  color: '#2dd4bf', border: 'rgba(20, 184, 166,0.25)' },
+  confirmed: { bg: 'rgba(34, 197, 94,0.1)',  color: '#3ddc84', border: 'rgba(34, 197, 94,0.25)' },
   failed:    { bg: 'rgba(239,68,68,0.1)',   color: '#f87171', border: 'rgba(239,68,68,0.25)'  },
 };
 
@@ -42,7 +42,7 @@ export default function ApprovalsPage() {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#ecf5f8', margin: 0 }}>Approvals</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#eef3f0', margin: 0 }}>Approvals</h1>
       </div>
 
       {/* Loading */}
@@ -57,12 +57,12 @@ export default function ApprovalsPage() {
       {/* Empty state */}
       {!loading && deliveries.length === 0 && (
         <div style={{
-          background: 'rgba(6, 20, 26,0.8)', border: '1px solid rgba(20, 184, 166,0.12)',
+          background: 'rgba(11, 15, 13,0.8)', border: '1px solid rgba(34, 197, 94,0.12)',
           borderRadius: 14, padding: '64px 32px', textAlign: 'center',
         }}>
           <CheckCircle2 size={48} color="#4ade80" style={{ margin: '0 auto 12px', opacity: 0.5, display: 'block' }} />
-          <p style={{ color: '#c3d9e0', fontWeight: 600, fontSize: 16, margin: 0 }}>All deliveries reviewed</p>
-          <p style={{ color: '#4a6672', fontSize: 13, marginTop: 4 }}>No pending approvals at this time</p>
+          <p style={{ color: '#c5d1ca', fontWeight: 600, fontSize: 16, margin: 0 }}>All deliveries reviewed</p>
+          <p style={{ color: '#55655d', fontSize: 13, marginTop: 4 }}>No pending approvals at this time</p>
         </div>
       )}
 
@@ -73,40 +73,40 @@ export default function ApprovalsPage() {
 
         return (
           <div key={d.id} style={{
-            background: 'rgba(6, 20, 26,0.8)',
-            border: '1px solid rgba(20, 184, 166,0.12)',
+            background: 'rgba(11, 15, 13,0.8)',
+            border: '1px solid rgba(34, 197, 94,0.12)',
             borderRadius: 14, marginBottom: 16, overflow: 'hidden',
           }}>
             {/* Card header */}
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(20, 184, 166,0.08)' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(34, 197, 94,0.08)' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                 {/* Left: title + meta */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {/* Reference */}
                   <Link href={`/deliveries/${d.id}`} style={{
                     fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
-                    color: '#2dd4bf', textDecoration: 'none', fontWeight: 600,
+                    color: '#3ddc84', textDecoration: 'none', fontWeight: 600,
                   }}>
                     {d.deliveryReference}
                   </Link>
 
                   {/* Description */}
-                  <p style={{ color: '#e0eef2', fontSize: 14, fontWeight: 600, margin: '4px 0 10px' }}>
+                  <p style={{ color: '#e8efeb', fontSize: 14, fontWeight: 600, margin: '4px 0 10px' }}>
                     {d.description}
                   </p>
 
                   {/* Meta row – properly spaced */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#6b8a96', fontSize: 12 }}>
-                      <Building2 size={12} color="#4a6672" />
-                      From: <span style={{ color: '#94b2bd', marginLeft: 3 }}>{d.senderCompany?.name ?? '—'}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#7b8a82', fontSize: 12 }}>
+                      <Building2 size={12} color="#55655d" />
+                      From: <span style={{ color: '#9aa9a1', marginLeft: 3 }}>{d.senderCompany?.name ?? '—'}</span>
                     </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#6b8a96', fontSize: 12 }}>
-                      <Package size={12} color="#4a6672" />
-                      Qty: <span style={{ color: '#94b2bd', marginLeft: 3, fontWeight: 600 }}>{d.quantity?.toLocaleString()}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#7b8a82', fontSize: 12 }}>
+                      <Package size={12} color="#55655d" />
+                      Qty: <span style={{ color: '#9aa9a1', marginLeft: 3, fontWeight: 600 }}>{d.quantity?.toLocaleString()}</span>
                     </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#6b8a96', fontSize: 12 }}>
-                      <Calendar size={12} color="#4a6672" />
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#7b8a82', fontSize: 12 }}>
+                      <Calendar size={12} color="#55655d" />
                       <span>{formatRelative(d.createdAt)}</span>
                     </span>
                   </div>
@@ -125,7 +125,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* Card actions */}
-            <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(6, 20, 26,0.4)' }}>
+            <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(11, 15, 13,0.4)' }}>
               {/* Comment input */}
               <SearchInput small icon={MessageSquare}
                   placeholder="Optional comment..."

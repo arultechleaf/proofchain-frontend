@@ -22,7 +22,7 @@ export default function InventoryPage() {
     { header: 'SKU', cell: (i) => i.sku || '—' },
     {
       header: c.branchId ? 'At this branch' : 'In stock', align: 'right',
-      cell: (i) => <span style={{ fontWeight: 600, color: i.lowStock ? '#f87171' : '#e0eef2' }}>{i.stock} {i.unit}</span>,
+      cell: (i) => <span style={{ fontWeight: 600, color: i.lowStock ? '#f87171' : '#e8efeb' }}>{i.stock} {i.unit}</span>,
     },
     { header: 'Alert at', align: 'right', cell: (i) => i.lowStockLevel },
     { header: 'Value', align: 'right', cell: (i) => formatMoney(i.stock * i.purchasePrice) },
@@ -78,7 +78,7 @@ export default function InventoryPage() {
       </div>
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
-        <StatCard label="Active items" value={totals?.itemCount ?? 0} icon={Package} color="#2dd4bf" loading={c.loading} />
+        <StatCard label="Active items" value={totals?.itemCount ?? 0} icon={Package} color="#3ddc84" loading={c.loading} />
         <StatCard label="Stock value" value={formatMoney(totals?.stockValue)} icon={Coins} color="#4ade80" hint="At purchase price" loading={c.loading} />
         <StatCard label="Retail value" value={formatMoney(totals?.retailValue)} icon={Boxes} color="#a78bfa" hint="At sale price" loading={c.loading} />
         <StatCard label="Low stock" value={totals?.lowStockCount ?? 0} icon={AlertTriangle}

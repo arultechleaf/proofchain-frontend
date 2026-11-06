@@ -40,10 +40,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading || (isAuthenticated && accessLoading)) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#06141a' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-          <Loader2 style={{ width: 32, height: 32, color: '#2dd4bf', animation: 'spin 1s linear infinite' }} />
-          <p style={{ color: '#4a6672', fontSize: 13 }}>Loading ProofChain...</p>
+          <Loader2 style={{ width: 32, height: 32, color: '#3ddc84', animation: 'spin 1s linear infinite' }} />
+          <p style={{ color: '#55655d', fontSize: 13 }}>Loading ProofChain...</p>
         </div>
       </div>
     );
@@ -56,7 +56,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const blocked = !!screen && !canView(screen.level);
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#06141a' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'transparent' }}>
       {/* Sidebar */}
       <Sidebar
         collapsed={sidebarCollapsed}

@@ -57,7 +57,7 @@ export function Card({
     <div className="glass-card card" style={style}>
       {(title || action) && (
         <div className="card-header">
-          {Icon && <Icon size={15} color="#2dd4bf" />}
+          {Icon && <Icon size={15} color="#3ddc84" />}
           {title && <h2 className="card-title">{title}</h2>}
           {action && <div className="card-action">{action}</div>}
         </div>
@@ -117,7 +117,7 @@ export function Spinner({ label }: { label?: string }) {
 export function EmptyState({ icon: Icon, title, action }: { icon: React.ElementType; title: string; action?: React.ReactNode }) {
   return (
     <div className="empty-state">
-      <Icon size={38} color="#2d4b58" className="empty-state-icon" />
+      <Icon size={38} color="#2d3b34" className="empty-state-icon" />
       <p className={`empty-state-title${action ? ' has-action' : ''}`}>{title}</p>
       {action}
     </div>
@@ -125,7 +125,7 @@ export function EmptyState({ icon: Icon, title, action }: { icon: React.ElementT
 }
 
 export function StatCard({
-  label, value, color = '#2dd4bf', icon: Icon, hint, loading,
+  label, value, color = '#3ddc84', icon: Icon, hint, loading,
 }: {
   label: string;
   value: React.ReactNode;

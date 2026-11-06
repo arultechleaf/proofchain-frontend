@@ -43,7 +43,7 @@ export default function ItemsPage() {
   const columns: Column<Item>[] = [
     {
       header: 'Item',
-      cell: (i) => <Link href={`/items/${i.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{i.name}</Link>,
+      cell: (i) => <Link href={`/items/${i.id}`} style={{ color: '#3ddc84', textDecoration: 'none', fontWeight: 600 }}>{i.name}</Link>,
     },
     { header: 'SKU', cell: (i) => i.sku || '—' },
     { header: 'Sale price', align: 'right', cell: (i) => formatMoney(i.salePrice) },
@@ -54,7 +54,7 @@ export default function ItemsPage() {
       align: 'right',
       cell: (i) => {
         const low = i.stock <= i.lowStockLevel;
-        return <span style={{ color: low ? '#f87171' : '#e0eef2', fontWeight: 600 }}>{i.stock} {i.unit}{low && ' ⚠'}</span>;
+        return <span style={{ color: low ? '#f87171' : '#e8efeb', fontWeight: 600 }}>{i.stock} {i.unit}{low && ' ⚠'}</span>;
       },
     },
     actionsColumn<Item>((i) => (
