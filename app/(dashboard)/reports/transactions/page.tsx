@@ -9,6 +9,7 @@ import { formatDay, formatMoney, todayIso } from '@/lib/utils';
 import {
   Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, StatCard, StatusBadge, useAsync, Select
 } from '@/components/ui';
+import { usePageSize } from '@/lib/usePageSize';
 
 const KINDS: Array<{ value: 'all' | TransactionKind; label: string }> = [
   { value: 'all', label: 'All' },
@@ -31,9 +32,9 @@ const daysAgo = (n: number) => {
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 };
 
-const LIMIT = 20;
 
 export default function TransactionHistoryPage() {
+  const [LIMIT, setLimit] = usePageSize(20);
   const [kind, setKind] = useState<'all' | TransactionKind>('all');
   const [from, setFrom] = useState(daysAgo(29));
   const [to, setTo] = useState(todayIso());
@@ -41,7 +42,7 @@ export default function TransactionHistoryPage() {
 
   const { data, loading, error } = useAsync<TransactionsReport>(
     async () => (await reportsApi.transactions({ kind, from, to, page, limit: LIMIT })).data.data,
-    [kind, from, to, page],
+    [kind, from, to, page, LIMIT],
   );
 
   const columns: Column<TransactionRow>[] = [
@@ -107,7 +108,7 @@ export default function TransactionHistoryPage() {
         rowKey={(r) => `${r.kind}-${r.id}`}
         empty={<EmptyState icon={History} title="No transactions in this range" />}
         startIndex={(page - 1) * LIMIT}
-        footer={<Pager page={page} total={data?.total ?? 0} limit={LIMIT} onPage={setPage} />}
+        footer={<Pager page={page} total={data?.total ?? 0} limit={LIMIT} onPage={setPage} onLimit={setLimit} />}
       />
     </Page>
   );

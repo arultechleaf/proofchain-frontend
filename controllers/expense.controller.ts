@@ -3,6 +3,7 @@
 /** CONTROLLER — expenses: date range, category filter, list, summary and the add form. */
 import { useState } from 'react';
 import { useAsync } from '@/controllers/useAsync';
+import { usePageSize } from '@/lib/usePageSize';
 import { useAuth } from '@/lib/auth';
 import { canWrite } from '@/lib/roles';
 import { apiError, todayIso } from '@/lib/utils';
@@ -30,6 +31,7 @@ export function useExpenseController() {
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = usePageSize(15);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<ExpenseFormValues>(blankForm());
   const [saving, setSaving] = useState(false);
@@ -37,7 +39,7 @@ export function useExpenseController() {
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const filters = { from, to, category, search: query };
-  const list = useAsync<ExpenseList>(() => expenseService.list({ ...filters, page, limit: EXPENSE_PAGE_SIZE }), [from, to, category, query, page]);
+  const list = useAsync<ExpenseList>(() => expenseService.list({ ...filters, page, limit }), [from, to, category, query, page, limit]);
   const summary = useAsync<ExpenseSummary>(() => expenseService.summary(filters), [from, to, category, query]);
   const categories = useAsync<string[]>(() => expenseService.categories(), []);
 
@@ -79,7 +81,7 @@ export function useExpenseController() {
     rows: list.data?.rows ?? [], total: list.data?.total ?? 0, loading: list.loading, error: !!list.error,
     summary: summary.data, summaryLoading: summary.loading,
     categories: categories.data ?? [],
-    page, setPage, limit: EXPENSE_PAGE_SIZE,
+    page, setPage, limit, setLimit,
     from, to, category, search,
     setFrom: reset(setFrom), setTo: reset(setTo), setCategory: reset(setCategory), setSearch,
     submitSearch: () => { setQuery(search); setPage(1); },

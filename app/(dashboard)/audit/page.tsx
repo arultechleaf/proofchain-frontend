@@ -6,6 +6,7 @@ import { auditApi } from '@/lib/api';
 import type { AuditLog } from '@/models';
 import { formatDate, downloadBlob } from '@/lib/utils';
 import { Column, DataTable, EmptyState, Pager, Button, Page, PageHeader, Select } from '@/components/ui';
+import { usePageSize } from '@/lib/usePageSize';
 
 const ACTION_STYLE: Record<string, { color: string; bg: string; border: string }> = {
   CREATE_DELIVERY:    { color: '#3ddc84', bg: 'rgba(22, 163, 74,0.1)',  border: 'rgba(34, 197, 94,0.25)' },
@@ -76,7 +77,7 @@ export default function AuditPage() {
   const [exporting, setExporting]   = useState(false);
   const [resourceType, setResourceType] = useState('');
   const [page, setPage]             = useState(1);
-  const limit = 50;
+  const [limit, setLimit] = usePageSize(50);
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -87,7 +88,7 @@ export default function AuditPage() {
     } catch { } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchLogs(); }, [page, resourceType]);
+  useEffect(() => { fetchLogs(); }, [page, resourceType, limit]);
 
   const handleExport = async () => {
     setExporting(true);
@@ -131,7 +132,7 @@ export default function AuditPage() {
         rowKey={(l) => l.id}
         empty={<EmptyState icon={ClipboardList} title="No audit logs found" />}
         startIndex={(page - 1) * limit}
-        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
+        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} onLimit={setLimit} />}
       />
     </Page>
   );

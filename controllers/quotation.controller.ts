@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAsync } from '@/controllers/useAsync';
+import { usePageSize } from '@/lib/usePageSize';
 import { useLineItems } from '@/controllers/useLineItems';
 import { useAuth } from '@/lib/auth';
 import { canWrite } from '@/lib/roles';
@@ -20,12 +21,13 @@ export function useQuotationListController() {
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = usePageSize(15);
 
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const { data, loading, error, reload } = useAsync<QuotationList>(
-    () => quotationService.list({ status, search: query, page, limit: QUOTATION_PAGE_SIZE }),
-    [status, query, page],
+    () => quotationService.list({ status, search: query, page, limit }),
+    [status, query, page, limit],
   );
 
   const remove = async (q: Quotation) => {
@@ -43,7 +45,7 @@ export function useQuotationListController() {
     rows: data?.rows ?? [], total: data?.total ?? 0, loading, error: !!error,
     status, selectStatus: (s: string) => { setStatus(s); setPage(1); },
     search, setSearch, submitSearch: () => { setQuery(search); setPage(1); },
-    page, setPage, limit: QUOTATION_PAGE_SIZE,
+    page, setPage, limit, setLimit,
     canCreate: canWrite(user?.role),
     message,
     remove,

@@ -7,6 +7,7 @@ import { notificationsApi } from '@/lib/api';
 import type { AppNotification, NotificationType } from '@/models';
 import { apiError, formatRelative } from '@/lib/utils';
 import { Card, EmptyState, Notice, Page, PageHeader, Pager, Spinner, useAsync, Tabs } from '@/components/ui';
+import { usePageSize } from '@/lib/usePageSize';
 
 interface NotificationList {
   data: AppNotification[];
@@ -22,9 +23,9 @@ const TYPE_ICON: Record<NotificationType, { icon: React.ElementType; color: stri
   system: { icon: Bell, color: '#9aa9a1' },
 };
 
-const LIMIT = 15;
 
 export default function NotificationsPage() {
+  const [LIMIT, setLimit] = usePageSize(15);
   const router = useRouter();
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [page, setPage] = useState(1);
@@ -32,7 +33,7 @@ export default function NotificationsPage() {
 
   const { data, loading, error, reload } = useAsync<NotificationList>(
     async () => (await notificationsApi.list({ page, limit: LIMIT, unread: unreadOnly || undefined })).data,
-    [page, unreadOnly],
+    [page, unreadOnly, LIMIT],
   );
 
   const run = async (fn: () => Promise<unknown>) => {
@@ -115,7 +116,7 @@ export default function NotificationsPage() {
             );
           })
         )}
-        <Pager page={page} total={data?.total ?? 0} limit={LIMIT} onPage={setPage} />
+        <Pager page={page} total={data?.total ?? 0} limit={LIMIT} onPage={setPage} onLimit={setLimit} />
       </Card>
     </Page>
   );

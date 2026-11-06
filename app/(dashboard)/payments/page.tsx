@@ -8,6 +8,7 @@ import type { Payment } from '@/models';
 import { useAuth } from '@/lib/auth';
 import { apiError, formatDay, formatMoney } from '@/lib/utils';
 import { Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, actionsColumn, canWrite, useAsync, Tabs } from '@/components/ui';
+import { usePageSize } from '@/lib/usePageSize';
 
 const TABS = [
   { key: '', label: 'All' },
@@ -19,13 +20,13 @@ export default function PaymentsPage() {
   const { user } = useAuth();
   const [direction, setDirection] = useState('');
   const [page, setPage] = useState(1);
-  const limit = 15;
+  const [limit, setLimit] = usePageSize(15);
 
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const { data, loading, error, reload } = useAsync(
     async () => (await paymentsApi.list({ direction: direction || undefined, page, limit })).data,
-    [direction, page],
+    [direction, page, limit],
   );
   const rows: Payment[] = data?.data ?? [];
   const total: number = data?.total ?? 0;
@@ -110,7 +111,7 @@ export default function PaymentsPage() {
         rowKey={(p) => p.id}
         empty={<EmptyState icon={Wallet} title="No payments recorded" />}
         startIndex={(page - 1) * limit}
-        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
+        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} onLimit={setLimit} />}
       />
     </Page>
   );

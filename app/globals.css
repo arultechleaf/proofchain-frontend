@@ -2220,3 +2220,52 @@ body::after {
 
 /* Light theme is this same dark design inverted, so give its backdrop a little more strength and a softer vignette */
 html[data-theme='light'] body::after { background: radial-gradient(ellipse at center, transparent 62%, rgba(0, 0, 0, 0.28) 100%); }
+
+/* Notices as toasts */
+#toast-stack { position: fixed; top: 68px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 10px; width: min(380px, calc(100vw - 32px)); pointer-events: none; }
+.notice-toast { pointer-events: auto; margin: 0 !important; background: rgba(17, 24, 21, 0.96) !important; backdrop-filter: blur(12px); box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45); animation: toast-in .25s ease-out both; position: relative; padding-right: 34px; }
+.notice-close { position: absolute; top: 8px; right: 10px; background: none; border: 0; color: #9aa9a1; font-size: 12px; cursor: pointer; line-height: 1; }
+.notice-close:hover { color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+
+/* Entry tables (invoice / quotation lines) share the common table look: same header band, text and row lines */
+.line-table th, .gst-table th {
+  padding: 11px 8px; font-size: 11px; font-weight: 600; color: #cbd6d0; text-transform: uppercase; letter-spacing: 0.06em;
+  background: #011205; border-bottom: 1px solid rgba(34, 197, 94, 0.35);
+}
+.line-table th:first-child, .gst-table th:first-child { border-top-left-radius: 10px; padding-left: 12px; }
+.line-table th:last-child, .gst-table th:last-child { border-top-right-radius: 10px; }
+.line-table td, .gst-table td { padding-top: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.line-table td:first-child, .gst-table td:first-child { padding-left: 4px; }
+.line-table tbody tr:hover, .gst-table tbody tr:hover { background: rgba(61, 220, 132, 0.04); }
+@media (max-width: 960px) { .line-table td, .gst-table td { border-bottom: 0; } }
+
+/* Sidebar: the current page gets a simple tint, a thin accent bar and a brighter label */
+.app-sidebar .nav-item.is-active {
+  background: rgba(34, 197, 94, 0.14) !important;
+  border-color: transparent !important;
+  color: #3ddc84 !important;
+  box-shadow: none;
+}
+.app-sidebar .nav-item.is-active::before {
+  content: ''; position: absolute; left: -6px; top: 22%; bottom: 22%; width: 3px; border-radius: 0 3px 3px 0; background: #22c55e;
+}
+.app-sidebar .nav-item.is-active span { color: #e8efeb; font-weight: 600 !important; }
+
+/* Tighter spacing between stat cards */
+.grid-layout:has(> .stat-card), .stat-grid { gap: 10px !important; }
+.stat-card { padding: 14px 16px; }
+.grid-layout:has(> .stat-card) { margin-bottom: 14px !important; }
+
+/* Pager: summary + rows picker on the left, numbered pages with arrows on the right */
+.pager { flex-wrap: wrap; gap: 12px; }
+.pager-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.pager-rows { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: #9aa9a1; }
+.pager-select { height: 32px; padding: 0 10px; border-radius: 8px; font-size: 13px; color: #e8efeb; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.14); outline: none; cursor: pointer; }
+.pager-select:focus { border-color: #3ddc84; box-shadow: 0 0 0 3px rgba(61, 220, 132, 0.2); }
+.pager-select option { background: #111815; color: #e8efeb; }
+.pager-buttons { align-items: center; gap: 6px; }
+.pager-btn { min-width: 34px; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 13px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #c5d1ca; transition: all .15s; }
+.pager-btn:hover:not(:disabled) { border-color: rgba(61, 220, 132, 0.5); color: #fff; background: rgba(61, 220, 132, 0.08); }
+.pager-btn.is-current { background: linear-gradient(135deg, #3ddc84, #16a34a); border-color: transparent; color: #04140a; font-weight: 700; }
+.pager-gap { color: #7b8a82; padding: 0 2px; }

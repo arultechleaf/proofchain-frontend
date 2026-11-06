@@ -108,7 +108,7 @@ export default function ExpensesPage() {
         rowKey={(e) => e.id}
         empty={<EmptyState icon={Receipt} title="No expenses in this range" />}
         startIndex={(c.page - 1) * c.limit}
-        footer={<Pager page={c.page} total={c.total} limit={c.limit} onPage={c.setPage} />}
+        footer={<Pager page={c.page} total={c.total} limit={c.limit} onPage={c.setPage} onLimit={c.setLimit} />}
       />
     </Page>
   );

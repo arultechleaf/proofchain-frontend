@@ -7,7 +7,7 @@ import { formatDate, formatMoney } from '@/lib/utils';
 import {
   Button, Card, Column, DataTable, EmptyState, Grid, Notice, Page, PageHeader, Pager, StatCard, Select
 } from '@/components/ui';
-import { MOVE_PAGE_SIZE, useInventoryController } from '@/controllers/inventory.controller';
+import { useInventoryController } from '@/controllers/inventory.controller';
 import { REASON_LABEL, type Movement, type StockItem } from '@/models/inventory';
 import { ExportButtons } from '@/components/ui/ExportButtons';
 
@@ -124,7 +124,7 @@ export default function InventoryPage() {
         </div>
         <DataTable bare columns={moveColumns} rows={c.moves} loading={c.movesLoading} rowKey={(m) => m.id}
           empty={<EmptyState icon={Boxes} title="No movements match" />}
-          footer={<Pager page={c.page} total={c.movesTotal} limit={MOVE_PAGE_SIZE} onPage={c.setPage} />} />
+          footer={<Pager page={c.page} total={c.movesTotal} limit={c.limit} onPage={c.setPage} onLimit={c.setLimit} />} />
       </Card>
     </Page>
   );

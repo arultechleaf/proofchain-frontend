@@ -10,6 +10,7 @@ import { apiError, formatMoney } from '@/lib/utils';
 import {
   CheckField, Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, SearchInput, actionsColumn, canWrite, useAsync,
 } from '@/components/ui';
+import { usePageSize } from '@/lib/usePageSize';
 
 export default function ItemsPage() {
   const { user } = useAuth();
@@ -17,13 +18,13 @@ export default function ItemsPage() {
   const [query, setQuery] = useState('');
   const [lowOnly, setLowOnly] = useState(false);
   const [page, setPage] = useState(1);
-  const limit = 15;
+  const [limit, setLimit] = usePageSize(15);
 
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const { data, loading, error, reload } = useAsync(
     async () => (await itemsApi.list({ search: query || undefined, lowStock: lowOnly || undefined, page, limit })).data,
-    [query, lowOnly, page],
+    [query, lowOnly, page, limit],
   );
   const rows: Item[] = data?.data ?? [];
   const total: number = data?.total ?? 0;
@@ -96,7 +97,7 @@ export default function ItemsPage() {
         rowKey={(i) => i.id}
         empty={<EmptyState icon={Package} title="No items found" />}
         startIndex={(page - 1) * limit}
-        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
+        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} onLimit={setLimit} />}
       />
     </Page>
   );

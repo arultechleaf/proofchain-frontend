@@ -9,6 +9,7 @@ import { formatRelative, statusLabel } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
 import { canUse } from '@/lib/roles';
 import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsColumn, Button, Select } from '@/components/ui';
+import { usePageSize } from '@/lib/usePageSize';
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   pending:   { bg: 'rgba(245,158,11,0.1)',  color: '#fbbf24', border: 'rgba(245,158,11,0.25)'  },
@@ -60,7 +61,7 @@ export default function DeliveriesPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const limit = 10;
+  const [limit, setLimit] = usePageSize(10);
 
   const fetchDeliveries = async () => {
     setLoading(true);
@@ -72,7 +73,7 @@ export default function DeliveriesPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchDeliveries(); }, [page, statusFilter]);
+  useEffect(() => { fetchDeliveries(); }, [page, statusFilter, limit]);
 
   const handleSearch = (e: React.FormEvent) => { e.preventDefault(); setPage(1); fetchDeliveries(); };
 
@@ -132,7 +133,7 @@ export default function DeliveriesPage() {
           } />
         }
         startIndex={(page - 1) * limit}
-        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
+        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} onLimit={setLimit} />}
       />
     </div>
   );

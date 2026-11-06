@@ -12,6 +12,7 @@ import { ExportButtons } from '@/components/ui/ExportButtons';
 import {
   Column, DataTable, EmptyState, Notice, Page, PageHeader, Pager, RowActions, StatusBadge, actionsColumn, canUse, canWrite, useAsync, Select
 } from '@/components/ui';
+import { usePageSize } from '@/lib/usePageSize';
 
 export const INVOICE_COPY: Record<InvoiceScreen, { base: string; title: string; noun: string; newLabel: string; party: string }> = {
   sale: { base: '/sales', title: 'Sales Invoices', noun: 'invoices', newLabel: 'New Sale', party: 'Customer' },
@@ -26,13 +27,13 @@ export function InvoiceList({ type }: { type: InvoiceScreen }) {
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const limit = 15;
+  const [limit, setLimit] = usePageSize(15);
 
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const { data, loading, error, reload } = useAsync(
     async () => (await invoicesApi.list(type, { status: status || undefined, search: query || undefined, page, limit })).data,
-    [type, status, query, page],
+    [type, status, query, page, limit],
   );
   const rows: Invoice[] = data?.data ?? [];
   const total: number = data?.total ?? 0;
@@ -151,7 +152,7 @@ export function InvoiceList({ type }: { type: InvoiceScreen }) {
             action={canUse(type === 'sale' ? 'sales_create' : type === 'non_gst_sale' ? 'non_gst_sales_create' : 'purchases_create', user?.role) ? <Link href={`${copy.base}/create`} className="btn btn-primary"><Plus size={14} /> {copy.newLabel}</Link> : undefined} />
         }
         startIndex={(page - 1) * limit}
-        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} />}
+        footer={<Pager page={page} total={total} limit={limit} onPage={setPage} onLimit={setLimit} />}
       />
     </Page>
   );

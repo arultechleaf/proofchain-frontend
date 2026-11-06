@@ -3,6 +3,7 @@
 /** CONTROLLER — the Inventory page: stock per company / branch, low stock, and filterable stock history. */
 import { useState } from 'react';
 import { useAsync } from '@/controllers/useAsync';
+import { usePageSize } from '@/lib/usePageSize';
 import { useAuth } from '@/lib/auth';
 import { canWrite } from '@/lib/roles';
 import { apiError, downloadBlob, formatDate } from '@/lib/utils';
@@ -22,13 +23,14 @@ export function useInventoryController() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = usePageSize(15);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState('');
 
   const summary = useAsync<StockSummary>(() => inventoryService.summary({ companyId, branchId }), [companyId, branchId]);
   const moves = useAsync(
-    () => inventoryService.movements({ companyId, branchId, reason, itemId, from, to, page, limit: MOVE_PAGE_SIZE }),
-    [companyId, branchId, reason, itemId, from, to, page],
+    () => inventoryService.movements({ companyId, branchId, reason, itemId, from, to, page, limit }),
+    [companyId, branchId, reason, itemId, from, to, page, limit],
   );
 
   const data = summary.data;
@@ -76,7 +78,7 @@ export function useInventoryController() {
 
   return {
     summary: data, items, branches, loading: summary.loading, failed: !!summary.error,
-    moves: moves.data?.rows ?? [], movesTotal: moves.data?.total ?? 0, movesLoading: moves.loading, page, setPage,
+    moves: moves.data?.rows ?? [], movesTotal: moves.data?.total ?? 0, movesLoading: moves.loading, page, setPage, limit, setLimit,
     acrossCompanies, canEnterStock: canWrite(user?.role), companies: data?.companies ?? [],
     companyId, branchId, reason, itemId, from, to,
     setCompanyId: (v: string) => { setCompanyId(v); setBranchId(''); setItemId(''); setPage(1); },

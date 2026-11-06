@@ -217,7 +217,7 @@ export default function CashBankPage() {
         rowKey={(t) => t.id}
         empty={<EmptyState icon={ArrowLeftRight} title="No transactions yet" />}
         startIndex={(c.txPage - 1) * c.txLimit}
-        footer={<Pager page={c.txPage} total={c.txTotal} limit={c.txLimit} onPage={c.setTxPage} />}
+        footer={<Pager page={c.txPage} total={c.txTotal} limit={c.txLimit} onPage={c.setTxPage} onLimit={c.setTxLimit} />}
       />
     </Page>
   );

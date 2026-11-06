@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAsync } from '@/controllers/useAsync';
+import { usePageSize } from '@/lib/usePageSize';
 import { useAuth } from '@/lib/auth';
 import { apiError } from '@/lib/utils';
 import { canWrite } from '@/lib/roles';
@@ -27,12 +28,13 @@ export function usePartyListController() {
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = usePageSize(15);
 
   const [message, setMessage] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
 
   const { data, loading, error, reload } = useAsync<PartyList>(
-    () => partyService.list({ type, search: query, page, limit: PARTY_PAGE_SIZE }),
-    [type, query, page],
+    () => partyService.list({ type, search: query, page, limit }),
+    [type, query, page, limit],
   );
 
   const remove = async (id: number, name: string) => {
@@ -52,7 +54,7 @@ export function usePartyListController() {
     loading,
     error: !!error,
     page,
-    limit: PARTY_PAGE_SIZE,
+    limit, setLimit,
     canCreate: canWrite(user?.role),
     message,
     remove,

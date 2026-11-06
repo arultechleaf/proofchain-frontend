@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { setCrumbLabel } from '@/lib/breadcrumb';
 import { createPortal } from 'react-dom';
+import { PAGE_SIZES } from '@/lib/usePageSize';
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { AlertCircle, ArrowLeft, CheckCircle2, Eye, Info, Loader2, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
 import { statusColor, statusLabel } from '@/lib/utils';
@@ -83,22 +84,39 @@ export function Grid({ cols, gap = 16, children, style }: {
 
 const NOTICE_ICON = { error: AlertCircle, success: CheckCircle2, info: Info };
 
-/** A success notice with plain text goes away by itself after 10 seconds (errors and info stay until the page changes them). */
-export function Notice({ kind = 'info', children, autoHideMs = kind === 'success' ? 10000 : 0 }: { kind?: keyof typeof NOTICE_ICON; children: React.ReactNode; autoHideMs?: number }) {
+const NOTICE_MS = { success: 4000, info: 6000, error: 8000 } as const;
+
+/** A notice pops up in the top-right corner like a notification, stacks with others, and goes away by itself (or with the ✕). */
+export function Notice({ kind = 'info', children, autoHideMs = NOTICE_MS[kind] }: { kind?: keyof typeof NOTICE_ICON; children: React.ReactNode; autoHideMs?: number }) {
   const Icon = NOTICE_ICON[kind];
   const text = typeof children === 'string' ? children : null;
+  const [host, setHost] = useState<HTMLElement | null>(null);
   const [hiddenText, setHiddenText] = useState<string | null>(null);
+  const [closed, setClosed] = useState(false);
+
   useEffect(() => {
-    if (!autoHideMs || text === null) return;
-    const timer = setTimeout(() => setHiddenText(text), autoHideMs);
+    let el = document.getElementById('toast-stack');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'toast-stack';
+      document.body.appendChild(el);
+    }
+    setHost(el);
+  }, []);
+  useEffect(() => {
+    if (!autoHideMs) return;
+    const timer = setTimeout(() => (text !== null ? setHiddenText(text) : setClosed(true)), autoHideMs);
     return () => clearTimeout(timer);
   }, [text, autoHideMs]);
-  if (text !== null && hiddenText === text) return null;
-  return (
-    <div role={kind === 'error' ? 'alert' : 'status'} className={`notice notice-${kind}`}>
+
+  if (!host || closed || (text !== null && hiddenText === text)) return null;
+  return createPortal(
+    <div role={kind === 'error' ? 'alert' : 'status'} className={`notice notice-${kind} notice-toast`}>
       <Icon size={16} className="notice-icon" />
       <div className="notice-body">{children}</div>
-    </div>
+      <button type="button" className="notice-close" aria-label="Dismiss" onClick={() => (text !== null ? setHiddenText(text) : setClosed(true))}>✕</button>
+    </div>,
+    host,
   );
 }
 
@@ -481,22 +499,47 @@ export function DataTable<T>({
   return <div className="data-table-wrap">{table}{footer}</div>;
 }
 
-export function Pager({ page, total, limit, onPage }: { page: number; total: number; limit: number; onPage: (p: number) => void }) {
-  if (total <= limit) return null;
-  const btn = (label: string, to: number, disabled: boolean) => (
-    <button key={label} onClick={() => onPage(to)} disabled={disabled} className="pager-btn">
-      {label}
-    </button>
-  );
+/** Page numbers to show: always the first and last, the neighbours of the current page, and … for gaps. */
+function pageList(page: number, pages: number): Array<number | '…'> {
+  const keep = new Set([1, pages, page - 1, page, page + 1].filter((n) => n >= 1 && n <= pages));
+  const out: Array<number | '…'> = [];
+  let last = 0;
+  [...keep].sort((x, y) => x - y).forEach((n) => {
+    if (n - last > 1) out.push('…');
+    out.push(n);
+    last = n;
+  });
+  return out;
+}
+
+export function Pager({ page, total, limit, onPage, onLimit }: {
+  page: number; total: number; limit: number; onPage: (p: number) => void; onLimit?: (n: number) => void;
+}) {
+  if (total <= Math.min(limit, PAGE_SIZES[0])) return null;
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const sizes = [...new Set([...PAGE_SIZES, limit])].sort((x, y) => x - y);
   return (
     <div className="pager">
-      <span className="pager-info">
-        Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
-      </span>
-      <div className="pager-buttons">
-        {btn('← Prev', page - 1, page === 1)}
-        {btn('Next →', page + 1, page * limit >= total)}
+      <div className="pager-left">
+        <span className="pager-info">
+          Showing {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
+        </span>
+        {onLimit && (
+          <label className="pager-rows">
+            Rows
+            <select className="pager-select" value={limit} onChange={(e) => { onLimit(Number(e.target.value)); onPage(1); }} aria-label="Rows per page">
+              {sizes.map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </label>
+        )}
       </div>
+      <nav className="pager-buttons" aria-label="Pagination">
+        <button type="button" className="pager-btn pager-arrow" onClick={() => onPage(page - 1)} disabled={page <= 1} aria-label="Previous page">←</button>
+        {pageList(page, pages).map((n, i) => n === '…'
+          ? <span key={`gap${i}`} className="pager-gap">…</span>
+          : <button key={n} type="button" className={`pager-btn pager-num${n === page ? ' is-current' : ''}`} onClick={() => onPage(n)} aria-current={n === page ? 'page' : undefined}>{n}</button>)}
+        <button type="button" className="pager-btn pager-arrow" onClick={() => onPage(page + 1)} disabled={page >= pages} aria-label="Next page">→</button>
+      </nav>
     </div>
   );
 }

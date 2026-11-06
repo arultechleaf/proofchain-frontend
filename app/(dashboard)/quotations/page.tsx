@@ -54,7 +54,7 @@ export default function QuotationsPage() {
         rowKey={(q) => q.id}
         empty={<EmptyState icon={FileText} title="No quotations found" />}
         startIndex={(c.page - 1) * c.limit}
-        footer={<Pager page={c.page} total={c.total} limit={c.limit} onPage={c.setPage} />}
+        footer={<Pager page={c.page} total={c.total} limit={c.limit} onPage={c.setPage} onLimit={c.setLimit} />}
       />
     </Page>
   );

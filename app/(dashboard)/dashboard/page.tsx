@@ -229,31 +229,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-
-      {/* Quick links */}
-      <div style={{ marginTop: 24, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12 }}>
-        {[
-          { href: '/sales/create',      label: '+ New Sale',        color: '#3ddc84', bg: 'rgba(22, 163, 74,0.12)', border: 'rgba(34, 197, 94,0.25)' },
-          { href: '/payments/create',   label: '+ Record Payment',  color: '#4ade80', bg: 'rgba(22, 163, 74,0.12)', border: 'rgba(34, 197, 94,0.25)' },
-          { href: '/deliveries/create', label: '+ New Delivery',    color: '#16a34a', bg: 'rgba(22, 163, 74,0.15)', border: 'rgba(34, 197, 94,0.3)' },
-          { href: '/approvals',         label: '✓ Approvals Queue', color: '#22c55e', bg: 'rgba(22, 163, 74,0.12)', border: 'rgba(34, 197, 94,0.25)' },
-          { href: '/verification',      label: '⛉ Verify Proof',   color: '#3ddc84', bg: 'rgba(22, 101, 52,0.12)', border: 'rgba(34, 197, 94,0.25)' },
-          { href: '/explorer',          label: '⬡ Blockchain',      color: '#a78bfa', bg: 'rgba(109,40,217,0.12)',border: 'rgba(139,92,246,0.25)' },
-        ].map(q => (
-          <Link key={q.href} href={q.href} style={{ textDecoration: 'none' }}>
-            <div style={{
-              background: q.bg, border: `1px solid ${q.border}`, borderRadius: 10,
-              padding: '12px 16px', color: q.color, fontSize: 13, fontWeight: 600,
-              textAlign: 'center', transition: 'opacity 0.15s',
-            }}
-              onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.opacity = '0.8'}
-              onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.opacity = '1'}
-            >
-              {q.label}
-            </div>
-          </Link>
-        ))}
-      </div>
     </Page>
   );
 }

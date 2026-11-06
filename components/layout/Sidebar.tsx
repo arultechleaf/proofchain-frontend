@@ -284,6 +284,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     return !item.roles || (!!user && item.roles.includes(user.role));
   });
 
+  // Only the most specific menu entry is highlighted (/inventory/entry must not also light up /inventory).
+  const activeHref = visibleItems
+    .map((i) => i.href)
+    .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
+
   const width = collapsed ? 72 : 240;
 
   return (
@@ -299,7 +305,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         flexDirection: 'column',
         flexShrink: 0,
         background:
-          'linear-gradient(180deg, #0b0f0d 0%, #080f1f 100%)',
+          'linear-gradient(180deg, #0b0f0d 0%, #070a09 100%)',
         borderRight: '1px solid rgba(34, 197, 94,0.12)',
         overflow: 'hidden',
         transition:
@@ -372,9 +378,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         }}
       >
         {visibleItems.map((item, index) => {
-          const isActive =
-            pathname === item.href ||
-            pathname.startsWith(`${item.href}/`);
+          const isActive = item.href === activeHref;
 
           const Icon = item.icon;
 
@@ -419,6 +423,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 }}
               >
                 <div
+                  className={isActive ? 'nav-item is-active' : 'nav-item'}
                   style={{
                     display: 'flex',
                     alignItems: 'center',

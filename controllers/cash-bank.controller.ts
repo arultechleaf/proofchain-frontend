@@ -3,6 +3,7 @@
 /** CONTROLLER — cash & bank: accounts, the transaction list and the three entry forms. */
 import { useState } from 'react';
 import { useAsync } from '@/controllers/useAsync';
+import { usePageSize } from '@/lib/usePageSize';
 import { useAuth } from '@/lib/auth';
 import { canWrite } from '@/lib/roles';
 import { apiError, todayIso } from '@/lib/utils';
@@ -22,6 +23,7 @@ export function useCashBankController() {
   const { user } = useAuth();
   const [accountFilter, setAccountFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = usePageSize(15);
   const [form, setForm] = useState<CashBankForm>(null);
   const [saving, setSaving] = useState(false);
   const [editingAccountId, setEditingAccountId] = useState<number | null>(null);
@@ -33,8 +35,8 @@ export function useCashBankController() {
 
   const accounts = useAsync<AccountsResult>(() => cashBankService.accounts(), []);
   const transactions = useAsync<TransactionList>(
-    () => cashBankService.transactions({ accountId: accountFilter, page, limit: TX_PAGE_SIZE }),
-    [accountFilter, page],
+    () => cashBankService.transactions({ accountId: accountFilter, page, limit }),
+    [accountFilter, page, limit],
   );
 
   const activeAccounts = (accounts.data?.rows ?? []).filter((a) => a.isActive);
@@ -63,7 +65,7 @@ export function useCashBankController() {
     accounts: accounts.data, accountsLoading: accounts.loading, accountsError: !!accounts.error,
     activeAccounts,
     transactions: transactions.data?.rows ?? [], txTotal: transactions.data?.total ?? 0, txLoading: transactions.loading,
-    txPage: page, setTxPage: setPage, txLimit: TX_PAGE_SIZE,
+    txPage: page, setTxPage: setPage, txLimit: limit, setTxLimit: setLimit,
     accountFilter, setAccountFilter: (id: string) => { setAccountFilter(id); setPage(1); },
     canWrite: canWrite(user?.role),
     form, editingAccountId,
