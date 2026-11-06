@@ -95,7 +95,7 @@ function InvoiceForm({ type }: { type: InvoiceScreen }) {
 
           {c.online && !c.accountsLoading && c.paymentAccounts.length > 0 && (
             <div className="notice notice-success" style={{ marginTop: 14 }}>
-              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 0 4px rgba(52,211,153,0.2)', flexShrink: 0 }} />
+              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 0 4px rgba(74, 222, 128,0.2)', flexShrink: 0 }} />
               <span>
                 Razorpay connected{c.razorpayMode === 'test' ? ' · Test mode (no real money)' : ''}. {formatMoney(c.onlineAmount)} is collected when you press <strong>Pay with Razorpay &amp; save</strong>.
               </span>
@@ -261,7 +261,7 @@ function InvoiceForm({ type }: { type: InvoiceScreen }) {
                   )}
                 </Field>
               )}
-              <div className="totals-row strong"><span>Balance due</span><span style={{ color: c.balanceDue > 0 ? '#fbbf24' : '#34d399' }}>{formatMoney(c.balanceDue)}</span></div>
+              <div className="totals-row strong"><span>Balance due</span><span style={{ color: c.balanceDue > 0 ? '#fbbf24' : '#4ade80' }}>{formatMoney(c.balanceDue)}</span></div>
               {c.error && <p className="form-hint" style={{ color: '#f87171', margin: 0 }}>{c.error}</p>}
               <SubmitButton loading={c.submitting}><Receipt size={15} /> {c.paidSale ? 'Save the paid sale' : c.online ? 'Pay with Razorpay & save' : 'Save & register proof'}</SubmitButton>
             </div>

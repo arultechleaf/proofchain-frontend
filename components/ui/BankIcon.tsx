@@ -16,7 +16,7 @@ export function BankIcon({ name, type = 'bank', size = 36 }: { name?: string | n
   }
   const Icon = type === 'cash' ? Banknote : Landmark;
   return (
-    <span aria-hidden style={{ ...box, background: type === 'cash' ? 'rgba(52,211,153,0.14)' : 'rgba(34,211,238,0.14)', color: type === 'cash' ? '#34d399' : '#22d3ee' }}>
+    <span aria-hidden style={{ ...box, background: type === 'cash' ? 'rgba(74, 222, 128,0.14)' : 'rgba(34,211,238,0.14)', color: type === 'cash' ? '#4ade80' : '#2dd4bf' }}>
       <Icon size={Math.round(size * 0.5)} />
     </span>
   );

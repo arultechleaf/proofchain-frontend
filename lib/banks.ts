@@ -8,7 +8,7 @@ const BANKS: Array<{ match: RegExp } & BankBrand> = [
   { match: /\baxis\b/i, key: 'axis', mark: 'A', bg: '#97144d', fg: '#ffffff', name: 'Axis Bank' },
   { match: /\bkotak\b/i, key: 'kotak', mark: 'K', bg: '#ed1c24', fg: '#ffffff', name: 'Kotak Mahindra Bank' },
   { match: /indian overseas|\biob\b/i, key: 'iob', mark: 'IOB', bg: '#0b3c8c', fg: '#ffffff', name: 'Indian Overseas Bank' },
-  { match: /\bindian\b/i, key: 'indian', mark: 'IB', bg: '#1e3a8a', fg: '#fbbf24', name: 'Indian Bank' },
+  { match: /\bindian\b/i, key: 'indian', mark: 'IB', bg: '#0a2a6e', fg: '#fbbf24', name: 'Indian Bank' },
   { match: /punjab national|\bpnb\b/i, key: 'pnb', mark: 'PNB', bg: '#a6192e', fg: '#ffffff', name: 'Punjab National Bank' },
   { match: /bank of baroda|\bbob\b|baroda/i, key: 'bob', mark: 'BoB', bg: '#f26522', fg: '#ffffff', name: 'Bank of Baroda' },
   { match: /\bcanara\b/i, key: 'canara', mark: 'C', bg: '#0f75bc', fg: '#ffd200', name: 'Canara Bank' },

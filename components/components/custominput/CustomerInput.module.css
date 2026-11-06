@@ -2,7 +2,7 @@
 min-height: 100vh;
 padding: 40px 20px;
 background: #f5f7fb;
-color: #202938;
+color: #183641;
 font-family: "Lato", Arial, sans-serif;
 }
 
@@ -14,7 +14,7 @@ padding: 32px;
 background: #fff;
 border: 1px solid #e5eaf2;
 border-radius: 16px;
-box-shadow: 0 8px 30px rgba(20, 35, 60, 0.07);
+box-shadow: 0 8px 30px rgba(20, 46, 58, 0.07);
 }
 
 .heading {
@@ -25,7 +25,7 @@ font-weight: 900;
 
 .subheading {
 margin: 0 0 28px;
-color: #687386;
+color: #6b8a96;
 font-size: 14px;
 line-height: 1.6;
 }
@@ -50,7 +50,7 @@ padding: 12px 14px;
 border: 1px solid #d5dce7;
 border-radius: 8px;
 background: #fff;
-color: #202938;
+color: #183641;
 font: inherit;
 font-size: 14px;
 transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -69,8 +69,8 @@ line-height: 1.6;
 .input:focus,
 .textarea:focus {
 outline: none;
-border-color: #4263eb;
-box-shadow: 0 0 0 3px rgba(66, 99, 235, 0.12);
+border-color: #0f766e;
+box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
 .input::placeholder,
@@ -80,7 +80,7 @@ color: #9aa4b4;
 
 .helperText {
 margin: 7px 0 0;
-color: #7a8495;
+color: #7a95a0;
 font-size: 12px;
 line-height: 1.5;
 }
@@ -113,7 +113,7 @@ transition: background 0.2s ease;
 
 .button {
 width: 100%;
-background: #3157d5;
+background: #0f766e;
 color: #fff;
 }
 
@@ -122,8 +122,8 @@ background: #2546b8;
 }
 
 .buttonSecondary {
-background: #edf2ff;
-color: #3157d5;
+background: #ecf8f7;
+color: #0f766e;
 }
 
 .buttonSecondary:hover {
@@ -135,7 +135,7 @@ background: #dfe7ff;
 .optionButton:focus-visible,
 .addOption:focus-visible,
 .removeButton:focus-visible {
-outline: 3px solid rgba(66, 99, 235, 0.35);
+outline: 3px solid rgba(15, 118, 110, 0.35);
 outline-offset: 2px;
 }
 
@@ -155,7 +155,7 @@ padding: 6px;
 border: 1px solid #e0e5ee;
 border-radius: 8px;
 background: #fff;
-box-shadow: 0 10px 24px rgba(20, 35, 60, 0.12);
+box-shadow: 0 10px 24px rgba(20, 46, 58, 0.12);
 }
 
 .optionButton,
@@ -167,7 +167,7 @@ padding: 10px 12px;
 border: 0;
 border-radius: 6px;
 background: transparent;
-color: #273247;
+color: #1d4350;
 text-align: left;
 cursor: pointer;
 font: inherit;
@@ -176,28 +176,28 @@ font-size: 13px;
 
 .optionButton:hover,
 .closeDropdown:hover {
-background: #f0f4ff;
+background: #effaf9;
 }
 
 .addOption {
-color: #3157d5;
+color: #0f766e;
 font-weight: 700;
 }
 
 .addOption:hover {
-background: #edf2ff;
+background: #ecf8f7;
 }
 
 .closeDropdown {
 margin-top: 4px;
 border-top: 1px solid #edf0f5;
-color: #687386;
+color: #6b8a96;
 }
 
 .emptyMessage {
 margin: 0;
 padding: 12px;
-color: #7a8495;
+color: #7a95a0;
 font-size: 13px;
 }
 
@@ -218,8 +218,8 @@ transition: border-color 0.2s ease, background 0.2s ease;
 
 .uploadArea:hover,
 .uploadAreaDragging {
-border-color: #4263eb;
-background: #f0f4ff;
+border-color: #0f766e;
+background: #effaf9;
 }
 
 .uploadIcon {
@@ -231,14 +231,14 @@ align-items: center;
 margin-bottom: 10px;
 border-radius: 50%;
 background: #e7edff;
-color: #3157d5;
+color: #0f766e;
 font-size: 25px;
 font-weight: 700;
 }
 
 .uploadTitle {
 margin: 0;
-color: #273247;
+color: #1d4350;
 font-size: 15px;
 font-weight: 700;
 }
@@ -285,7 +285,7 @@ background: #ffe8e8;
 
 .characterCount {
 margin: 7px 0 0;
-color: #7a8495;
+color: #7a95a0;
 text-align: right;
 font-size: 12px;
 }
@@ -294,8 +294,8 @@ font-size: 12px;
 margin: 0 0 18px;
 padding: 12px;
 border-radius: 8px;
-background: #f0f4ff;
-color: #3157d5;
+background: #effaf9;
+color: #0f766e;
 font-size: 13px;
 line-height: 1.5;
 overflow-wrap: anywhere;
@@ -343,7 +343,7 @@ align-items: flex-start;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  color: #1f2937;
+  color: #183641;
 }
 
 .dropdown > .dropdownArrow {
@@ -366,7 +366,7 @@ align-items: flex-start;
   padding: 0;
   border: none;
   background: transparent;
-  color: #1f2937;
+  color: #183641;
   cursor: pointer;
 }
 
@@ -376,7 +376,7 @@ align-items: flex-start;
 }
 
 .dropdownArrowButton:focus-visible {
-  outline: 2px solid #315be8;
+  outline: 2px solid #0f766e;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -407,12 +407,12 @@ align-items: flex-start;
   padding: 0;
   border: none;
   background: transparent;
-  color: #64748b;
+  color: #6b8a96;
   cursor: pointer;
 }
 
 .passwordToggle:hover {
-  color: #2563eb;
+  color: #0d9488;
 }
 
 
@@ -477,11 +477,11 @@ align-items: flex-start;
 }
 
 .fileUploadButton:hover {
-  border-color: #0367d1;
+  border-color: #0f766e;
 }
 
 .hiddenFileInput:focus-visible + .fileUploadButton {
-  outline: 2px solid #0367d1;
+  outline: 2px solid #0f766e;
   outline-offset: 2px;
 }
 

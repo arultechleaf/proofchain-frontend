@@ -27,7 +27,7 @@ interface Outstanding {
 }
 
 const BUCKETS: Array<[keyof Outstanding['buckets'], string, string]> = [
-  ['current', 'Not yet due', '#34d399'],
+  ['current', 'Not yet due', '#4ade80'],
   ['d1_30', '1–30 days', '#fbbf24'],
   ['d31_60', '31–60 days', '#fb923c'],
   ['d61_90', '61–90 days', '#f87171'],
@@ -46,7 +46,7 @@ export default function OutstandingReportPage() {
       header: 'Number',
       cell: (r) => (
         <Link href={`/${r.type === 'sale' ? 'sales' : 'purchases'}/${r.id}`}
-          style={{ color: '#60a5fa', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+          style={{ color: '#2dd4bf', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
           {r.invoiceNumber}
         </Link>
       ),
@@ -56,7 +56,7 @@ export default function OutstandingReportPage() {
     { header: 'Due', cell: (r) => formatDay(r.dueDate ?? r.invoiceDate) },
     {
       header: 'Overdue', align: 'right',
-      cell: (r) => r.daysOverdue > 0 ? <span style={{ color: '#f87171' }}>{r.daysOverdue} days</span> : <span style={{ color: '#34d399' }}>On time</span>,
+      cell: (r) => r.daysOverdue > 0 ? <span style={{ color: '#f87171' }}>{r.daysOverdue} days</span> : <span style={{ color: '#4ade80' }}>On time</span>,
     },
     { header: 'Total', align: 'right', cell: (r) => formatMoney(r.total) },
     { header: 'Balance due', align: 'right', cell: (r) => <strong>{formatMoney(r.balanceDue)}</strong> },
@@ -73,7 +73,7 @@ export default function OutstandingReportPage() {
       {error ? <Notice kind="error">Could not load the report.</Notice> : null}
 
       <Grid cols={2} style={{ marginBottom: 18 }}>
-        <StatCard label="Receivable" value={formatMoney(data?.totals.receivable)} color="#34d399" icon={ArrowDownLeft} loading={loading} hint="Customers owe you" />
+        <StatCard label="Receivable" value={formatMoney(data?.totals.receivable)} color="#4ade80" icon={ArrowDownLeft} loading={loading} hint="Customers owe you" />
         <StatCard label="Payable" value={formatMoney(data?.totals.payable)} color="#f87171" icon={ArrowUpRight} loading={loading} hint="You owe suppliers" />
       </Grid>
 

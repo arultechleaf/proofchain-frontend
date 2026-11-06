@@ -8,17 +8,17 @@ import { formatDate, downloadBlob } from '@/lib/utils';
 import { Column, DataTable, EmptyState, Pager, Button, Page, PageHeader, Select } from '@/components/ui';
 
 const ACTION_STYLE: Record<string, { color: string; bg: string; border: string }> = {
-  CREATE_DELIVERY:    { color: '#60a5fa', bg: 'rgba(37,99,235,0.1)',  border: 'rgba(59,130,246,0.25)' },
-  DELIVERY_APPROVED:  { color: '#34d399', bg: 'rgba(5,150,105,0.1)', border: 'rgba(16,185,129,0.25)' },
+  CREATE_DELIVERY:    { color: '#2dd4bf', bg: 'rgba(13, 148, 136,0.1)',  border: 'rgba(20, 184, 166,0.25)' },
+  DELIVERY_APPROVED:  { color: '#4ade80', bg: 'rgba(22, 163, 74,0.1)', border: 'rgba(34, 197, 94,0.25)' },
   DELIVERY_REJECTED:  { color: '#f87171', bg: 'rgba(185,28,28,0.1)', border: 'rgba(239,68,68,0.25)'  },
-  VERIFY_DELIVERY:    { color: '#22d3ee', bg: 'rgba(8,145,178,0.1)', border: 'rgba(6,182,212,0.25)'  },
+  VERIFY_DELIVERY:    { color: '#2dd4bf', bg: 'rgba(17, 94, 89,0.1)', border: 'rgba(20, 184, 166,0.25)'  },
   LOGIN:              { color: '#a78bfa', bg: 'rgba(109,40,217,0.1)',border: 'rgba(139,92,246,0.25)' },
-  LOGOUT:             { color: '#94a3b8', bg: 'rgba(30,41,59,0.4)',  border: 'rgba(51,65,85,0.4)'   },
+  LOGOUT:             { color: '#94b2bd', bg: 'rgba(20, 48, 58,0.4)',  border: 'rgba(38, 70, 84,0.4)'   },
 };
 
 const inputStyle: React.CSSProperties = {
-  background: 'rgba(15,23,42,0.7)', border: '1px solid rgba(51,65,85,0.6)',
-  borderRadius: 8, color: '#e2e8f0', fontSize: 13, outline: 'none',
+  background: 'rgba(12, 30, 38,0.7)', border: '1px solid rgba(38, 70, 84,0.6)',
+  borderRadius: 8, color: '#e0eef2', fontSize: 13, outline: 'none',
 };
 
 const humanize = (s: string) =>
@@ -42,11 +42,11 @@ function Details({ value }: { value: unknown }) {
 const columns: Column<AuditLog>[] = [
   {
     header: 'When', width: 170,
-    cell: (l) => <span style={{ color: '#94a3b8', whiteSpace: 'nowrap' }}>{formatDate(l.createdAt)}</span>,
+    cell: (l) => <span style={{ color: '#94b2bd', whiteSpace: 'nowrap' }}>{formatDate(l.createdAt)}</span>,
   },
   {
     header: 'Who', width: 150,
-    cell: (l) => <strong style={{ fontWeight: 600, color: '#e2e8f0' }}>{l.actor?.name ?? (l.actorId ? '#' + l.actorId : 'System')}</strong>,
+    cell: (l) => <strong style={{ fontWeight: 600, color: '#e0eef2' }}>{l.actor?.name ?? (l.actorId ? '#' + l.actorId : 'System')}</strong>,
   },
   {
     header: 'What happened', width: 240,
@@ -58,7 +58,7 @@ const columns: Column<AuditLog>[] = [
           <span style={{ ...as, padding: '3px 10px', borderRadius: 9999, border: `1px solid ${as.border}`, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>
             {humanize(l.action)}
           </span>
-          <p style={{ margin: '6px 0 0', fontSize: 12, color: '#94a3b8' }}>
+          <p style={{ margin: '6px 0 0', fontSize: 12, color: '#94b2bd' }}>
             <span style={{ textTransform: 'capitalize' }}>{l.resourceType}</span>
             {l.resourceId ? <span title={l.resourceId} style={{ fontFamily: 'JetBrains Mono, monospace' }}> · {l.resourceId.length > 12 ? l.resourceId.slice(0, 8) + '…' : l.resourceId}</span> : null}
           </p>

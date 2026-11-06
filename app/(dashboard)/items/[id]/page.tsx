@@ -44,7 +44,7 @@ export default function ItemDetailPage() {
     { header: 'Reference', cell: (m) => m.reference || '—' },
     {
       header: 'Change', align: 'right',
-      cell: (m) => <span style={{ color: m.change < 0 ? '#f87171' : '#34d399', fontWeight: 600 }}>{m.change > 0 ? '+' : ''}{m.change}</span>,
+      cell: (m) => <span style={{ color: m.change < 0 ? '#f87171' : '#4ade80', fontWeight: 600 }}>{m.change > 0 ? '+' : ''}{m.change}</span>,
     },
     { header: 'Balance', align: 'right', cell: (m) => m.balanceAfter },
   ];
@@ -76,10 +76,10 @@ export default function ItemDetailPage() {
       {message && <Notice kind={message.kind}>{message.text}</Notice>}
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
-        <StatCard label="In stock" value={`${it.stock} ${it.unit}`} color={low ? '#f87171' : '#34d399'} icon={Boxes}
+        <StatCard label="In stock" value={`${it.stock} ${it.unit}`} color={low ? '#f87171' : '#4ade80'} icon={Boxes}
           hint={low ? `Low — alert level ${it.lowStockLevel}` : `Alert level ${it.lowStockLevel}`} />
-        <StatCard label="Sale price" value={formatMoney(it.salePrice)} color="#60a5fa" />
-        <StatCard label="Purchase price" value={formatMoney(it.purchasePrice)} color="#22d3ee" />
+        <StatCard label="Sale price" value={formatMoney(it.salePrice)} color="#2dd4bf" />
+        <StatCard label="Purchase price" value={formatMoney(it.purchasePrice)} color="#2dd4bf" />
         <StatCard label="Stock value" value={formatMoney(it.stock * it.purchasePrice)} color="#a78bfa" hint="At purchase price" />
       </Grid>
 
@@ -135,7 +135,7 @@ export default function ItemDetailPage() {
       </Grid>
 
       <h2 style={{ fontSize: 15, fontWeight: 600, margin: '24px 0 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <History size={15} color="#60a5fa" /> Stock history
+        <History size={15} color="#2dd4bf" /> Stock history
       </h2>
       <DataTable columns={columns} rows={moves.data ?? []} loading={moves.loading} rowKey={(m) => m.id}
         empty={<EmptyState icon={History} title="No stock movements yet" />} />

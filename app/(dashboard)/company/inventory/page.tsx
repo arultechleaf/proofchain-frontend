@@ -23,7 +23,7 @@ export default function CompanyInventoryPage() {
     { header: 'Item', cell: (m) => m.item?.name ?? '—' },
     { header: 'Branch', cell: (m) => m.branchName ?? '—' },
     { header: 'Reason', cell: (m) => REASON_LABEL[m.reason] ?? m.reason },
-    { header: 'Change', align: 'right', cell: (m) => <span style={{ color: m.change < 0 ? '#f87171' : '#34d399', fontWeight: 600 }}>{m.change > 0 ? '+' : ''}{m.change}</span> },
+    { header: 'Change', align: 'right', cell: (m) => <span style={{ color: m.change < 0 ? '#f87171' : '#4ade80', fontWeight: 600 }}>{m.change > 0 ? '+' : ''}{m.change}</span> },
   ];
 
   return (
@@ -41,10 +41,10 @@ export default function CompanyInventoryPage() {
       {c.failed ? <Notice kind="error">Could not load your inventory.</Notice> : null}
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
-        <StatCard label="Active items" value={totals?.itemCount ?? 0} icon={Package} color="#60a5fa" loading={c.loading} />
-        <StatCard label="Stock value" value={formatMoney(totals?.stockValue)} icon={Coins} color="#34d399" hint="At purchase price" loading={c.loading} />
+        <StatCard label="Active items" value={totals?.itemCount ?? 0} icon={Package} color="#2dd4bf" loading={c.loading} />
+        <StatCard label="Stock value" value={formatMoney(totals?.stockValue)} icon={Coins} color="#4ade80" hint="At purchase price" loading={c.loading} />
         <StatCard label="Retail value" value={formatMoney(totals?.retailValue)} icon={Boxes} color="#a78bfa" hint="At sale price" loading={c.loading} />
-        <StatCard label="Low stock" value={totals?.lowStockCount ?? 0} icon={AlertTriangle} color={totals?.lowStockCount ? '#f87171' : '#34d399'} loading={c.loading} />
+        <StatCard label="Low stock" value={totals?.lowStockCount ?? 0} icon={AlertTriangle} color={totals?.lowStockCount ? '#f87171' : '#4ade80'} loading={c.loading} />
       </Grid>
 
       <Card title="Stock by branch / godown" icon={Warehouse} style={{ marginBottom: 20 }}>

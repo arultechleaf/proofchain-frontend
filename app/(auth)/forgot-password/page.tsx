@@ -8,6 +8,7 @@ import { authApi } from '@/lib/api';
 import { apiError } from '@/lib/utils';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Field, Notice, SubmitButton } from '@/components/ui';
+import { OtpEntry, type OtpStatus } from '@/components/auth/OtpEntry';
 
 type Step = 'email' | 'otp' | 'password' | 'done';
 
@@ -31,7 +32,8 @@ export default function ForgotPasswordPage() {
   const [cooldown, setCooldown] = useState(0);
 
   const emailForm = useForm<{ email: string }>();
-  const otpForm = useForm<{ otp: string }>();
+  const [otp, setOtp] = useState('');
+  const [otpStatus, setOtpStatus] = useState<OtpStatus>('idle');
   const passwordForm = useForm<{ password: string; confirm: string }>();
 
   useEffect(() => {
@@ -62,11 +64,20 @@ export default function ForgotPasswordPage() {
       setInfo(`If ${address} is registered, a code is on its way. It expires in 5 minutes.`);
     }, 'Could not send the code');
 
-  const verifyCode = ({ otp }: { otp: string }) =>
-    run(async () => {
-      await authApi.verifyResetOtp(email, otp.trim());
-      setStep('password');
-    }, 'Could not verify the code');
+  const verifyCode = async (code: string) => {
+    setError('');
+    setInfo('');
+    setOtpStatus('verifying');
+    try {
+      await authApi.verifyResetOtp(email, code.trim());
+      setOtpStatus('success');
+      setTimeout(() => setStep('password'), 900);
+    } catch (err) {
+      setError(apiError(err, 'Could not verify the code'));
+      setOtp('');
+      setOtpStatus('idle');
+    }
+  };
 
   const savePassword = ({ password }: { password: string }) =>
     run(async () => {
@@ -94,23 +105,10 @@ export default function ForgotPasswordPage() {
       )}
 
       {step === 'otp' && (
-        <form onSubmit={otpForm.handleSubmit(verifyCode)} className="auth-form" noValidate>
-          <Field label="6-digit code" required error={otpForm.formState.errors.otp?.message}>
-            <input className="form-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6}
-              placeholder="000000" style={{ letterSpacing: 6, textAlign: 'center', fontSize: 18 }}
-              {...otpForm.register('otp', {
-                required: 'Enter the code from your email',
-                pattern: { value: /^\d{6}$/, message: 'The code is 6 digits' },
-              })} />
-          </Field>
-          <SubmitButton loading={loading}>Verify code</SubmitButton>
+        <form onSubmit={(e) => { e.preventDefault(); if (otp.length === 6 && otpStatus === 'idle') void verifyCode(otp); }} className="auth-form" noValidate>
+          <OtpEntry value={otp} onChange={setOtp} onComplete={verifyCode} status={otpStatus} hasError={!!error} resendIn={cooldown} onResend={() => { setOtp(''); void sendCode(email); }} />
+          <SubmitButton loading={otpStatus === 'verifying'} disabled={otp.length !== 6 || otpStatus !== 'idle'}>Verify code</SubmitButton>
           <p className="auth-footnote">
-            {cooldown > 0 ? (
-              <>Resend code in {cooldown}s</>
-            ) : (
-              <button type="button" className="btn btn-link" disabled={loading} onClick={() => sendCode(email)}>Resend code</button>
-            )}
-            {' · '}
             <button type="button" className="btn btn-link" onClick={() => { setStep('email'); setError(''); setInfo(''); }}>Change email</button>
           </p>
         </form>
@@ -138,7 +136,7 @@ export default function ForgotPasswordPage() {
 
       {step === 'done' && (
         <div className="auth-success">
-          <CheckCircle2 size={42} color="#34d399" className="auth-success-icon" />
+          <CheckCircle2 size={42} color="#4ade80" className="auth-success-icon" />
           <p className="auth-success-text">Your password has been changed. You can sign in now.</p>
           <Link href="/login" className="btn btn-primary btn-block">Sign in</Link>
         </div>

@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import { MenuToggle } from './MenuToggle';
+import { LiveClock } from './LiveClock';
 import { useAuth } from '@/lib/auth';
 import { roleLabel } from '@/lib/utils';
 import { isRecordSegment, useCrumbLabels } from '@/lib/breadcrumb';
@@ -55,11 +56,11 @@ const BREADCRUMBS: Record<string, string> = {
 
 const ROLE_COLORS: Record<string, string> = {
   admin: '#a78bfa',
-  company_a: '#60a5fa',
-  company_b: '#22d3ee',
+  company_a: '#2dd4bf',
+  company_b: '#2dd4bf',
   auditor: '#fbbf24',
-  manager: '#34d399',
-  user: '#94a3b8',
+  manager: '#4ade80',
+  user: '#94b2bd',
 };
 const ROLE_LABELS: Record<string, string> = {
   admin: 'Administrator',
@@ -99,8 +100,8 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
       alignItems: 'center',
       gap: 16,
       padding: '0 24px',
-      borderBottom: '1px solid rgba(59,130,246,0.1)',
-      background: 'rgba(5,13,26,0.85)',
+      borderBottom: '1px solid rgba(20, 184, 166,0.1)',
+      background: 'rgba(6, 20, 26,0.85)',
       backdropFilter: 'blur(12px)',
       flexShrink: 0,
     }}>
@@ -111,9 +112,9 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
       <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, flex: 1, overflow: 'hidden' }}>
         {crumbs.map((crumb, i) => (
           <span key={crumb.href} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {i > 0 && <ChevronRight size={12} color="#334155" />}
+            {i > 0 && <ChevronRight size={12} color="#2d4b58" />}
             <span style={{
-              color: i === crumbs.length - 1 ? '#e2e8f0' : '#475569',
+              color: i === crumbs.length - 1 ? '#e0eef2' : '#4a6672',
               fontWeight: i === crumbs.length - 1 ? 600 : 400,
               whiteSpace: 'nowrap',
             }}>
@@ -146,16 +147,17 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
         {user && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 8 }}>
             <div style={{
-              width: 28, height: 28, borderRadius: 7, flexShrink: 0,
-              background: 'linear-gradient(135deg, #2563eb, #0891b2)',
+              width: 36, height: 36, borderRadius: 9, flexShrink: 0,
+              background: 'linear-gradient(135deg, #0d9488, #115e59)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 11, fontWeight: 700,
+              color: '#fff', fontSize: 14, fontWeight: 700,
             }}>
               {user.name[0]?.toUpperCase()}
             </div>
-            <div className="topnav-user-text">
-              <p style={{ color: '#e2e8f0', fontSize: 12, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{user.name}</p>
-              <p style={{ color: ROLE_COLORS[user.role] ?? '#64748b', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</p>
+            <div className="topnav-user-text" style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 1, textAlign: "left", whiteSpace: "nowrap" }}>
+              <p style={{ color: '#e0eef2', fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{user.name}</p>
+              <p style={{ color: ROLE_COLORS[user.role] ?? '#6b8a96', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</p>
+              <LiveClock style={{ color: '#6b8a96', fontSize: 10, margin: 0, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }} />
             </div>
           </div>
         )}

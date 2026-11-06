@@ -9,14 +9,14 @@ import type { Company, User } from '@/models';
 import { Column, DataTable } from '@/components/ui';
 
 const TYPE_STYLE: Record<string, { bg: string; color: string; border: string }> = {
-  sender:   { bg: 'rgba(37,99,235,0.12)',  color: '#60a5fa', border: 'rgba(59,130,246,0.3)'  },
-  receiver: { bg: 'rgba(8,145,178,0.12)',  color: '#22d3ee', border: 'rgba(6,182,212,0.3)'   },
+  sender:   { bg: 'rgba(13, 148, 136,0.12)',  color: '#2dd4bf', border: 'rgba(20, 184, 166,0.3)'  },
+  receiver: { bg: 'rgba(17, 94, 89,0.12)',  color: '#2dd4bf', border: 'rgba(20, 184, 166,0.3)'   },
   auditor:  { bg: 'rgba(180,83,9,0.12)',   color: '#fbbf24', border: 'rgba(245,158,11,0.3)'  },
 };
 const ROLE_STYLE: Record<string, { color: string }> = {
   admin:     { color: '#a78bfa' },
-  company_a: { color: '#60a5fa' },
-  company_b: { color: '#22d3ee' },
+  company_a: { color: '#2dd4bf' },
+  company_b: { color: '#2dd4bf' },
   auditor:   { color: '#fbbf24' },
 };
 const ROLE_LABEL: Record<string, string> = {
@@ -28,29 +28,29 @@ const userColumns: Column<User>[] = [
     header: 'User',
     cell: (u) => (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg,#2563eb,#0891b2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg,#0d9488,#115e59)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
           {u.name[0]?.toUpperCase()}
         </div>
-        <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{u.name}</span>
+        <span style={{ color: '#e0eef2', fontWeight: 600 }}>{u.name}</span>
       </div>
     ),
   },
-  { header: 'Email', cell: (u) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{u.email}</span> },
+  { header: 'Email', cell: (u) => <span style={{ color: '#94b2bd', fontSize: 12 }}>{u.email}</span> },
   {
     header: 'Role',
     cell: (u) => (
-      <span style={{ color: (ROLE_STYLE[u.role] ?? { color: '#94a3b8' }).color, fontSize: 12, fontWeight: 600 }}>
+      <span style={{ color: (ROLE_STYLE[u.role] ?? { color: '#94b2bd' }).color, fontSize: 12, fontWeight: 600 }}>
         {ROLE_LABEL[u.role] ?? u.role}
       </span>
     ),
   },
-  { header: 'Organization', cell: (u) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{u.company?.name ?? '—'}</span> },
+  { header: 'Organization', cell: (u) => <span style={{ color: '#94b2bd', fontSize: 12 }}>{u.company?.name ?? '—'}</span> },
   {
     header: 'Status',
     cell: (u) => (
       <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: u.isActive ? '#34d399' : '#f87171', display: 'inline-block' }} />
-        <span style={{ fontSize: 11, color: u.isActive ? '#34d399' : '#f87171' }}>{u.isActive ? 'Active' : 'Inactive'}</span>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: u.isActive ? '#4ade80' : '#f87171', display: 'inline-block' }} />
+        <span style={{ fontSize: 11, color: u.isActive ? '#4ade80' : '#f87171' }}>{u.isActive ? 'Active' : 'Inactive'}</span>
       </div>
     ),
   },
@@ -76,7 +76,7 @@ export default function OrganizationsPage() {
       {/* Header */}
       <div style={{ marginBottom: 28, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Organizations & Users</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#ecf5f8', margin: 0 }}>Organizations & Users</h1>
         </div>
         {me?.role === 'admin' && (
           <div style={{ display: 'flex', gap: 10 }}>
@@ -88,7 +88,7 @@ export default function OrganizationsPage() {
 
       {/* Companies section */}
       <div style={{ marginBottom: 32 }}>
-        <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 16px' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#94b2bd', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 16px' }}>
           <Building2 size={14} /> Organizations ({companies.length})
         </h2>
 
@@ -101,7 +101,7 @@ export default function OrganizationsPage() {
             {companies.map(c => {
               const ts = TYPE_STYLE[c.organizationType] ?? TYPE_STYLE.sender;
               return (
-                <Link key={c.id} href={`/organizations/${c.id}`} style={{ display: 'block', textDecoration: 'none', background: 'rgba(8,15,30,0.85)', border: '1px solid rgba(59,130,246,0.12)', borderRadius: 14, padding: '18px 20px' }}>
+                <Link key={c.id} href={`/organizations/${c.id}`} style={{ display: 'block', textDecoration: 'none', background: 'rgba(6, 20, 26,0.85)', border: '1px solid rgba(20, 184, 166,0.12)', borderRadius: 14, padding: '18px 20px' }}>
                   {/* Card top */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
                     <div style={{
@@ -118,14 +118,14 @@ export default function OrganizationsPage() {
                   </div>
 
                   {/* Name & code */}
-                  <p style={{ color: '#f1f5f9', fontSize: 15, fontWeight: 700, margin: '0 0 2px' }}>{c.name}</p>
-                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#475569', margin: '0 0 8px' }}>{c.organizationCode}</p>
-                  <p style={{ color: '#64748b', fontSize: 12, margin: '0 0 12px', lineHeight: 1.4 }}>{c.description}</p>
+                  <p style={{ color: '#ecf5f8', fontSize: 15, fontWeight: 700, margin: '0 0 2px' }}>{c.name}</p>
+                  <p style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#4a6672', margin: '0 0 8px' }}>{c.organizationCode}</p>
+                  <p style={{ color: '#6b8a96', fontSize: 12, margin: '0 0 12px', lineHeight: 1.4 }}>{c.description}</p>
 
                   {/* Active badge */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.isActive ? '#34d399' : '#f87171', display: 'inline-block' }} />
-                    <span style={{ fontSize: 11, color: c.isActive ? '#34d399' : '#f87171' }}>{c.isActive ? 'Active' : 'Inactive'}</span>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.isActive ? '#4ade80' : '#f87171', display: 'inline-block' }} />
+                    <span style={{ fontSize: 11, color: c.isActive ? '#4ade80' : '#f87171' }}>{c.isActive ? 'Active' : 'Inactive'}</span>
                   </div>
                 </Link>
               );
@@ -136,7 +136,7 @@ export default function OrganizationsPage() {
 
       {/* Users table */}
       <div>
-        <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 16px' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: '#94b2bd', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 16px' }}>
           <Users size={14} /> Users ({users.length})
         </h2>
         <DataTable

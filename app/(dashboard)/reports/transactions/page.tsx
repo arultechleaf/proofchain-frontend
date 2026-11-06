@@ -19,9 +19,9 @@ const KINDS: Array<{ value: 'all' | TransactionKind; label: string }> = [
 ];
 
 const KIND_STYLE: Record<TransactionKind, { label: string; color: string }> = {
-  sale: { label: 'Sale', color: '#60a5fa' },
-  purchase: { label: 'Purchase', color: '#22d3ee' },
-  payment_in: { label: 'Payment in', color: '#34d399' },
+  sale: { label: 'Sale', color: '#2dd4bf' },
+  purchase: { label: 'Purchase', color: '#2dd4bf' },
+  payment_in: { label: 'Payment in', color: '#4ade80' },
   payment_out: { label: 'Payment out', color: '#f87171' },
 };
 
@@ -53,13 +53,13 @@ export default function TransactionHistoryPage() {
     {
       header: 'Reference',
       cell: (r) => (
-        <Link href={r.link} style={{ color: '#60a5fa', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+        <Link href={r.link} style={{ color: '#2dd4bf', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
           {r.reference}
         </Link>
       ),
     },
     { header: 'Party', cell: (r) => r.partyName },
-    { header: 'Status', cell: (r) => (r.status === 'recorded' ? <span style={{ color: '#64748b' }}>—</span> : <StatusBadge status={r.status} />) },
+    { header: 'Status', cell: (r) => (r.status === 'recorded' ? <span style={{ color: '#6b8a96' }}>—</span> : <StatusBadge status={r.status} />) },
     { header: 'Amount', align: 'right', cell: (r) => <strong>{formatMoney(r.amount)}</strong> },
   ];
 
@@ -94,9 +94,9 @@ export default function TransactionHistoryPage() {
       {error ? <Notice kind="error">Could not load transactions. Check the date range.</Notice> : null}
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
-        <StatCard label="Sales" value={formatMoney(t?.sale)} color="#60a5fa" icon={Receipt} loading={loading} />
-        <StatCard label="Purchases" value={formatMoney(t?.purchase)} color="#22d3ee" icon={ShoppingCart} loading={loading} />
-        <StatCard label="Payments in" value={formatMoney(t?.paymentIn)} color="#34d399" icon={ArrowDownLeft} loading={loading} />
+        <StatCard label="Sales" value={formatMoney(t?.sale)} color="#2dd4bf" icon={Receipt} loading={loading} />
+        <StatCard label="Purchases" value={formatMoney(t?.purchase)} color="#2dd4bf" icon={ShoppingCart} loading={loading} />
+        <StatCard label="Payments in" value={formatMoney(t?.paymentIn)} color="#4ade80" icon={ArrowDownLeft} loading={loading} />
         <StatCard label="Payments out" value={formatMoney(t?.paymentOut)} color="#f87171" icon={ArrowUpRight} loading={loading} />
       </Grid>
 

@@ -16,7 +16,7 @@ const invoiceColumns: Column<Invoice>[] = [
     header: 'Number',
     cell: (i) => (
       <Link href={`/${i.type === 'sale' ? 'sales' : 'purchases'}/${i.id}`}
-        style={{ color: '#60a5fa', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+        style={{ color: '#2dd4bf', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
         {i.invoiceNumber}
       </Link>
     ),
@@ -63,8 +63,8 @@ export default function PartyDetailPage() {
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
         <StatCard label="Balance" value={formatMoney(Math.abs(summary.balance))} color={balance.color} icon={Wallet} hint={balance.hint} />
-        <StatCard label="Total sales" value={formatMoney(summary.totalSales)} color="#60a5fa" hint={`Received ${formatMoney(summary.received)}`} />
-        <StatCard label="Total purchases" value={formatMoney(summary.totalPurchases)} color="#22d3ee" hint={`Paid ${formatMoney(summary.paid)}`} />
+        <StatCard label="Total sales" value={formatMoney(summary.totalSales)} color="#2dd4bf" hint={`Received ${formatMoney(summary.received)}`} />
+        <StatCard label="Total purchases" value={formatMoney(summary.totalPurchases)} color="#2dd4bf" hint={`Paid ${formatMoney(summary.paid)}`} />
         <StatCard label="Opening balance" value={formatMoney(summary.openingBalance)} color="#a78bfa" />
       </Grid>
 

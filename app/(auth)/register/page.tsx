@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { Check, CheckCircle2 } from 'lucide-react';
 import { authApi, emailOtpApi } from '@/lib/api';
+import { OtpEntry, type OtpStatus } from '@/components/auth/OtpEntry';
 import { apiError } from '@/lib/utils';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Field, Notice, SubmitButton, Select } from '@/components/ui';
@@ -32,6 +33,7 @@ export default function RegisterPage() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [error, setError] = useState('');
   const [otp, setOtp] = useState('');
+  const [otpStatus, setOtpStatus] = useState<OtpStatus>('idle');
   const [otpSentFor, setOtpSentFor] = useState('');
   const [verifiedEmail, setVerifiedEmail] = useState('');
   const [resendInSeconds, setResendInSeconds] = useState(0);
@@ -76,18 +78,21 @@ export default function RegisterPage() {
     }
   };
 
-  const verifyOtp = async () => {
-    setOtpLoading(true);
+  const verifyOtp = async (code: string = otp) => {
     setError('');
+    setOtpStatus('verifying');
     try {
-      await emailOtpApi.verify(email, otp);
+      await emailOtpApi.verify(email, code);
       setVerifiedEmail(email);
-      // Verified: go straight to the next step.
+      setOtpStatus('success');
+      // Show "Access Granted" briefly, then go to the next step.
+      await new Promise((resolve) => setTimeout(resolve, 900));
       setStep((s) => Math.min(s + 1, STEPS.length - 1));
     } catch (err) {
       setError(apiError(err, 'Could not verify the email address'));
+      setOtp('');
     } finally {
-      setOtpLoading(false);
+      setOtpStatus('idle');
     }
   };
 
@@ -117,7 +122,7 @@ export default function RegisterPage() {
     return (
       <AuthShell title="Request received">
         <div className="auth-success padded">
-          <CheckCircle2 size={42} color="#34d399" className="auth-success-icon" />
+          <CheckCircle2 size={42} color="#4ade80" className="auth-success-icon" />
           <p className="auth-success-text">{done}</p>
           <Link href="/login" className="btn btn-primary btn-block">Back to sign in</Link>
         </div>
@@ -168,23 +173,10 @@ export default function RegisterPage() {
             ) : otpSentFor !== '' && otpSentFor === email ? (
               <>
                 <Notice kind="info">Enter the 6-digit code sent to your email. The code expires in 5 minutes.</Notice>
-                <Field label="Email verification code" required>
-                  <input
-                    className="form-input"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    maxLength={6}
-                    value={otp}
-                    onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000000"
-                  />
-                </Field>
-                <SubmitButton type="button" loading={otpLoading} disabled={otp.length !== 6} onClick={verifyOtp}>
+                <OtpEntry value={otp} onChange={setOtp} onComplete={verifyOtp} status={otpStatus} hasError={!!error} resendIn={resendInSeconds} onResend={otpLoading ? undefined : sendOtp} />
+                <SubmitButton type="button" loading={otpStatus === 'verifying'} disabled={otp.length !== 6 || otpStatus !== 'idle'} onClick={() => verifyOtp()}>
                   Verify email
                 </SubmitButton>
-                <button type="button" className="btn btn-secondary btn-block" disabled={otpLoading || resendInSeconds > 0} onClick={sendOtp}>
-                  {resendInSeconds > 0 ? `Resend code in ${resendInSeconds}s` : 'Resend code'}
-                </button>
               </>
             ) : (
               <SubmitButton type="button" loading={otpLoading} disabled={!/^\S+@\S+\.\S+$/.test(email)} onClick={sendOtp}>

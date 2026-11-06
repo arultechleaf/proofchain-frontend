@@ -13,7 +13,7 @@ function buildColumns(writable: boolean, remove: (id: number, name: string) => v
   {
     header: 'Name',
     cell: (p) => (
-      <Link href={`/parties/${p.id}`} style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>{p.name}</Link>
+      <Link href={`/parties/${p.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{p.name}</Link>
     ),
   },
   { header: 'Type', cell: (p) => PARTY_TYPE_LABEL[p.partyType] ?? p.partyType },

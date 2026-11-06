@@ -12,10 +12,10 @@ import { Column, DataTable, EmptyState, Pager, RowActions, SearchInput, actionsC
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
   pending:   { bg: 'rgba(245,158,11,0.1)',  color: '#fbbf24', border: 'rgba(245,158,11,0.25)'  },
-  approved:  { bg: 'rgba(16,185,129,0.1)',  color: '#34d399', border: 'rgba(16,185,129,0.25)'  },
+  approved:  { bg: 'rgba(34, 197, 94,0.1)',  color: '#4ade80', border: 'rgba(34, 197, 94,0.25)'  },
   rejected:  { bg: 'rgba(239,68,68,0.1)',   color: '#f87171', border: 'rgba(239,68,68,0.25)'   },
-  confirmed: { bg: 'rgba(59,130,246,0.1)',  color: '#60a5fa', border: 'rgba(59,130,246,0.25)'  },
-  draft:     { bg: 'rgba(100,116,139,0.1)', color: '#94a3b8', border: 'rgba(100,116,139,0.25)' },
+  confirmed: { bg: 'rgba(20, 184, 166,0.1)',  color: '#2dd4bf', border: 'rgba(20, 184, 166,0.25)'  },
+  draft:     { bg: 'rgba(100, 138, 150,0.1)', color: '#94b2bd', border: 'rgba(100, 138, 150,0.25)' },
 };
 
 function Badge({ status }: { status: string }) {
@@ -31,7 +31,7 @@ const columns: Column<Delivery>[] = [
   {
     header: 'Reference',
     cell: (d) => (
-      <Link href={`/deliveries/${d.id}`} style={{ color: '#60a5fa', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
+      <Link href={`/deliveries/${d.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 600 }}>
         {d.deliveryReference}
       </Link>
     ),
@@ -42,12 +42,12 @@ const columns: Column<Delivery>[] = [
       <span style={{ display: 'block', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>{d.description}</span>
     ),
   },
-  { header: 'Sender', cell: (d) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{d.senderCompany?.name ?? '—'}</span> },
-  { header: 'Receiver', cell: (d) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{d.receiverCompany?.name ?? '—'}</span> },
-  { header: 'Qty', align: 'right', cell: (d) => <strong style={{ color: '#e2e8f0' }}>{d.quantity?.toLocaleString()}</strong> },
+  { header: 'Sender', cell: (d) => <span style={{ color: '#94b2bd', fontSize: 12 }}>{d.senderCompany?.name ?? '—'}</span> },
+  { header: 'Receiver', cell: (d) => <span style={{ color: '#94b2bd', fontSize: 12 }}>{d.receiverCompany?.name ?? '—'}</span> },
+  { header: 'Qty', align: 'right', cell: (d) => <strong style={{ color: '#e0eef2' }}>{d.quantity?.toLocaleString()}</strong> },
   { header: 'Status', cell: (d) => <Badge status={d.status} /> },
   { header: 'Blockchain', cell: (d) => <Badge status={d.blockchainStatus} /> },
-  { header: 'Created', cell: (d) => <span style={{ color: '#64748b', fontSize: 12 }}>{formatRelative(d.createdAt)}</span> },
+  { header: 'Created', cell: (d) => <span style={{ color: '#6b8a96', fontSize: 12 }}>{formatRelative(d.createdAt)}</span> },
   // Deliveries are proven on the blockchain, so they are view-only: no edit or delete.
   actionsColumn<Delivery>((d) => <RowActions view={`/deliveries/${d.id}`} />, 80),
 ];
@@ -82,13 +82,13 @@ export default function DeliveriesPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Deliveries</h1>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#ecf5f8', margin: 0 }}>Deliveries</h1>
         </div>
         {canUse('deliveries_create', user?.role) && <Link href="/deliveries/create" style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '9px 18px', borderRadius: 8,
-          background: '#2563eb', color: '#fff', fontSize: 13, fontWeight: 600,
-          textDecoration: 'none', boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+          background: '#0d9488', color: '#fff', fontSize: 13, fontWeight: 600,
+          textDecoration: 'none', boxShadow: '0 4px 12px rgba(13, 148, 136,0.3)',
         }}>
           <Plus size={15} /> New Delivery
         </Link>}

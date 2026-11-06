@@ -23,7 +23,7 @@ function HashValue({ text }: { text: string }) {
     <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: 6, justifyContent: 'flex-end' }}>
       <span className="link-mono" style={{ wordBreak: 'break-all', fontWeight: 500 }}>{text}</span>
       <button type="button" onClick={copy} className="icon-btn" aria-label="Copy" title={copied ? 'Copied' : 'Copy'} style={{ flexShrink: 0 }}>
-        {copied ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
+        {copied ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
       </button>
     </span>
   );
@@ -190,7 +190,7 @@ export default function DeliveryDetailPage() {
 
           <div style={{ display: 'grid', gap: 18 }}>
             <div className="dd-verify">
-              <h3 className="dd-verify-title"><ShieldCheck size={17} color="#34d399" /> Verification</h3>
+              <h3 className="dd-verify-title"><ShieldCheck size={17} color="#4ade80" /> Verification</h3>
               <p className="dd-verify-text">
                 Check this delivery against the proof recorded on the blockchain. Any change to the details above will fail verification.
               </p>
@@ -199,7 +199,7 @@ export default function DeliveryDetailPage() {
                 <span>{txHash ?? '[0x… transaction hash]'}</span>
                 {txHash && (
                   <button type="button" onClick={copyHash} aria-label="Copy transaction hash" title={hashCopied ? 'Copied' : 'Copy'}>
-                    {hashCopied ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
+                    {hashCopied ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
                   </button>
                 )}
               </div>
@@ -248,7 +248,7 @@ export default function DeliveryDetailPage() {
               {proof.canonicalPayload && (
                 <div style={{ marginTop: 18 }}>
                   <p className="text-muted" style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Canonical payload (hashed)</p>
-                  <pre style={{ background: 'rgba(15,23,42,0.6)', borderRadius: 10, padding: 12, fontSize: 12, overflow: 'auto', maxHeight: 160, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  <pre style={{ background: 'rgba(12, 30, 38,0.6)', borderRadius: 10, padding: 12, fontSize: 12, overflow: 'auto', maxHeight: 160, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                     {proof.canonicalPayload}
                   </pre>
                 </div>
@@ -266,8 +266,8 @@ export default function DeliveryDetailPage() {
             const approved = a.decision === 'approved';
             const Icon = approved ? CheckCircle2 : XCircle;
             return (
-              <div key={a.id} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: '1px solid rgba(30,41,59,0.6)' }}>
-                <Icon size={22} color={approved ? '#34d399' : '#f87171'} style={{ flexShrink: 0, marginTop: 1 }} />
+              <div key={a.id} style={{ display: 'flex', gap: 14, padding: '14px 0', borderBottom: '1px solid rgba(20, 48, 58,0.6)' }}>
+                <Icon size={22} color={approved ? '#4ade80' : '#f87171'} style={{ flexShrink: 0, marginTop: 1 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                     <strong style={{ fontSize: 14 }}>{a.reviewer?.name ?? 'Unknown'}</strong>

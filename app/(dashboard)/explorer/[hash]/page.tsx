@@ -37,9 +37,9 @@ export default function TransactionPage() {
 
   const { tx, invoice } = data;
   const subject = tx.delivery
-    ? <Link href={`/deliveries/${tx.delivery.id}`} style={{ color: '#60a5fa' }}>Delivery {tx.delivery.deliveryReference}</Link>
+    ? <Link href={`/deliveries/${tx.delivery.id}`} style={{ color: '#2dd4bf' }}>Delivery {tx.delivery.deliveryReference}</Link>
     : invoice
-      ? <Link href={`/${invoice.type === 'sale' ? 'sales' : 'purchases'}/${invoice.id}`} style={{ color: '#60a5fa' }}>
+      ? <Link href={`/${invoice.type === 'sale' ? 'sales' : 'purchases'}/${invoice.id}`} style={{ color: '#2dd4bf' }}>
           {invoice.type === 'sale' ? 'Invoice' : 'Bill'} {invoice.invoiceNumber}
         </Link>
       : '—';
@@ -50,11 +50,11 @@ export default function TransactionPage() {
 
       <Card title="Details" icon={Blocks}>
         <div style={{ marginBottom: 14 }}>
-          <p style={{ fontSize: 11, color: '#64748b', marginBottom: 4 }}>Transaction hash</p>
+          <p style={{ fontSize: 11, color: '#6b8a96', marginBottom: 4 }}>Transaction hash</p>
           <p className="hash-display" style={{ fontSize: 12, wordBreak: 'break-all' }}>
             {tx.transactionHash}{' '}
             <button aria-label="Copy hash" onClick={() => tx.transactionHash && copyToClipboard(tx.transactionHash)}
-              style={{ background: 'none', border: 0, cursor: 'pointer', color: '#64748b', verticalAlign: 'middle' }}>
+              style={{ background: 'none', border: 0, cursor: 'pointer', color: '#6b8a96', verticalAlign: 'middle' }}>
               <Copy size={13} />
             </button>
           </p>

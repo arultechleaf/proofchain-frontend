@@ -46,13 +46,13 @@ export default function PaymentsPage() {
     { header: 'Date', cell: (p) => formatDay(p.paymentDate) },
     {
       header: 'Party',
-      cell: (p) => <Link href={`/parties/${p.partyId}`} style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>{p.party?.name ?? '—'}</Link>,
+      cell: (p) => <Link href={`/parties/${p.partyId}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{p.party?.name ?? '—'}</Link>,
     },
     {
       header: 'Invoice',
       cell: (p) => p.invoice
-        ? <Link href={`/${p.invoice.type === 'sale' ? 'sales' : 'purchases'}/${p.invoice.id}`} style={{ color: '#94a3b8', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>{p.invoice.invoiceNumber}</Link>
-        : <span style={{ color: '#475569' }}>On account</span>,
+        ? <Link href={`/${p.invoice.type === 'sale' ? 'sales' : 'purchases'}/${p.invoice.id}`} style={{ color: '#94b2bd', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>{p.invoice.invoiceNumber}</Link>
+        : <span style={{ color: '#4a6672' }}>On account</span>,
     },
     { header: 'Method', cell: (p) => (p.method === 'upi' ? 'UPI' : <span style={{ textTransform: 'capitalize' }}>{p.method}</span>) },
     { header: 'Account', cell: (p) => p.accountName || '—' },
@@ -65,7 +65,7 @@ export default function PaymentsPage() {
     {
       header: 'Amount', align: 'right',
       cell: (p) => (
-        <strong style={{ color: p.direction === 'in' ? '#34d399' : '#f87171' }}>
+        <strong style={{ color: p.direction === 'in' ? '#4ade80' : '#f87171' }}>
           {p.direction === 'in' ? '+' : '−'}{formatMoney(p.amount)}
         </strong>
       ),
@@ -91,9 +91,9 @@ export default function PaymentsPage() {
       />
 
       <Grid cols={3} style={{ marginBottom: 20 }}>
-        <StatCard label="Received" value={formatMoney(data?.totals?.received)} color="#34d399" icon={ArrowDownLeft} loading={loading && !data} />
+        <StatCard label="Received" value={formatMoney(data?.totals?.received)} color="#4ade80" icon={ArrowDownLeft} loading={loading && !data} />
         <StatCard label="Paid out" value={formatMoney(data?.totals?.paid)} color="#f87171" icon={ArrowUpRight} loading={loading && !data} />
-        <StatCard label="Net cash flow" value={formatMoney((data?.totals?.received ?? 0) - (data?.totals?.paid ?? 0))} color="#60a5fa" icon={Wallet} loading={loading && !data} />
+        <StatCard label="Net cash flow" value={formatMoney((data?.totals?.received ?? 0) - (data?.totals?.paid ?? 0))} color="#2dd4bf" icon={Wallet} loading={loading && !data} />
       </Grid>
 
       <div style={{ marginBottom: 16 }}>

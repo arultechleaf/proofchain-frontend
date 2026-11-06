@@ -30,7 +30,7 @@ export default function StockReportPage() {
   const potential = (t?.retailValue ?? 0) - (t?.stockValue ?? 0);
 
   const columns: Column<StockItem>[] = [
-    { header: 'Item', cell: (i) => <Link href={`/items/${i.id}`} style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: 600 }}>{i.name}</Link> },
+    { header: 'Item', cell: (i) => <Link href={`/items/${i.id}`} style={{ color: '#2dd4bf', textDecoration: 'none', fontWeight: 600 }}>{i.name}</Link> },
     ...(acrossCompanies ? [{ header: 'Company', cell: (i: StockItem) => i.companyName ?? '—' } as Column<StockItem>] : []),
     { header: 'SKU', cell: (i) => i.sku || '—' },
     { header: branchId ? 'At this branch' : 'In stock', align: 'right', cell: (i) => `${i.stock} ${i.unit}` },
@@ -85,10 +85,10 @@ export default function StockReportPage() {
       </div>
 
       <Grid cols={4} style={{ marginBottom: 20 }}>
-        <StatCard label="Active items" value={t?.itemCount ?? 0} color="#60a5fa" icon={Package} loading={loading} />
-        <StatCard label="Stock value" value={formatMoney(t?.stockValue)} color="#34d399" icon={Coins} loading={loading} hint="At purchase price" />
+        <StatCard label="Active items" value={t?.itemCount ?? 0} color="#2dd4bf" icon={Package} loading={loading} />
+        <StatCard label="Stock value" value={formatMoney(t?.stockValue)} color="#4ade80" icon={Coins} loading={loading} hint="At purchase price" />
         <StatCard label="Potential profit" value={formatMoney(potential)} color="#a78bfa" icon={Boxes} loading={loading} hint="Retail minus cost" />
-        <StatCard label="Low stock" value={t?.lowStockCount ?? 0} color={t?.lowStockCount ? '#f87171' : '#34d399'} icon={AlertTriangle} loading={loading} />
+        <StatCard label="Low stock" value={t?.lowStockCount ?? 0} color={t?.lowStockCount ? '#f87171' : '#4ade80'} icon={AlertTriangle} loading={loading} />
       </Grid>
 
       <DataTable columns={columns} rows={items} loading={loading} rowKey={(i) => i.id}

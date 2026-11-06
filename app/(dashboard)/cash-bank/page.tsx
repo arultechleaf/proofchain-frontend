@@ -71,9 +71,9 @@ export default function CashBankPage() {
       {c.message ? <Notice kind={c.message.kind}>{c.message.text}</Notice> : null}
 
       <Grid cols={3} style={{ marginBottom: 20 }}>
-        <StatCard label="Total balance" value={formatMoney(a?.totals.all)} color="#60a5fa" icon={Wallet} loading={c.accountsLoading} hint="Active accounts" />
-        <StatCard label="Cash in hand" value={formatMoney(a?.totals.cash)} color="#34d399" icon={Banknote} loading={c.accountsLoading} />
-        <StatCard label="In banks" value={formatMoney(a?.totals.bank)} color="#22d3ee" icon={Landmark} loading={c.accountsLoading} />
+        <StatCard label="Total balance" value={formatMoney(a?.totals.all)} color="#2dd4bf" icon={Wallet} loading={c.accountsLoading} hint="Active accounts" />
+        <StatCard label="Cash in hand" value={formatMoney(a?.totals.cash)} color="#4ade80" icon={Banknote} loading={c.accountsLoading} />
+        <StatCard label="In banks" value={formatMoney(a?.totals.bank)} color="#2dd4bf" icon={Landmark} loading={c.accountsLoading} />
       </Grid>
 
       {c.form === 'account' && (

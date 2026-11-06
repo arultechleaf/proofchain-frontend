@@ -57,7 +57,7 @@ export function Card({
     <div className="glass-card card" style={style}>
       {(title || action) && (
         <div className="card-header">
-          {Icon && <Icon size={15} color="#60a5fa" />}
+          {Icon && <Icon size={15} color="#2dd4bf" />}
           {title && <h2 className="card-title">{title}</h2>}
           {action && <div className="card-action">{action}</div>}
         </div>
@@ -70,7 +70,11 @@ export function Card({
 export function Grid({ cols, gap = 16, children, style }: {
   cols: number | string; gap?: number; children: React.ReactNode; style?: React.CSSProperties;
 }) {
-  const template = typeof cols === 'number' ? `repeat(${cols}, minmax(0, 1fr))` : cols;
+  // Up to `cols` columns, but fewer when the container is narrow (e.g. with the menu open), so content never gets squeezed.
+  const MIN_COL: Record<number, number> = { 2: 340, 3: 240, 4: 190 };
+  const template = typeof cols === 'number'
+    ? (MIN_COL[cols] ? `repeat(auto-fit, minmax(max(min(100%, ${MIN_COL[cols]}px), calc((100% - ${gap * (cols - 1)}px) / ${cols})), 1fr))` : `repeat(${cols}, minmax(0, 1fr))`)
+    : cols;
   // data-cols lets the stylesheet reflow the grid on tablets and phones.
   return <div className="grid-layout" data-cols={typeof cols === 'number' ? cols : 'custom'} style={{ gridTemplateColumns: template, gap, ...style }}>{children}</div>;
 }
@@ -113,7 +117,7 @@ export function Spinner({ label }: { label?: string }) {
 export function EmptyState({ icon: Icon, title, action }: { icon: React.ElementType; title: string; action?: React.ReactNode }) {
   return (
     <div className="empty-state">
-      <Icon size={38} color="#334155" className="empty-state-icon" />
+      <Icon size={38} color="#2d4b58" className="empty-state-icon" />
       <p className={`empty-state-title${action ? ' has-action' : ''}`}>{title}</p>
       {action}
     </div>
@@ -121,7 +125,7 @@ export function EmptyState({ icon: Icon, title, action }: { icon: React.ElementT
 }
 
 export function StatCard({
-  label, value, color = '#60a5fa', icon: Icon, hint, loading,
+  label, value, color = '#2dd4bf', icon: Icon, hint, loading,
 }: {
   label: string;
   value: React.ReactNode;
