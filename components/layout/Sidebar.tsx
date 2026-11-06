@@ -3,6 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import {
   LayoutDashboard,
   Package,
@@ -35,6 +36,7 @@ import {
 } from 'lucide-react';
 import type { ElementType } from 'react';
 import { useAuth } from '@/lib/auth';
+import { MenuToggle } from './MenuToggle';
 import { canView, matchScreen } from '@/lib/access';
 
 interface NavItem {
@@ -290,6 +292,12 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
     .sort((a, b) => b.length - a.length)[0];
 
+  // Keep the current page's menu item in view when the menu list is longer than the screen.
+  const navRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    navRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'nearest' });
+  }, [activeHref, collapsed]);
+
   const width = collapsed ? 72 : 240;
 
   return (
@@ -324,19 +332,23 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           flexShrink: 0,
         }}
       >
-        <img
-          src="/A_logo.svg"
-          alt="Inventory Audit"
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 10,
-            flexShrink: 0,
-            objectFit: 'contain',
-            background: '#fff',
-            boxShadow: '0 0 20px rgba(34,168,102,0.35)',
-          }}
-        />
+        {/* Desktop: the menu button lives here. Phones: it stays in the top bar, so the logo is shown instead. */}
+        <span className="only-desktop"><MenuToggle open={!collapsed} onClick={onToggle} /></span>
+        <span className="only-mobile" style={{ display: 'none' }}>
+          <img
+            src="/A_logo.svg"
+            alt="Inventory Audit"
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 10,
+              flexShrink: 0,
+              objectFit: 'contain',
+              background: '#fff',
+              boxShadow: '0 0 20px rgba(34,168,102,0.35)',
+            }}
+          />
+        </span>
 
         {!collapsed && (
           <div style={{ overflow: 'hidden', flex: 1, minWidth: 0 }}>
@@ -368,6 +380,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Navigation */}
       <nav
+        ref={navRef}
+        className="sidebar-nav"
         aria-label="Main navigation"
         style={{
           flex: 1,
@@ -404,7 +418,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                       fontWeight: 700,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      color: '#2d3b34',
+                      color: '#b9c7bf',
                       margin: '12px 10px 4px',
                     }}
                   >

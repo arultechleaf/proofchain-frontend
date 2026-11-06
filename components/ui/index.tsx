@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { setCrumbLabel } from '@/lib/breadcrumb';
 import { createPortal } from 'react-dom';
-import { PAGE_SIZES } from '@/lib/usePageSize';
+import { PAGE_SIZES, usePageSize } from '@/lib/usePageSize';
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { AlertCircle, ArrowLeft, CheckCircle2, Eye, Info, Loader2, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
 import { statusColor, statusLabel } from '@/lib/utils';
@@ -454,6 +454,19 @@ export function DataTable<T>({
   startIndex?: number;
 }) {
   const align = (c: Column<T>) => `col-${c.align ?? 'left'}`;
+
+  // Tables whose page does not paginate on the server get page numbers and a rows picker here, so every list has them.
+  const [clientPage, setClientPage] = useState(1);
+  const [clientSize, setClientSize] = usePageSize(10);
+  const auto = footer === undefined && !compact;
+  const pageCount = Math.max(1, Math.ceil(rows.length / clientSize));
+  const currentPage = Math.min(clientPage, pageCount);
+  const shownRows = auto ? rows.slice((currentPage - 1) * clientSize, currentPage * clientSize) : rows;
+  const firstIndex = auto ? (currentPage - 1) * clientSize : startIndex;
+  const pagerFooter = auto && !loading
+    ? <Pager page={currentPage} total={rows.length} limit={clientSize} onPage={setClientPage} onLimit={setClientSize} />
+    : footer;
+
   const table = (
     <div className="data-table-scroll">
       <table className={`data-table${compact ? ' data-table-compact' : ''}`} style={minWidth ? { minWidth } : undefined}>
@@ -461,7 +474,7 @@ export function DataTable<T>({
           <tr>
             {serial && <th className="col-center col-serial">S.No</th>}
             {columns.map((c) => (
-              <th key={colKey(c)} className={align(c)} style={{ width: c.width }}>{c.header}</th>
+              <th key={colKey(c)} className={`${align(c)}${c.nowrap === true ? ' col-nowrap' : ''}`} style={{ width: c.width }}>{c.header}</th>
             ))}
           </tr>
         </thead>
@@ -481,11 +494,11 @@ export function DataTable<T>({
             ? (
               <tr className="data-table-empty"><td colSpan={columns.length + (serial ? 1 : 0)}>{empty}</td></tr>
             )
-            : rows.map((row, index) => (
+            : shownRows.map((row, index) => (
                 <tr key={rowKey(row)}>
-                  {serial && <td className="col-center col-serial" data-label="S.No">{startIndex + index + 1}</td>}
+                  {serial && <td className="col-center col-serial" data-label="S.No">{firstIndex + index + 1}</td>}
                   {columns.map((c) => (
-                    <td key={colKey(c)} className={`${align(c)}${c.nowrap === false ? ' col-wrap' : ''}`} data-label={c.id === 'actions' || typeof c.header !== 'string' ? undefined : c.header}>
+                    <td key={colKey(c)} className={`${align(c)}${c.nowrap === false ? ' col-wrap' : ''}${c.nowrap === true ? ' col-nowrap' : ''}`} data-label={c.id === 'actions' || typeof c.header !== 'string' ? undefined : c.header}>
                       {c.cell(row)}
                     </td>
                   ))}
@@ -495,8 +508,8 @@ export function DataTable<T>({
       </table>
     </div>
   );
-  if (bare) return <>{table}{footer}</>;
-  return <div className="data-table-wrap">{table}{footer}</div>;
+  if (bare) return <>{table}{pagerFooter}</>;
+  return <div className="data-table-wrap">{table}{pagerFooter}</div>;
 }
 
 /** Page numbers to show: always the first and last, the neighbours of the current page, and … for gaps. */
@@ -515,7 +528,7 @@ function pageList(page: number, pages: number): Array<number | '…'> {
 export function Pager({ page, total, limit, onPage, onLimit }: {
   page: number; total: number; limit: number; onPage: (p: number) => void; onLimit?: (n: number) => void;
 }) {
-  if (total <= Math.min(limit, PAGE_SIZES[0])) return null;
+  if (total <= 0) return null;
   const pages = Math.max(1, Math.ceil(total / limit));
   const sizes = [...new Set([...PAGE_SIZES, limit])].sort((x, y) => x - y);
   return (

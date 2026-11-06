@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopNav } from '@/components/layout/TopNav';
 import { AccessDenied } from '@/components/layout/AccessDenied';
+import { Footer } from '@/components/layout/Footer';
 import { canView, matchScreen } from '@/lib/access';
 import { useAuth } from '@/lib/auth';
 import { Loader2 } from 'lucide-react';
@@ -75,9 +76,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            style={{ minHeight: '100%' }}
+            style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}
           >
-            {blocked ? <AccessDenied screen={screen?.label} /> : children}
+            <div style={{ flex: 1 }}>{blocked ? <AccessDenied screen={screen?.label} /> : children}</div>
+            <Footer />
           </motion.div>
         </main>
       </div>

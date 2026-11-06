@@ -167,13 +167,18 @@ export default function CashBankPage() {
           {c.canWrite && <button type="button" className="add-account-card" style={{ marginTop: 14, maxWidth: 340 }} onClick={() => c.openForm('account')}><span className="add-account-plus"><Plus size={20} /></span>Add new account</button>}
         </>
       ) : (
-        <div className="stat-grid" style={{ marginBottom: 28 }}>
+        <div className="stat-grid account-grid" style={{ marginBottom: 28 }}>
           {(a?.rows ?? []).map((x) => (
             <div key={x.id} className={`glass-card account-card${x.isActive ? '' : ' is-inactive'}`}>
               <div className="account-card-top">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                  <BankIcon name={x.name} type={x.accountType} size={40} />
-                  <p className="account-card-name">{x.name}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                  <BankIcon name={x.name} type={x.accountType} size={36} />
+                  <div style={{ minWidth: 0 }}>
+                    <p className="account-card-name">{x.name}</p>
+                    <p className="account-card-meta">
+                      {x.accountType === 'cash' ? 'Cash' : 'Bank'}{x.accountNumber ? ` · ${x.accountNumber}` : ''}{x.isActive ? '' : ' · inactive'}
+                    </p>
+                  </div>
                 </div>
                 {c.canWrite && (
                   <RowActions
@@ -182,16 +187,14 @@ export default function CashBankPage() {
                   />
                 )}
               </div>
+              <p className="account-card-label">Balance</p>
               <p className="account-card-balance">{formatMoney(x.balance)}</p>
-              <p className="account-card-meta">
-                {x.accountType === 'cash' ? 'Cash' : 'Bank'}{x.accountNumber ? ` · ${x.accountNumber}` : ''}{x.isActive ? '' : ' · inactive'}
-              </p>
-              <div className="toolbar" style={{ marginBottom: 0, marginTop: 4 }}>
-                <button className="btn btn-ghost" onClick={() => c.setAccountFilter(c.accountFilter === String(x.id) ? '' : String(x.id))}>
+              <div className="account-card-actions">
+                <button type="button" className="btn btn-primary" onClick={() => c.setAccountFilter(c.accountFilter === String(x.id) ? '' : String(x.id))}>
                   {c.accountFilter === String(x.id) ? 'Show all' : 'View transactions'}
                 </button>
                 {c.canWrite && (
-                  <button className="btn btn-ghost" onClick={() => c.toggleActive(x.id, !x.isActive)}>
+                  <button type="button" className="btn btn-secondary" onClick={() => c.toggleActive(x.id, !x.isActive)}>
                     {x.isActive ? 'Deactivate' : 'Activate'}
                   </button>
                 )}

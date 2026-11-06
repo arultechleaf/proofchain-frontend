@@ -39,20 +39,20 @@ export default function UsersPage() {
 
   const columns: Column<User>[] = [
     {
-      header: 'Name',
+      header: 'Name', nowrap: true,
       cell: (u) => isAdmin
         ? <Link href={`/users/${u.id}`} style={{ color: '#3ddc84', textDecoration: 'none', fontWeight: 600 }}>{u.name}</Link>
         : <strong>{u.name}</strong>,
     },
-    { header: 'Code', cell: (u) => u.userCode ?? '—' },
-    { header: 'Email', cell: (u) => u.email },
-    { header: 'Mobile', cell: (u) => u.mobile ?? '—' },
-    { header: 'Role', cell: (u) => roleLabel(u.role) },
+    { header: 'Code', nowrap: true, cell: (u) => u.userCode ?? '—' },
+    { header: 'Email', nowrap: true, cell: (u) => u.email },
+    { header: 'Mobile', nowrap: true, cell: (u) => u.mobile ?? '—' },
+    { header: 'Role', nowrap: true, cell: (u) => roleLabel(u.role) },
     { header: 'Organization', cell: (u) => u.company?.name ?? '—' },
-    { header: 'Joined', cell: (u) => formatRelative(u.createdAt) },
-    { header: 'Password', cell: (u) => (u.mustChangePassword ? <span className="badge badge-pending">Temporary</span> : '—') },
+    { header: 'Joined', nowrap: true, cell: (u) => formatRelative(u.createdAt) },
+    { header: 'Password', nowrap: true, cell: (u) => (u.mustChangePassword ? <span className="badge badge-pending">Temporary</span> : '—') },
     {
-      header: 'Status',
+      header: 'Status', nowrap: true,
       cell: (u) => (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
           <StatusBadge status={u.isActive ? 'active' : 'inactive'} />

@@ -1787,11 +1787,12 @@ select option:checked { background-color: #e3f7ea; color: #121a16; }
 /* Stat cards (every page): each card tints its background and outline with its own colour */
 .stat-card.glass-card,
 .stat-card {
-  background: color-mix(in srgb, var(--stat-color) 12%, #0f1512);
-  border: 1px solid color-mix(in srgb, var(--stat-color) 50%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--stat-color) 8%, transparent), 0 6px 18px color-mix(in srgb, var(--stat-color) 10%, transparent);
+  background: color-mix(in srgb, var(--stat-color) 5%, rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-top: 2px solid color-mix(in srgb, var(--stat-color) 70%, transparent);
+  box-shadow: none;
 }
-.stat-card:hover { border-color: var(--stat-color); }
+.stat-card:hover { border-color: color-mix(in srgb, var(--stat-color) 45%, transparent); }
 
 /* Sections inside long forms (account creation) */
 .form-section {
@@ -1971,7 +1972,7 @@ html[data-theme='light'] .dd-verify { filter: invert(1) hue-rotate(180deg); }
 
 /* Tables fit the page: no inner horizontal scrollbar, long text wraps, the page itself scrolls. */
 .data-table th { white-space: normal; padding: 12px 10px; }
-.data-table td { white-space: normal; overflow-wrap: anywhere; padding: 12px 10px; }
+.data-table td { white-space: normal; overflow-wrap: break-word; padding: 12px 10px; }
 .data-table td.col-right, .data-table th.col-right, .data-table td.col-serial, .data-table td.col-center { white-space: nowrap; }
 
 /* Audit log details as readable chips */
@@ -2042,7 +2043,7 @@ html[data-theme='light'] .dd-verify { filter: invert(1) hue-rotate(180deg); }
 .menu-toggle {
   position: relative; flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(154, 169, 161,0.22);
   display: inline-flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; color: #c5d1ca;
-  background: #162033;
+  background: #ffffff;
   box-shadow: 0 2px 6px rgba(7, 10, 9,0.35);
   transition: transform .2s ease, box-shadow .25s ease, border-color .25s ease, color .2s ease;
 }
@@ -2240,17 +2241,25 @@ html[data-theme='light'] body::after { background: radial-gradient(ellipse at ce
 .line-table tbody tr:hover, .gst-table tbody tr:hover { background: rgba(61, 220, 132, 0.04); }
 @media (max-width: 960px) { .line-table td, .gst-table td { border-bottom: 0; } }
 
-/* Sidebar: the current page gets a simple tint, a thin accent bar and a brighter label */
+/* Sidebar: a dark rail with a green strip down its edge; the current page is a tab that grows out of the strip with curved joins */
+.app-sidebar { border-right: 6px solid #16a34a !important; }
+.app-sidebar nav a { margin-bottom: 8px !important; }
 .app-sidebar .nav-item.is-active {
-  background: rgba(34, 197, 94, 0.14) !important;
+  background: #16a34a !important;
   border-color: transparent !important;
-  color: #3ddc84 !important;
+  border-radius: 16px 0 0 16px !important;
+  color: #ffffff !important;
+  margin-right: -6px;
   box-shadow: none;
 }
-.app-sidebar .nav-item.is-active::before {
-  content: ''; position: absolute; left: -6px; top: 22%; bottom: 22%; width: 3px; border-radius: 0 3px 3px 0; background: #22c55e;
+.app-sidebar .nav-item.is-active::before,
+.app-sidebar .nav-item.is-active::after {
+  content: ''; position: absolute; right: 0; width: 18px; height: 18px; pointer-events: none;
 }
-.app-sidebar .nav-item.is-active span { color: #e8efeb; font-weight: 600 !important; }
+.app-sidebar .nav-item.is-active::before { top: -18px; background: radial-gradient(circle at 0 0, transparent 17.5px, #16a34a 18px); }
+.app-sidebar .nav-item.is-active::after { bottom: -18px; background: radial-gradient(circle at 0 100%, transparent 17.5px, #16a34a 18px); }
+.app-sidebar .nav-item.is-active svg { color: #ffffff; }
+.app-sidebar .nav-item.is-active span { color: #ffffff; font-weight: 600 !important; }
 
 /* Tighter spacing between stat cards */
 .grid-layout:has(> .stat-card), .stat-grid { gap: 10px !important; }
@@ -2269,3 +2278,85 @@ html[data-theme='light'] body::after { background: radial-gradient(ellipse at ce
 .pager-btn:hover:not(:disabled) { border-color: rgba(61, 220, 132, 0.5); color: #fff; background: rgba(61, 220, 132, 0.08); }
 .pager-btn.is-current { background: linear-gradient(135deg, #3ddc84, #16a34a); border-color: transparent; color: #04140a; font-weight: 700; }
 .pager-gap { color: #7b8a82; padding: 0 2px; }
+
+/* Swap: menu button in the sidebar header and logo in the top bar on desktop; reversed on phones where the sidebar is hidden */
+.topnav-logo { width: 38px; height: 38px; border-radius: 10px; object-fit: contain; background: #fff; flex-shrink: 0; box-shadow: 0 0 18px rgba(34, 197, 94, 0.35); }
+.only-mobile { display: none !important; }
+@media (max-width: 768px) {
+  .only-desktop { display: none !important; }
+  .only-mobile { display: inline-flex !important; }
+}
+
+/* Footer */
+.app-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; padding: 14px 28px; margin-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.07); font-size: 12px; color: #9aa9a1; }
+.app-footer-muted { color: #6a7a72; }
+@media (max-width: 768px) { .app-footer { padding: 12px 14px; justify-content: center; text-align: center; } }
+
+/* Back arrow: a white filled circle with the arrow inside (same in both themes) */
+.page-header-back {
+  width: 38px; height: 38px; padding: 0; align-items: center; justify-content: center; flex-shrink: 0;
+  border-radius: 50%; background: #ffffff; color: #12261c; border: 1px solid #d6e0da;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); transition: transform .15s, box-shadow .15s;
+}
+.page-header-back:hover { transform: translateX(-2px); box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35); color: #15803d; }
+html[data-theme='light'] .page-header-back { filter: invert(1) hue-rotate(180deg); }
+
+/* Menu button: a white container with a dark icon (same in both themes) */
+.menu-toggle { background: #ffffff; color: #12261c; border: 1px solid #d6e0da; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); }
+.menu-toggle:hover { color: #fff; }
+html[data-theme='light'] .menu-toggle { filter: invert(1) hue-rotate(180deg); }
+
+/* Tables: single-line cells stay on one line, and cells line up in the middle of the row */
+.data-table td.col-nowrap, .data-table th.col-nowrap { white-space: nowrap !important; overflow-wrap: normal !important; word-break: keep-all; }
+.data-table th, .data-table td { vertical-align: middle; }
+.data-table td:has(.row-actions), .data-table td:has(.badge) { vertical-align: middle; }
+
+/* Visible, slim scrollbars everywhere (page, tables, panels) so wide content is easy to scroll */
+* { scrollbar-width: thin; scrollbar-color: rgba(61, 220, 132, 0.55) rgba(255, 255, 255, 0.05); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(61, 220, 132, 0.55); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(61, 220, 132, 0.85); background-clip: padding-box; }
+.data-table-scroll { scrollbar-width: thin; -ms-overflow-style: auto; cursor: auto; padding-bottom: 2px; }
+.data-table-scroll::-webkit-scrollbar { display: block; width: 10px; height: 10px; }
+
+/* Account cards (Cash & Bank): icon + name/number, balance label and amount, then two buttons */
+.account-card { padding: 18px; gap: 0; }
+.account-card-name { font-size: 15px; font-weight: 600; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-card-meta { font-size: 12px; color: #9aa9a1; margin-top: 2px; }
+.account-card-label { font-size: 12px; color: #9aa9a1; margin: 18px 0 2px; }
+.account-card-balance { font-size: 28px; font-weight: 600; letter-spacing: -0.01em; }
+.account-card-actions { display: flex; gap: 8px; margin-top: 18px; }
+.account-card-actions .btn { justify-content: center; }
+.account-card-actions .btn-primary { flex: 1; }
+.account-card-actions .btn-secondary { flex: 0 0 auto; }
+
+/* Keep the card's buttons inside the card: wider cards, buttons share the row or wrap below */
+.account-grid { grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+.account-card { min-width: 0; overflow: hidden; }
+.account-card-actions { flex-wrap: wrap; }
+.account-card-actions .btn { min-width: 0; white-space: nowrap; padding-inline: 14px; }
+.account-card-actions .btn-primary { flex: 1 1 140px; }
+.account-card-actions .btn-secondary { flex: 1 1 100px; }
+
+/* Sidebar menu: scrolls with the wheel, touch or arrow keys; the scrollbar is hidden and faded edges hint that there is more above or below */
+.app-sidebar .sidebar-nav {
+  scrollbar-width: none; -ms-overflow-style: none; overscroll-behavior: contain; scroll-behavior: smooth;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 22px), transparent 100%);
+}
+.app-sidebar .sidebar-nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+/* Sidebar tab: smaller, neater proportions with tighter curves that meet the strip cleanly */
+.app-sidebar .nav-item.is-active {
+  border-radius: 12px 0 0 12px !important;
+  margin-right: -7px; margin-left: 4px;
+  padding-top: 7px !important; padding-bottom: 7px !important;
+  min-height: 40px;
+}
+.app-sidebar .nav-item.is-active::before,
+.app-sidebar .nav-item.is-active::after { width: 12px; height: 12px; right: 0; }
+.app-sidebar .nav-item.is-active::before { top: -12px; background: radial-gradient(circle at 0 0, transparent 11.5px, #16a34a 12px); }
+.app-sidebar .nav-item.is-active::after { bottom: -12px; background: radial-gradient(circle at 0 100%, transparent 11.5px, #16a34a 12px); }
+.app-sidebar nav a { margin-bottom: 6px !important; }
+.app-sidebar[data-collapsed='true'] .nav-item.is-active { margin-left: 8px; }

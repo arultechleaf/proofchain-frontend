@@ -106,7 +106,8 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
       flexShrink: 0,
     }}>
       {/* Mobile menu */}
-      <MenuToggle open={!menuCollapsed} onClick={onMenuToggle} />
+      <span className="only-mobile" style={{ display: 'none' }}><MenuToggle open={!menuCollapsed} onClick={onMenuToggle} /></span>
+      <img src="/A_logo.svg" alt="Inventory Audit" className="only-desktop topnav-logo" />
 
       {/* Breadcrumbs */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, flex: 1, overflow: 'hidden' }}>
