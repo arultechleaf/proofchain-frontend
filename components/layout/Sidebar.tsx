@@ -13,7 +13,6 @@ import {
   Building2,
   Settings,
   LogOut,
-  ChevronLeft,
   Users,
   Boxes,
   Receipt,
@@ -359,44 +358,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          style={{
-            marginLeft: 'auto',
-            flexShrink: 0,
-            width: 28,
-            height: 28,
-            borderRadius: 6,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'transparent',
-            border: 'none',
-            color: '#475569',
-            cursor: 'pointer',
-            transition: 'background 0.15s, color 0.15s',
-          }}
-          onMouseEnter={(event) => {
-            event.currentTarget.style.background =
-              'rgba(30,41,59,0.8)';
-            event.currentTarget.style.color = '#94a3b8';
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.background = 'transparent';
-            event.currentTarget.style.color = '#475569';
-          }}
-        >
-          <ChevronLeft
-            size={14}
-            style={{
-              transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s',
-            }}
-          />
-        </button>
       </div>
 
       {/* Navigation */}

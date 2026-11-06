@@ -37,7 +37,7 @@ export default function VerificationPage() {
       const res = await deliveriesApi.list({ search: query, limit: 1 });
       const found = res.data.data?.[0];
       if (found) setDelivery(found);
-      else setError('No delivery found matching that reference or ID');
+      else setError(/^0x[0-9a-f]{64}$/i.test(query.trim()) ? 'No delivery has this hash. If it belongs to a sale or purchase invoice, open that invoice and use its Verify button.' : 'No delivery found matching that reference or ID');
     } catch { setError('Search failed'); } finally { setSearching(false); }
   };
 

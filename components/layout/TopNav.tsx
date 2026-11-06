@@ -1,7 +1,8 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { ChevronRight, Menu } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { MenuToggle } from './MenuToggle';
 import { useAuth } from '@/lib/auth';
 import { roleLabel } from '@/lib/utils';
 import { isRecordSegment, useCrumbLabels } from '@/lib/breadcrumb';
@@ -71,9 +72,10 @@ const ROLE_LABELS: Record<string, string> = {
 
 interface TopNavProps {
   onMenuToggle?: () => void;
+  menuCollapsed?: boolean;
 }
 
-export function TopNav({ onMenuToggle }: TopNavProps) {
+export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
   const { user } = useAuth();
   const pathname = usePathname();
   const crumbLabels = useCrumbLabels();
@@ -103,13 +105,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
       flexShrink: 0,
     }}>
       {/* Mobile menu */}
-      <button
-        onClick={onMenuToggle}
-        style={{ color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-        aria-label="Open menu"
-      >
-        <Menu size={20} />
-      </button>
+      <MenuToggle open={!menuCollapsed} onClick={onMenuToggle} />
 
       {/* Breadcrumbs */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, flex: 1, overflow: 'hidden' }}>

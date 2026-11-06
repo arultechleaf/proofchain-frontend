@@ -87,35 +87,18 @@ function InvoiceForm({ type }: { type: InvoiceScreen }) {
             </Field>
           </Grid>
 
-          {c.online && (
-            <div className="notice notice-info" style={{ display: 'block', marginTop: 14 }}>
-              <p style={{ fontWeight: 600, marginBottom: 8 }}>Pay with Razorpay (UPI QR, apps, cards)</p>
-              <Grid cols={3}>
-                <Field label="Bank account to credit" required>
-                  <Select className="form-input" value={c.accountId} onChange={(e) => c.setAccountId(e.target.value)} required>
-                    <option value="">{c.accountsLoading ? 'Loading accounts…' : 'Select account…'}</option>
-                    {c.paymentAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
-                  </Select>
-                  {!c.accountsLoading && !c.accountsError && c.paymentAccounts.length === 0 && (
-                    <p className="form-hint" style={{ color: '#f59e0b' }}>You have no bank account yet, and Razorpay needs one to credit. <Link href="/cash-bank" className="auth-link">Add a bank account in Cash &amp; Bank</Link>, then come back.</p>
-                  )}
-                </Field>
-                <Field label="Amount to pay now (₹)" hint="Less than the total to take a part payment">
-                  <input type="number" step="0.01" min="1" max={t.total} className="form-input"
-                    value={c.onlineField} placeholder="0" onChange={(e) => c.setReceived(e.target.value)} />
-                </Field>
-              </Grid>
-              <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap', margin: '14px 0 4px', padding: 14, borderRadius: 12, border: '1px dashed rgba(96,165,250,0.5)' }}>
-                <UpiQr upiId={c.upiId} payee={c.upiPayee} amount={c.onlineAmount} note={c.nextNumber ?? 'Sale'} />
-                <div style={{ flex: 1, minWidth: 220 }}>
-                  <p style={{ margin: '0 0 6px', fontWeight: 600 }}>Customer scans the QR code?</p>
-                  <p className="form-hint" style={{ margin: '0 0 10px' }}>The money goes straight to your UPI ID and is not confirmed automatically. After you see it arrive, save the sale as received.</p>
-                  <button type="button" className="btn btn-secondary" disabled={c.submitting} onClick={() => void c.saveQrPaid()}>
-                    Paid by QR: save sale as received
-                  </button>
-                </div>
-              </div>
-              <p className="form-hint" style={{ marginTop: 6 }}>Razorpay opens as soon as the customer, products and bank account are filled in (or press <strong>Pay with Razorpay &amp; save</strong> at the bottom). The sale is saved the moment the payment succeeds.</p>
+          {c.online && !c.accountsLoading && !c.accountsError && c.paymentAccounts.length === 0 && (
+            <Notice kind="info">
+              Razorpay needs a bank account to credit. <Link href="/cash-bank" className="auth-link">Add a bank account in Cash &amp; Bank</Link>, then choose UPI again.
+            </Notice>
+          )}
+
+          {c.online && !c.accountsLoading && c.paymentAccounts.length > 0 && (
+            <div className="notice notice-success" style={{ marginTop: 14 }}>
+              <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 0 4px rgba(52,211,153,0.2)', flexShrink: 0 }} />
+              <span>
+                Razorpay connected{c.razorpayMode === 'test' ? ' · Test mode (no real money)' : ''}. {formatMoney(c.onlineAmount)} is collected when you press <strong>Pay with Razorpay &amp; save</strong>.
+              </span>
             </div>
           )}
 
@@ -265,16 +248,16 @@ function InvoiceForm({ type }: { type: InvoiceScreen }) {
                 )}
               </div>
               {c.received > 0 && (c.paymentType === 'cash' || c.paymentType === 'bank') && (
-                <Field label={`${c.paymentType === 'cash' ? 'Cash' : 'Bank'} account`} required>
-                  <Select className="form-input" value={c.accountId} onChange={(e) => c.setAccountId(e.target.value)} required>
-                    <option value="">{c.accountsLoading ? 'Loading accounts…' : 'Select account…'}</option>
+                <Field label={`${c.paymentType === 'cash' ? 'Cash' : 'Bank'} account`} required={c.paymentType === 'bank'} hint={c.paymentType === 'cash' ? 'Optional: leave empty for cash in hand' : undefined}>
+                  <Select className="form-input" value={c.accountId} onChange={(e) => c.setAccountId(e.target.value)} required={c.paymentType === 'bank'}>
+                    <option value="">{c.accountsLoading ? 'Loading accounts…' : c.paymentType === 'cash' ? 'Cash in hand (no account)' : 'Select account…'}</option>
                     {c.paymentAccounts.map((account) => (
                       <option key={account.id} value={account.id}>{account.name}</option>
                     ))}
                   </Select>
                   {c.accountsError && <p className="form-hint">Could not load accounts. Refresh the page and try again.</p>}
                   {!c.accountsLoading && !c.accountsError && c.paymentAccounts.length === 0 && (
-                    <p className="form-hint">No active {c.paymentType} account. <Link href="/cash-bank" className="auth-link">Create one in Cash &amp; Bank</Link>.</p>
+                    <p className="form-hint">No active {c.paymentType} account{c.paymentType === 'cash' ? ' (optional)' : ''}. <Link href="/cash-bank" className="auth-link">Create one in Cash &amp; Bank</Link>.</p>
                   )}
                 </Field>
               )}

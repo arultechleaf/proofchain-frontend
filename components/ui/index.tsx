@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { setCrumbLabel } from '@/lib/breadcrumb';
+import { createPortal } from 'react-dom';
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
-import { AlertCircle, ArrowLeft, CheckCircle2, Eye, Info, Loader2, Pencil, Search, Trash2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Eye, Info, Loader2, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
 import { statusColor, statusLabel } from '@/lib/utils';
 
 /* ── Layout ─────────────────────────────────────────────────────────────── */
@@ -78,8 +79,17 @@ export function Grid({ cols, gap = 16, children, style }: {
 
 const NOTICE_ICON = { error: AlertCircle, success: CheckCircle2, info: Info };
 
-export function Notice({ kind = 'info', children }: { kind?: keyof typeof NOTICE_ICON; children: React.ReactNode }) {
+/** A success notice with plain text goes away by itself after 10 seconds (errors and info stay until the page changes them). */
+export function Notice({ kind = 'info', children, autoHideMs = kind === 'success' ? 10000 : 0 }: { kind?: keyof typeof NOTICE_ICON; children: React.ReactNode; autoHideMs?: number }) {
   const Icon = NOTICE_ICON[kind];
+  const text = typeof children === 'string' ? children : null;
+  const [hiddenText, setHiddenText] = useState<string | null>(null);
+  useEffect(() => {
+    if (!autoHideMs || text === null) return;
+    const timer = setTimeout(() => setHiddenText(text), autoHideMs);
+    return () => clearTimeout(timer);
+  }, [text, autoHideMs]);
+  if (text !== null && hiddenText === text) return null;
   return (
     <div role={kind === 'error' ? 'alert' : 'status'} className={`notice notice-${kind}`}>
       <Icon size={16} className="notice-icon" />
@@ -297,9 +307,9 @@ export const CheckField = forwardRef<HTMLInputElement, React.InputHTMLAttributes
 type ActionTarget = string | (() => void);
 
 /**
- * The view / edit / delete icons shown in a table's Actions column. A string target is a link,
- * a function is a click handler. Delete always asks for confirmation first; pass `disabled` with
- * a reason to show the icon greyed out with that reason as its tooltip.
+ * The Actions cell of a table: one "⋮" button that opens a list with View, Edit, any extras and Delete.
+ * A string target is a link, a function is a click handler. Delete always asks for confirmation first; pass
+ * `disabled` with a reason to show it greyed out with that reason as its tooltip.
  */
 export function RowActions({ view, edit, remove, extra }: {
   view?: ActionTarget;
@@ -308,30 +318,73 @@ export function RowActions({ view, edit, remove, extra }: {
   extra?: React.ReactNode;
 }) {
   const { confirm, dialog } = useConfirm();
-  const icon = (kind: 'view' | 'edit', label: string, target: ActionTarget, Icon: React.ElementType) =>
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number; up: boolean } | null>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
+
+  const place = useCallback(() => {
+    const r = trigger.current?.getBoundingClientRect();
+    if (!r) return;
+    const up = window.innerHeight - r.bottom < 220 && r.top > window.innerHeight - r.bottom;
+    setPos({ top: up ? r.top - 6 : r.bottom + 6, left: Math.max(8, r.right - 190), up });
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => {
+      if (!menu.current?.contains(e.target as Node) && !trigger.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { setOpen(false); trigger.current?.focus(); } };
+    const close = () => setOpen(false);
+    document.addEventListener('mousedown', away);
+    document.addEventListener('keydown', key);
+    window.addEventListener('resize', close);
+    window.addEventListener('scroll', close, true);
+    return () => {
+      document.removeEventListener('mousedown', away);
+      document.removeEventListener('keydown', key);
+      window.removeEventListener('resize', close);
+      window.removeEventListener('scroll', close, true);
+    };
+  }, [open]);
+
+  const item = (kind: 'view' | 'edit', label: string, target: ActionTarget, Icon: React.ElementType) =>
     typeof target === 'string' ? (
-      <Link href={target} className={`icon-btn icon-${kind}`} title={label} aria-label={label}><Icon size={15} /></Link>
+      <Link href={target} className={`row-menu-item row-menu-${kind}`} role="menuitem"><Icon size={15} />{label}</Link>
     ) : (
-      <button type="button" className={`icon-btn icon-${kind}`} title={label} aria-label={label} onClick={target}><Icon size={15} /></button>
+      <button type="button" className={`row-menu-item row-menu-${kind}`} role="menuitem" onClick={target}><Icon size={15} />{label}</button>
     );
+
   return (
     <span className="row-actions">
-      {view && icon('view', 'View', view, Eye)}
-      {edit && icon('edit', 'Edit', edit, Pencil)}
-      {extra}
-      {remove && (
-        <button
-          type="button"
-          className="icon-btn icon-delete"
-          title={remove.disabled ?? remove.label ?? 'Delete'}
-          aria-label={remove.label ?? 'Delete'}
-          disabled={!!remove.disabled}
-          onClick={async () => {
-            if (await confirm({ title: 'Delete this record?', message: remove.confirm, confirmLabel: 'Yes, delete' })) void remove.onConfirm();
-          }}
+      <button
+        type="button" ref={trigger} className="icon-btn" title="Actions" aria-label="Actions" aria-haspopup="menu" aria-expanded={open}
+        onClick={() => { if (open) setOpen(false); else { place(); setOpen(true); } }}
+      >
+        <MoreVertical size={16} />
+      </button>
+      {open && pos && createPortal(
+        <div
+          ref={menu} role="menu" className="sel-menu row-menu" onClick={() => setOpen(false)}
+          style={{ left: pos.left, width: 190, ...(pos.up ? { bottom: window.innerHeight - pos.top } : { top: pos.top }) }}
         >
-          <Trash2 size={15} />
-        </button>
+          {view && item('view', 'View', view, Eye)}
+          {edit && item('edit', 'Edit', edit, Pencil)}
+          {extra && <div className="row-menu-extra">{extra}</div>}
+          {remove && (
+            <button
+              type="button" role="menuitem" className="row-menu-item row-menu-delete"
+              title={remove.disabled} disabled={!!remove.disabled}
+              onClick={async () => {
+                if (await confirm({ title: 'Delete this record?', message: remove.confirm, confirmLabel: 'Yes, delete' })) void remove.onConfirm();
+              }}
+            >
+              <Trash2 size={15} />{remove.label ?? 'Delete'}
+            </button>
+          )}
+        </div>,
+        document.body,
       )}
       {dialog}
     </span>
@@ -339,7 +392,7 @@ export function RowActions({ view, edit, remove, extra }: {
 }
 
 /** A ready-made "Actions" column for DataTable. */
-export function actionsColumn<T>(render: (row: T) => React.ReactNode, width = 130): Column<T> {
+export function actionsColumn<T>(render: (row: T) => React.ReactNode, width = 70): Column<T> {
   return { header: 'Actions', id: 'actions', align: 'center', width, cell: render };
 }
 
@@ -544,3 +597,4 @@ function useDragScroll() {
 
 export { Select } from "./Select";
 export { Combobox } from "./Combobox";
+export { BankIcon } from "./BankIcon";

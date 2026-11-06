@@ -2039,3 +2039,82 @@ html[data-theme='light'] .dd-verify { filter: invert(1) hue-rotate(180deg); }
 .sel-trigger .sel-placeholder { color: #64748b; }
 .sel-group, .sel-empty { color: #64748b; }
 .sel-hint { font-size: 12px; color: #64748b; font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+
+/* ---- Menu toggle: glass tile, bars morph into an arrow, hover glow, press and ripple ---- */
+.menu-toggle {
+  position: relative; flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(148,163,184,0.22);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; color: #cbd5e1;
+  background: #162033;
+  box-shadow: 0 2px 6px rgba(2,6,23,0.35);
+  transition: transform .2s ease, box-shadow .25s ease, border-color .25s ease, color .2s ease;
+}
+.menu-toggle-sm { width: 30px; height: 30px; border-radius: 9px; }
+.menu-toggle::before { /* blue to violet fill that fades in on hover */
+  content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity .25s ease;
+  background: linear-gradient(135deg, #3b82f6, #7c3aed);
+}
+.menu-toggle::after { /* ripple on click */
+  content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%;
+  background: rgba(255,255,255,0.45); opacity: 0; transform: scale(1);
+}
+.menu-toggle:hover { transform: translateY(-1px); color: #fff; border-color: transparent; box-shadow: 0 6px 16px rgba(99,102,241,0.4); }
+.menu-toggle:hover::before { opacity: 1; }
+.menu-toggle:active { transform: scale(0.94); transition-duration: .08s; }
+.menu-toggle:active::after { animation: menu-toggle-ripple .45s ease-out; }
+.menu-toggle:focus-visible { outline: 2px solid #818cf8; outline-offset: 2px; }
+
+.menu-toggle-bars { position: relative; z-index: 1; width: 18px; height: 14px; display: block; }
+.menu-toggle-bars i {
+  position: absolute; left: 0; height: 2px; border-radius: 2px; background: currentColor; transform-origin: center;
+  transition: transform .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1), top .35s cubic-bezier(.4,0,.2,1), left .35s cubic-bezier(.4,0,.2,1), opacity .2s ease;
+}
+.menu-toggle-bars i:nth-child(1) { top: 0; width: 18px; }
+.menu-toggle-bars i:nth-child(2) { top: 6px; width: 12px; }
+.menu-toggle-bars i:nth-child(3) { top: 12px; width: 18px; }
+.menu-toggle:hover .menu-toggle-bars i:nth-child(2) { width: 18px; }
+/* open: a right arrow (→), the two outer bars become the arrow head */
+.menu-toggle[data-open="true"] .menu-toggle-bars i:nth-child(1) { top: 6px; left: 10px; width: 9px; transform: rotate(45deg); transform-origin: right center; }
+.menu-toggle[data-open="true"] .menu-toggle-bars i:nth-child(2) { top: 6px; width: 18px; }
+.menu-toggle[data-open="true"] .menu-toggle-bars i:nth-child(3) { top: 6px; left: 10px; width: 9px; transform: rotate(-45deg); transform-origin: right center; }
+.menu-toggle[data-open="true"]:hover .menu-toggle-bars { transform: translateX(2px); }
+.menu-toggle[data-open="false"]:hover .menu-toggle-bars { transform: translateX(-2px); }
+.menu-toggle-bars { transition: transform .25s ease; }
+@keyframes menu-toggle-ripple { from { opacity: .7; transform: scale(1); } to { opacity: 0; transform: scale(9); } }
+
+/* sidebar: labels slide and fade in when the menu opens */
+.app-sidebar[data-collapsed="false"] nav span, .app-sidebar[data-collapsed="false"] nav p { animation: sidebar-label-in .35s ease both; }
+@keyframes sidebar-label-in { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .menu-toggle, .menu-toggle * { transition: none !important; animation: none !important; }
+  .app-sidebar nav span, .app-sidebar nav p { animation: none !important; }
+}
+
+/* ---- Row actions menu (the "⋮" in a table's Actions column) ---- */
+.row-menu { padding: 6px; }
+.row-menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border-radius: 8px; border: 0; background: transparent;
+  color: #cbd5e1; font: inherit; font-size: 13px; text-align: left; text-decoration: none; cursor: pointer;
+}
+.row-menu-item:hover, .row-menu-item:focus-visible { background: rgba(59,130,246,0.14); color: #fff; outline: none; }
+.row-menu-edit:hover { color: #fbbf24; }
+.row-menu-delete { color: #f87171; }
+.row-menu-delete:hover { background: rgba(239,68,68,0.14); color: #fca5a5; }
+.row-menu-item:disabled { opacity: .4; cursor: not-allowed; }
+.row-menu-item:disabled:hover { background: transparent; color: #f87171; }
+.row-menu-extra { display: contents; }
+/* extra actions are icon buttons with a title: show the title as the menu label */
+.row-menu-extra .icon-btn {
+  width: 100%; height: auto; padding: 9px 10px; border-radius: 8px; border: 0; justify-content: flex-start; gap: 10px; font-size: 13px; color: #cbd5e1; text-decoration: none;
+}
+.row-menu-extra .icon-btn::after { content: attr(title); }
+.row-menu-extra .icon-btn:hover { background: rgba(59,130,246,0.14); color: #fff; border: 0; }
+
+/* ---- "Add new account" tile in the Cash & Bank accounts grid ---- */
+.add-account-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; min-height: 180px; width: 100%;
+  border: 1px dashed rgba(96,165,250,0.35); border-radius: 16px; background: transparent; color: #94a3b8; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s, transform .2s;
+}
+.add-account-plus { width: 44px; height: 44px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #162033; color: #cbd5e1; transition: background .2s, color .2s; }
+.add-account-card:hover { border-color: #60a5fa; background: rgba(59,130,246,0.06); color: #fff; transform: translateY(-2px); }
+.add-account-card:hover .add-account-plus { background: linear-gradient(135deg, #3b82f6, #7c3aed); color: #fff; }

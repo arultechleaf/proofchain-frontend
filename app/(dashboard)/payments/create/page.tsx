@@ -3,10 +3,11 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { invoicesApi, partiesApi, paymentsApi } from '@/lib/api';
+import { invoicesApi, partiesApi, paymentsApi, razorpayApi } from '@/lib/api';
+import { loadRazorpayCheckout } from '@/lib/razorpay';
 import type { Invoice, Party, PaymentAccount } from '@/models';
 import { apiError, formatMoney, todayIso } from '@/lib/utils';
-import { Card, Field, Grid, Page, PageHeader, Spinner, Form, useAsync, Tabs, Select } from '@/components/ui';
+import { Card, Field, Grid, Page, PageHeader, Spinner, Form, useAsync, Tabs, Select, Notice } from '@/components/ui';
 
 const METHODS = ['cash', 'bank', 'upi', 'card', 'cheque', 'other'];
 
@@ -33,6 +34,10 @@ function RecordPayment() {
     [],
   );
   const paymentAccounts = (accounts.data ?? []).filter((a) => a.accountType === method);
+  const razorpay = useAsync<{ enabled: boolean; mode?: 'test' | 'live' } | null>(async () => { try { return (await razorpayApi.config()).data.data; } catch { return null; } }, []);
+  const bankAccount = (accounts.data ?? []).find((a) => a.accountType === 'bank');
+  // money coming in by UPI against a document is collected through Razorpay (the payment is recorded when it succeeds)
+  const viaRazorpay = direction === 'in' && method === 'upi' && !!invoiceId && !!razorpay.data?.enabled;
 
   // Opening from an invoice: take direction and amount from it.
   useEffect(() => {
@@ -72,10 +77,31 @@ function RecordPayment() {
     if (!partyId) return setError('Select a party');
     if (!(value > 0)) return setError('Enter an amount greater than 0');
     if (due !== null && value > due) return setError(`Amount exceeds the balance due (${formatMoney(due)})`);
-    if ((method === 'cash' || method === 'bank') && !accountId) return setError(`Select a ${method} account`);
+    if (method === 'bank' && !accountId) return setError('Select a bank account');
 
     setSubmitting(true);
     try {
+      if (viaRazorpay) {
+        if (!bankAccount) { setSubmitting(false); return setError('Razorpay needs a bank account to credit. Add one in Cash & Bank first.'); }
+        const order = (await razorpayApi.createOrder(invoiceId, bankAccount.id, value)).data.data;
+        await loadRazorpayCheckout();
+        let paid = false;
+        const checkout = new window.Razorpay!({
+          key: order.keyId, amount: order.amount, currency: order.currency, order_id: order.orderId,
+          name: order.merchantName || 'ProofChain', description: `Invoice ${order.invoiceNumber}`,
+          prefill: order.customer, notes: { invoiceNumber: order.invoiceNumber }, theme: { color: '#2563eb' },
+          handler: (response) => {
+            paid = true;
+            razorpayApi.verify({ orderId: response.razorpay_order_id, paymentId: response.razorpay_payment_id, signature: response.razorpay_signature })
+              .then(() => router.push(`/sales/${invoiceId}`))
+              .catch((err) => { setError(`Razorpay took the payment (${response.razorpay_payment_id}) but it could not be confirmed: ${apiError(err)}. Do not pay again; open the invoice and use Retry confirmation.`); setSubmitting(false); });
+          },
+          modal: { ondismiss: () => { if (!paid) { setSubmitting(false); setError('Payment window closed. No money was taken.'); } } },
+        });
+        checkout.on('payment.failed', (r) => setError(`Payment failed: ${r.error.description}. You can try another method.`));
+        checkout.open();
+        return;
+      }
       await paymentsApi.create({
         partyId,
         invoiceId: invoiceId || undefined,
@@ -103,7 +129,7 @@ function RecordPayment() {
     <Page narrow>
       <PageHeader title="Record Payment" subtitle="Money received from a customer or paid to a supplier" backHref="/payments" />
       <Card>
-        <Form onSubmit={submit} loading={submitting} submitLabel="Save Payment" error={error || undefined}>
+        <Form onSubmit={submit} loading={submitting} submitLabel={viaRazorpay ? 'Pay with Razorpay' : 'Save Payment'} error={error || undefined}>
 
           <Tabs fill value={direction}
             onChange={(k) => { setDirection(k); setInvoiceId(''); setPartyId(''); setAmount(''); }}
@@ -139,10 +165,14 @@ function RecordPayment() {
             </Field>
           </Grid>
 
+          {viaRazorpay && (
+            <Notice kind="success">Razorpay opens when you press Pay with Razorpay{razorpay.data?.mode === 'test' ? ' (Test mode, no real money)' : ''}. The payment is recorded on the invoice and in your bank account when it succeeds.</Notice>
+          )}
+
           {(method === 'cash' || method === 'bank') && (
-            <Field label={`${method === 'cash' ? 'Cash' : 'Bank'} account`} required>
-              <Select className="form-input" value={accountId} onChange={(e) => setAccountId(e.target.value)} required>
-                <option value="">{accounts.loading ? 'Loading accounts…' : 'Select account…'}</option>
+            <Field label={`${method === 'cash' ? 'Cash' : 'Bank'} account`} required={method === 'bank'} hint={method === 'cash' ? 'Optional: leave empty for cash in hand' : undefined}>
+              <Select className="form-input" value={accountId} onChange={(e) => setAccountId(e.target.value)} required={method === 'bank'}>
+                <option value="">{accounts.loading ? 'Loading accounts…' : method === 'cash' ? 'Cash in hand (no account)' : 'Select account…'}</option>
                 {paymentAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
               </Select>
               {!!accounts.error && <p className="form-hint">Could not load accounts. Refresh the page and try again.</p>}

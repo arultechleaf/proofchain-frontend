@@ -114,7 +114,7 @@ export function useInvoiceCreateController(type: InvoiceScreen) {
     [],
   );
   // With Razorpay set up, choosing UPI on a sale means "pay online": the sale is saved, then Razorpay Checkout opens.
-  const razorpay = useAsync<{ enabled: boolean } | null>(async () => { try { return (await razorpayApi.config()).data.data; } catch { return null; } }, []);
+  const razorpay = useAsync<{ enabled: boolean; mode?: 'test' | 'live' } | null>(async () => { try { return (await razorpayApi.config()).data.data; } catch { return null; } }, []);
   const items = useAsync<Item[]>(async () => (await itemsApi.list({ limit: 500 })).data.data, []);
   // The next number and the seller's GSTIN both come from the database.
   const context = useAsync<InvoiceContext | null>(async () => {
@@ -202,9 +202,9 @@ export function useInvoiceCreateController(type: InvoiceScreen) {
   const online = sale && paymentType === 'upi' && !!razorpay.data?.enabled;
   // load checkout.js as soon as UPI is chosen, so the window opens without a delay after saving
   useEffect(() => { if (online) loadRazorpayCheckout().catch(() => undefined); }, [online]);
-  // a single bank account is chosen for the user
+  // the first bank account is chosen for the user (no extra fields are shown when UPI is clicked)
   const bankAccounts = (accounts.data ?? []).filter((a) => a.accountType === 'bank');
-  if (online && !accountId && bankAccounts.length === 1) setAccountId(String(bankAccounts[0].id));
+  if (online && !accountId && bankAccounts.length > 0) setAccountId(String(bankAccounts[0].id));
   // what Razorpay is asked to collect now: the full total unless the user types a smaller amount
   const onlineAmount = round2(receivedTouched ? num(receivedText) : totals.total);
   const received = paymentType === 'credit' || online ? 0 : receivedTouched ? num(receivedText) : totals.total;
@@ -236,8 +236,8 @@ export function useInvoiceCreateController(type: InvoiceScreen) {
     if (online && onlineAmount > totals.total + 0.004) return 'The online amount cannot be more than the grand total';
     if (received < 0) return 'Amount received cannot be negative';
     if (received > totals.total + 0.004) return 'Amount received cannot be more than the grand total';
-    if (received > 0 && (paymentType === 'cash' || paymentType === 'bank') && !accountId) {
-      return `Select a ${paymentType} account for this payment`;
+    if (received > 0 && paymentType === 'bank' && !accountId) {
+      return 'Select a bank account for this payment';
     }
     return '';
   };
@@ -378,6 +378,7 @@ export function useInvoiceCreateController(type: InvoiceScreen) {
     upiId: companySettings.data?.upiId ?? null,
     upiPayee: companySettings.data?.accountHolder || companySettings.data?.bankName || 'ProofChain',
     /** UPI chosen but Razorpay keys are missing on the server, so no payment window can open. */
+    razorpayMode: razorpay.data?.mode ?? null,
     razorpayOff: sale && paymentType === 'upi' && !razorpay.loading && !razorpay.data?.enabled,
     loading: parties.loading || items.loading,
     parties: partyList, items: itemList,

@@ -4,7 +4,7 @@
 import { ArrowLeftRight, Banknote, Landmark, Plus, Wallet } from 'lucide-react';
 import { formatDay, formatMoney } from '@/lib/utils';
 import {
-  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, Form, actionsColumn, Select
+  Card, Column, DataTable, EmptyState, Field, Grid, Notice, Page, PageHeader, Pager, RowActions, StatCard, Form, actionsColumn, Select, BankIcon
 } from '@/components/ui';
 import { useCashBankController } from '@/controllers/cash-bank.controller';
 import { TX_LABEL, type BankTransaction } from '@/models/cash-bank';
@@ -12,7 +12,7 @@ import { TX_LABEL, type BankTransaction } from '@/models/cash-bank';
 function buildColumns(writable: boolean, remove: (t: BankTransaction) => void): Column<BankTransaction>[] {
   return [
   { header: 'Date', cell: (t) => formatDay(t.transactionDate) },
-  { header: 'Account', cell: (t) => t.accountName },
+  { header: 'Account', cell: (t) => <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}><BankIcon name={t.accountName} size={22} />{t.accountName}</span> },
   { header: 'Type', cell: (t) => <span style={{ color: TX_LABEL[t.type].color, fontWeight: 600 }}>{TX_LABEL[t.type].label}</span> },
   {
     header: 'Details',
@@ -81,7 +81,10 @@ export default function CashBankPage() {
           <Form onSubmit={() => c.submitAccount()} loading={c.saving} submitLabel={c.editingAccountId ? 'Save changes' : 'Create account'} onCancel={c.closeForm}>
             <Grid cols={4}>
               <Field label="Name" required>
-                <input className="form-input" value={c.account.name} onChange={(e) => c.setAccount({ ...c.account, name: e.target.value })} placeholder="HDFC Current" required />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <BankIcon name={c.account.name} type={c.account.accountType} size={36} />
+                  <input className="form-input" value={c.account.name} onChange={(e) => c.setAccount({ ...c.account, name: e.target.value })} placeholder="HDFC Current" required />
+                </div>
               </Field>
               <Field label="Type">
                 <Select className="form-input" disabled={!!c.editingAccountId} value={c.account.accountType} onChange={(e) => c.setAccount({ ...c.account, accountType: e.target.value as 'cash' | 'bank' })}>
@@ -159,15 +162,19 @@ export default function CashBankPage() {
 
       <h2 className="card-title" style={{ marginBottom: 12 }}>Accounts</h2>
       {!c.accountsLoading && (a?.rows.length ?? 0) === 0 ? (
+        <>
         <EmptyState icon={Landmark} title="No accounts yet — create your cash drawer or a bank account to begin" />
+          {c.canWrite && <button type="button" className="add-account-card" style={{ marginTop: 14, maxWidth: 340 }} onClick={() => c.openForm('account')}><span className="add-account-plus"><Plus size={20} /></span>Add new account</button>}
+        </>
       ) : (
         <div className="stat-grid" style={{ marginBottom: 28 }}>
           {(a?.rows ?? []).map((x) => (
             <div key={x.id} className={`glass-card account-card${x.isActive ? '' : ' is-inactive'}`}>
               <div className="account-card-top">
-                <p className="account-card-name">
-                  {x.accountType === 'cash' ? <Banknote size={14} color="#34d399" /> : <Landmark size={14} color="#22d3ee" />} {x.name}
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                  <BankIcon name={x.name} type={x.accountType} size={40} />
+                  <p className="account-card-name">{x.name}</p>
+                </div>
                 {c.canWrite && (
                   <RowActions
                     edit={() => c.startEditAccount(x)}
@@ -191,6 +198,12 @@ export default function CashBankPage() {
               </div>
             </div>
           ))}
+          {c.canWrite && (
+            <button type="button" className="add-account-card" onClick={() => { c.openForm('account'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+              <span className="add-account-plus"><Plus size={20} /></span>
+              Add new account
+            </button>
+          )}
         </div>
       )}
 
