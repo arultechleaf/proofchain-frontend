@@ -187,6 +187,7 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
               <div className="topnav-account-menu" role="menu" aria-label="User account">
                 <div className="topnav-account-menu-user">
                   <strong>{user.name}</strong>
+                  <span>User ID: {user.id}</span>
                   <span>{user.email}</span>
                   <span>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</span>
                 </div>
