@@ -65,10 +65,13 @@ const variantClass: Record<ToastVariant, string> = {
   warning: styles.toast_warning,
 };
 
-const Toaster = ({ title, message, variant = "info", duration = 4000, onClose }: ToasterProps) => {
+const Toaster = ({ title, message, variant = "info", duration = 30000, onClose }: ToasterProps) => {
   // keeps the timer from restarting when the parent re-renders
   const closeRef = useRef(onClose);
-  closeRef.current = onClose;
+
+  useEffect(() => {
+    closeRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!duration) return;
@@ -97,6 +100,11 @@ const Toaster = ({ title, message, variant = "info", duration = 4000, onClose }:
         <button type="button" className={`${styles.toast_close}`} aria-label="Close" onClick={onClose}>
           <CloseIcon />
         </button>
+        {duration > 0 && (
+          <div className={styles.toast_progress_track} aria-hidden="true">
+            <div className={styles.toast_progress} style={{ animationDuration: `${duration}ms` }} />
+          </div>
+        )}
       </div>
     </div>
   );

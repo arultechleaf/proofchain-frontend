@@ -31,40 +31,6 @@
   position: relative;
   width: var(--pagination-select-width);
 }
-.custom_pagination_select {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 100%;
-  height: var(--pagination-btn-size);
-  padding: 0 var(--space-6) 0 var(--space-3);
-  background-color: var(--bg-surface);
-  border: var(--border-width) solid var(--pagination-border);
-  border-radius: var(--radius-md);
-  font-family: inherit;
-  font-size: var(--fs-sm);
-  color: var(--text-body);
-  cursor: pointer;
-  transition: border-color var(--transition-fast),
-              box-shadow var(--transition-fast);
-}
-.custom_pagination_select:hover {
-  border-color: var(--border-input-active);
-}
-.custom_pagination_select:focus-visible {
-  outline: none;
-  border-color: var(--border-focus);
-  box-shadow: var(--shadow-focus);
-}
-.custom_pagination_select_icon {
-  position: absolute;
-  top: 50%;
-  right: var(--space-3);
-  width: var(--icon-xs);
-  height: var(--icon-xs);
-  color: var(--color-gray-600);
-  transform: translateY(-50%);
-  pointer-events: none;
-}
 
 /* ---------- Page buttons (numbers + arrows) ---------- */
 .custom_pagination_btn {

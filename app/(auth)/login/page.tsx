@@ -15,7 +15,7 @@ interface LoginForm {
 }
 
 const DEV_CREDENTIALS = [
-  { label: 'Admin',     email: 'admin@proofchain.dev',  password: 'Admin@123456' },
+  { label: 'Admin',     email: 'admin1@yopmail.com',  password: 'Admin@123456' },
   { label: 'Company A', email: 'alice@companya.dev',    password: 'Alice@123456' },
   { label: 'Company B', email: 'bob@companyb.dev',      password: 'Bob@123456' },
   { label: 'Auditor',   email: 'carol@auditor.dev',     password: 'Carol@123456' },

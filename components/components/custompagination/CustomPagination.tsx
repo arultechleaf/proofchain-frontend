@@ -28,12 +28,6 @@ const ChevronRight = () => (
     <path d="M6 3l5 5-5 5" />
   </svg>
 );
-const ChevronDown = () => (
-  <svg className={`${styles.custom_pagination_select_icon}`} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M3 6l5 5 5-5" />
-  </svg>
-);
-
 /* ---------- Which page buttons to show ----------
    7 slots at most, so the bar never jumps in width:
    - 7 pages or fewer      -> 1 2 3 4 5 6 7
@@ -91,19 +85,13 @@ const CustomPagination = ({
       <div className={`${styles.custom_pagination_rows}`}>
         <label htmlFor="custom-pagination-size">Rows per page:</label>
         <div className={`${styles.custom_pagination_select_wrap}`}>
-          <Select
-            id="custom-pagination-size"
-            className={`${styles.custom_pagination_select}`}
-            value={pageSize}
-            onChange={(e) => changeSize(Number(e.target.value))}
-          >
+          <Select id="custom-pagination-size" value={pageSize} onChange={(e) => changeSize(Number(e.target.value))}>
             {sizes.map((size) => (
               <option key={size} value={size}>
                 {size}
               </option>
             ))}
           </Select>
-          <ChevronDown />
         </div>
       </div>
 

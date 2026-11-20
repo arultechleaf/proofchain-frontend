@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { authApi, rolesApi, session } from './api';
 import { setScreens, type ScreenAccess } from './access';
 import type { User } from '@/models';
+import Toaster from '@/components/components/toaster/Toaster';
 
 interface AuthState {
   user: User | null;
@@ -29,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [access, setAccess] = useState<{ token: string; screens: ScreenAccess[] | null } | null>(null);
+  const [loginNotice, setLoginNotice] = useState<{ title: string; message: string } | null>(null);
 
   useEffect(() => {
     const storedToken = session.getToken();
@@ -80,6 +82,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     session.save(accessToken, userData);
     setToken(accessToken);
     setUser(userData);
+    setLoginNotice({
+      title: `Welcome, ${userData.name}!`,
+      message: 'Login successful.',
+    });
     return userData as User;
   };
 
@@ -103,6 +109,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{ user, token, isLoading, isAuthenticated: !!user, screens, accessLoading, login, applySession, refreshScreens, logout }}
     >
       {children}
+      {loginNotice && (
+        <Toaster
+          key={`${loginNotice.title}:${loginNotice.message}`}
+          title={loginNotice.title}
+          message={loginNotice.message}
+          variant="success"
+          onClose={() => setLoginNotice(null)}
+        />
+      )}
     </AuthContext.Provider>
   );
 }

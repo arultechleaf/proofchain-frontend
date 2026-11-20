@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, LogOut } from 'lucide-react';
 import { MenuToggle } from './MenuToggle';
 import { LiveClock } from './LiveClock';
 import { useAuth } from '@/lib/auth';
@@ -77,9 +78,27 @@ interface TopNavProps {
 }
 
 export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
   const crumbLabels = useCrumbLabels();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!userMenuRef.current?.contains(event.target as Node)) setUserMenuOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setUserMenuOpen(false);
+    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('mousedown', closeOnOutsideClick);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [userMenuOpen]);
 
   const crumbs = pathname
     .split('/')
@@ -105,9 +124,7 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
       backdropFilter: 'blur(12px)',
       flexShrink: 0,
     }}>
-      {/* Mobile menu */}
-      <span className="only-mobile" style={{ display: 'none' }}><MenuToggle open={!menuCollapsed} onClick={onMenuToggle} /></span>
-      <img src="/A_logo.svg" alt="Inventory Audit" className="only-desktop topnav-logo" />
+      <MenuToggle open={!menuCollapsed} onClick={onMenuToggle} />
 
       {/* Breadcrumbs */}
       <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, flex: 1, overflow: 'hidden' }}>
@@ -146,20 +163,44 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
 
         {/* User chip */}
         {user && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 8 }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: 9, flexShrink: 0,
-              background: 'linear-gradient(135deg, #16a34a, #166534)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 14, fontWeight: 700,
-            }}>
-              {user.name[0]?.toUpperCase()}
-            </div>
-            <div className="topnav-user-text" style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 1, textAlign: "left", whiteSpace: "nowrap" }}>
-              <p style={{ color: '#e8efeb', fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.2 }}>{user.name}</p>
-              <p style={{ color: ROLE_COLORS[user.role] ?? '#7b8a82', fontSize: 10, margin: 0, lineHeight: 1.3 }}>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</p>
-              <LiveClock style={{ color: '#7b8a82', fontSize: 10, margin: 0, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }} />
-            </div>
+          <div className="topnav-account" ref={userMenuRef}>
+            <button
+              type="button"
+              className="topnav-account-trigger"
+              aria-haspopup="menu"
+              aria-expanded={userMenuOpen}
+              onClick={() => setUserMenuOpen((open) => !open)}
+            >
+              <span className="topnav-account-avatar">{user.name[0]?.toUpperCase()}</span>
+              <span className="topnav-user-text">
+                <span className="topnav-account-name">{user.name}</span>
+                <span className="topnav-account-role" style={{ color: ROLE_COLORS[user.role] ?? '#7b8a82' }}>
+                  {ROLE_LABELS[user.role] ?? roleLabel(user.role)}
+                </span>
+                <span className="topnav-account-clock">
+                  <LiveClock style={{ color: '#7b8a82', fontSize: 10, margin: 0, lineHeight: 1.3, fontVariantNumeric: 'tabular-nums' }} />
+                </span>
+              </span>
+              <ChevronDown size={15} className="topnav-account-chevron" aria-hidden />
+            </button>
+            {userMenuOpen && (
+              <div className="topnav-account-menu" role="menu" aria-label="User account">
+                <div className="topnav-account-menu-user">
+                  <strong>{user.name}</strong>
+                  <span>{user.email}</span>
+                  <span>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</span>
+                </div>
+                <button
+                  type="button"
+                  className="topnav-account-logout"
+                  role="menuitem"
+                  onClick={() => { setUserMenuOpen(false); void logout(); }}
+                >
+                  <LogOut size={16} aria-hidden />
+                  <span>Log out</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -8,6 +8,7 @@ import { PAGE_SIZES, usePageSize } from '@/lib/usePageSize';
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { AlertCircle, ArrowLeft, CheckCircle2, Eye, Info, Loader2, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
 import { statusColor, statusLabel } from '@/lib/utils';
+import { Select } from './Select';
 
 /* ── Layout ─────────────────────────────────────────────────────────────── */
 /* Styles for everything in this file live in app/globals.css. */
@@ -540,9 +541,9 @@ export function Pager({ page, total, limit, onPage, onLimit }: {
         {onLimit && (
           <label className="pager-rows">
             Rows
-            <select className="pager-select" value={limit} onChange={(e) => { onLimit(Number(e.target.value)); onPage(1); }} aria-label="Rows per page">
+            <Select value={limit} onChange={(e) => { onLimit(Number(e.target.value)); onPage(1); }} aria-label="Rows per page">
               {sizes.map((n) => <option key={n} value={n}>{n}</option>)}
-            </select>
+            </Select>
           </label>
         )}
       </div>

@@ -1,6 +1,7 @@
 
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
@@ -13,7 +14,6 @@ import {
   ClipboardList,
   Building2,
   Settings,
-  LogOut,
   Users,
   Boxes,
   Receipt,
@@ -36,7 +36,6 @@ import {
 } from 'lucide-react';
 import type { ElementType } from 'react';
 import { useAuth } from '@/lib/auth';
-import { MenuToggle } from './MenuToggle';
 import { canView, matchScreen } from '@/lib/access';
 
 interface NavItem {
@@ -269,12 +268,11 @@ const GROUPED_ITEMS = (() => {
 
 interface SidebarProps {
   collapsed: boolean;
-  onToggle: () => void;
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout, screens } = useAuth();
+  const { user, screens } = useAuth();
 
   // The menu is built from the screens this user may open (role_permissions in MySQL); the built-in role lists
   // are only a fallback if that list could not be loaded.
@@ -327,28 +325,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          padding: '18px 14px 16px',
+          justifyContent: collapsed ? 'center' : undefined,
+          padding: collapsed ? '18px 12px 16px' : '18px 14px 16px',
           borderBottom: '1px solid rgba(34, 197, 94,0.1)',
           flexShrink: 0,
         }}
       >
-        {/* Desktop: the menu button lives here. Phones: it stays in the top bar, so the logo is shown instead. */}
-        <span className="only-desktop"><MenuToggle open={!collapsed} onClick={onToggle} /></span>
-        <span className="only-mobile" style={{ display: 'none' }}>
-          <img
-            src="/A_logo.svg"
-            alt="Inventory Audit"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10,
-              flexShrink: 0,
-              objectFit: 'contain',
-              background: '#fff',
-              boxShadow: '0 0 20px rgba(34,168,102,0.35)',
-            }}
-          />
-        </span>
+        <Image src="/A_logo.svg" alt="Inventory Audit" width={40} height={40} className="sidebar-brand-logo" />
 
         {!collapsed && (
           <div style={{ overflow: 'hidden', flex: 1, minWidth: 0 }}>
@@ -494,48 +477,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      {/* Sign Out */}
-      <div
-        style={{
-          padding: 6,
-          borderTop: '1px solid rgba(34, 197, 94,0.08)',
-          flexShrink: 0,
-        }}
-      >
-        <button
-          type="button"
-          onClick={logout}
-          title={collapsed ? 'Sign Out' : undefined}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            width: '100%',
-            padding: collapsed ? '9px 0' : '9px 10px',
-            borderRadius: 8,
-            background: 'transparent',
-            border: 'none',
-            color: '#55655d',
-            cursor: 'pointer',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            fontSize: 13,
-            fontWeight: 500,
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={(event) => {
-            event.currentTarget.style.background =
-              'rgba(239,68,68,0.1)';
-            event.currentTarget.style.color = '#f87171';
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.background = 'transparent';
-            event.currentTarget.style.color = '#55655d';
-          }}
-        >
-          <LogOut size={16} style={{ flexShrink: 0 }} />
-          {!collapsed && <span>Sign Out</span>}
-        </button>
-      </div>
     </aside>
   );
 }

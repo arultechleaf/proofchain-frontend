@@ -59,10 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'transparent' }}>
       {/* Sidebar */}
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+      <Sidebar collapsed={sidebarCollapsed} />
 
       <div className="sidebar-backdrop" data-open={!sidebarCollapsed} onClick={() => setSidebarCollapsed(true)} aria-hidden="true" />
 
