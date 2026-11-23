@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { ChevronDown, ChevronRight, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { ChevronDown, ChevronRight, KeyRound, LogOut, Settings, UserRound } from 'lucide-react';
 import { MenuToggle } from './MenuToggle';
 import { LiveClock } from './LiveClock';
 import { useAuth } from '@/lib/auth';
@@ -187,10 +188,41 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
               <div className="topnav-account-menu" role="menu" aria-label="User account">
                 <div className="topnav-account-menu-user">
                   <strong>{user.name}</strong>
-                  <span>User ID: {user.id}</span>
                   <span>{user.email}</span>
-                  <span>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</span>
+                  <span className="topnav-account-menu-meta">
+                    {[user.company?.name, ROLE_LABELS[user.role] ?? roleLabel(user.role)].filter(Boolean).join(' · ')}
+                  </span>
+                  <span className="topnav-account-menu-id">User ID: {user.id}</span>
                 </div>
+                <nav className="topnav-account-menu-actions" aria-label="Account actions">
+                  <Link
+                    href="/profile"
+                    className="topnav-account-menu-link"
+                    role="menuitem"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <UserRound size={16} aria-hidden />
+                    <span>My Profile</span>
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="topnav-account-menu-link"
+                    role="menuitem"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <Settings size={16} aria-hidden />
+                    <span>Settings</span>
+                  </Link>
+                  <Link
+                    href="/change-password"
+                    className="topnav-account-menu-link"
+                    role="menuitem"
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <KeyRound size={16} aria-hidden />
+                    <span>Change Password</span>
+                  </Link>
+                </nav>
                 <button
                   type="button"
                   className="topnav-account-logout"

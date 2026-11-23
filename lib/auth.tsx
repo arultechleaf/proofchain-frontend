@@ -115,6 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           title={loginNotice.title}
           message={loginNotice.message}
           variant="success"
+          duration={10000}
+          compact
           onClose={() => setLoginNotice(null)}
         />
       )}

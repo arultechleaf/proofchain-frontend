@@ -11,6 +11,7 @@ type ToasterProps = {
   variant?: ToastVariant;
   /** Milliseconds before it closes itself. Use 0 to keep it open. */
   duration?: number;
+  compact?: boolean;
   onClose: () => void;
 };
 
@@ -65,7 +66,7 @@ const variantClass: Record<ToastVariant, string> = {
   warning: styles.toast_warning,
 };
 
-const Toaster = ({ title, message, variant = "info", duration = 30000, onClose }: ToasterProps) => {
+const Toaster = ({ title, message, variant = "info", duration = 30000, compact = false, onClose }: ToasterProps) => {
   // keeps the timer from restarting when the parent re-renders
   const closeRef = useRef(onClose);
 
@@ -85,6 +86,7 @@ const Toaster = ({ title, message, variant = "info", duration = 30000, onClose }
         className={[
           `${styles.toast}`,
           variantClass[variant],
+          compact ? styles.toast_compact : '',
         ]
           .filter(Boolean)
           .join(" ")}
@@ -101,8 +103,11 @@ const Toaster = ({ title, message, variant = "info", duration = 30000, onClose }
           <CloseIcon />
         </button>
         {duration > 0 && (
-          <div className={styles.toast_progress_track} aria-hidden="true">
-            <div className={styles.toast_progress} style={{ animationDuration: `${duration}ms` }} />
+          <div className={styles.toast_timeline_track} aria-hidden="true">
+            <div
+              className={styles.toast_timeline}
+              style={{ animationDuration: `${duration}ms` }}
+            />
           </div>
         )}
       </div>
