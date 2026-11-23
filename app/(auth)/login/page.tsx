@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Mail, Eye, EyeOff, Loader2, AlertCircle, ChevronRight } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, AlertCircle, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { apiError } from '@/lib/utils';
+import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 
 interface LoginForm {
   email: string;
@@ -171,7 +172,7 @@ export default function LoginPage() {
               className="btn btn-primary auth-submit"
             >
               {loading
-                ? <><Loader2 className="animate-spin" /> Signing in...</>
+                ? <><LoadSpinner size="sm" /> Signing in...</>
                 : <><ChevronRight /> Sign In</>
               }
             </button>

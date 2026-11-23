@@ -6,7 +6,8 @@ import { setCrumbLabel } from '@/lib/breadcrumb';
 import { createPortal } from 'react-dom';
 import { PAGE_SIZES, usePageSize } from '@/lib/usePageSize';
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
-import { AlertCircle, ArrowLeft, CheckCircle2, Eye, Info, Loader2, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Eye, Info, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
+import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 import { statusColor, statusLabel } from '@/lib/utils';
 import { Select } from './Select';
 
@@ -18,10 +19,10 @@ export function Page({ children, narrow }: { children: React.ReactNode; narrow?:
 }
 
 export function PageHeader({
-  title, backHref, actions,
+  title, actions,
 }: {
   title: string;
-  /** Accepted for compatibility but no longer shown under the title. */
+  /** Retained for page compatibility; navigation is provided by the sidebar and breadcrumbs. */
   subtitle?: React.ReactNode;
   backHref?: string;
   actions?: React.ReactNode;
@@ -32,11 +33,6 @@ export function PageHeader({
   return (
     <div className="page-header">
       <div className="page-header-main">
-        {backHref && (
-          <Link href={backHref} className="page-header-back" aria-label="Back">
-            <ArrowLeft size={16} />
-          </Link>
-        )}
         <div>
           <h1 className="page-title">{title}</h1>
         </div>
@@ -128,7 +124,8 @@ export function StatusBadge({ status }: { status: string }) {
 export function Spinner({ label }: { label?: string }) {
   return (
     <div className="spinner-block">
-      <Loader2 size={18} className="spin" /> {label ?? 'Loading...'}
+      <LoadSpinner />
+      <span>{label ?? 'Loading...'}</span>
     </div>
   );
 }
@@ -211,7 +208,7 @@ export function SubmitButton({
 }) {
   return (
     <button type={type} onClick={onClick} disabled={loading || disabled} className="btn btn-primary btn-block">
-      {loading && <Loader2 size={15} className="spin" />}
+      {loading && <LoadSpinner size="sm" />}
       {children}
     </button>
   );
@@ -274,7 +271,7 @@ export function Button({
   const iconSize = size === 'sm' ? 14 : 15;
   return (
     <button type={type} className={classes} disabled={disabled || loading} aria-busy={loading || undefined} {...rest}>
-      {loading ? <Loader2 size={iconSize} className="spin" /> : Icon ? <Icon size={iconSize} className={iconSpin ? 'spin' : undefined} /> : null}
+      {loading ? <LoadSpinner size="sm" /> : Icon ? <Icon size={iconSize} className={iconSpin ? 'spin' : undefined} /> : null}
       {children}
     </button>
   );

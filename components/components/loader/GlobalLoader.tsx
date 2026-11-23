@@ -16,7 +16,7 @@ export default function GlobalLoader() {
  
   return (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/30">
-      <LoadingSpinner />
+      <LoadingSpinner size="lg" />
     </div>
   );
 }

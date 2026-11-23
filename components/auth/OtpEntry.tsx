@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
+import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 
 export type OtpStatus = 'idle' | 'verifying' | 'success';
 
@@ -89,7 +90,7 @@ export function OtpEntry({ value, onChange, onComplete, status = 'idle', length 
       )}
       {status === 'verifying' && (
         <div className="otp-state">
-          <Loader2 size={40} className="otp-spinner" />
+          <LoadSpinner size="lg" />
           <p className="otp-title">Verifying...</p>
         </div>
       )}

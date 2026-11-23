@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, Award, Check, CheckCircle2, Copy, Hash, Loader2, Package, ShieldCheck, X, XCircle } from 'lucide-react';
+import { ArrowRight, Award, Check, CheckCircle2, Copy, Hash, Package, ShieldCheck, X, XCircle } from 'lucide-react';
 import { deliveriesApi, approvalsApi, verificationApi } from '@/lib/api';
 import type { Delivery, Approval, ProofRecord, VerificationResult } from '@/models';
 import { formatDate, formatRelative, statusColor, statusLabel, copyToClipboard } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
 import { canUse } from '@/lib/roles';
 import { Button, Card, EmptyState, KeyValue, Page, PageHeader, Spinner, StatusBadge, Tabs } from '@/components/ui';
+import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 
 /** A long hash or address: monospace, wraps instead of overflowing, with a copy button. */
 function HashValue({ text }: { text: string }) {
@@ -204,7 +205,7 @@ export default function DeliveryDetailPage() {
                 )}
               </div>
               <button type="button" className="dd-btn dd-btn-primary" onClick={handleVerify} disabled={verifying}>
-                {verifying ? <><Loader2 size={15} className="spin" /> Verifying…</> : 'Verify proof'}
+                {verifying ? <><LoadSpinner size="sm" /> Verifying…</> : 'Verify proof'}
               </button>
               <Link href={`/deliveries/${id}/proof`} className="dd-btn dd-btn-outline"><Award size={15} /> Proof certificate</Link>
               {verResult && (

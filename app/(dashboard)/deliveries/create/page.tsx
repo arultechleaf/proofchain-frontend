@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, ChevronRight, Loader2, Check, AlertCircle, ArrowLeft, Building2 } from 'lucide-react';
+import { Package, ChevronRight, Check, AlertCircle, Building2 } from 'lucide-react';
+import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 import { deliveriesApi, companiesApi } from '@/lib/api';
 import type { Company } from '@/models';
 import { useAuth } from '@/lib/auth';
@@ -70,9 +71,6 @@ export default function CreateDeliveryPage() {
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link href="/deliveries" className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Create Delivery</h1>
         </div>
@@ -154,7 +152,7 @@ export default function CreateDeliveryPage() {
             <div className="flex gap-3 pt-2">
               <button onClick={() => setStep(0)} className="btn btn-secondary flex-1">Back</button>
               <button onClick={handleSubmit(onSubmit)} disabled={isLoading} className="btn btn-primary flex-1">
-                {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : <><Check className="w-4 h-4" /> Confirm & Submit</>}
+                {isLoading ? <><LoadSpinner size="sm" /> Submitting...</> : <><Check className="w-4 h-4" /> Confirm & Submit</>}
               </button>
             </div>
           </motion.div>

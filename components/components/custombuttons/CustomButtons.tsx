@@ -78,7 +78,7 @@ const CustomButton = ({
       {loading ? (
         <>
           <span className={styles.custom_button_loading_content}>
-          <LoadSpinner />
+          <LoadSpinner size="sm" />
           <span>{loadingText}</span> {/* when loading, show the loading text instead of children */}
           </span>
         </>

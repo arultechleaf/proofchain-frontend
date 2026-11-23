@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
 import { IgnoreExtensionErrors } from '@/components/layout/IgnoreExtensionErrors';
+import GlobalLoader from '@/components/components/loader/GlobalLoader';
 
 export const metadata: Metadata = {
   title: 'ProofChain — Blockchain Delivery Verification',
@@ -22,7 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="bg-grid antialiased">
         <IgnoreExtensionErrors />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <GlobalLoader />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

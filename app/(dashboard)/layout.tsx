@@ -9,7 +9,7 @@ import { AccessDenied } from '@/components/layout/AccessDenied';
 import { Footer } from '@/components/layout/Footer';
 import { canView, matchScreen } from '@/lib/access';
 import { useAuth } from '@/lib/auth';
-import { Loader2 } from 'lucide-react';
+import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-          <Loader2 style={{ width: 32, height: 32, color: '#3ddc84', animation: 'spin 1s linear infinite' }} />
+          <LoadSpinner size="lg" />
           <p style={{ color: '#55655d', fontSize: 13 }}>Loading ProofChain...</p>
         </div>
       </div>
