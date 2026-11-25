@@ -120,7 +120,7 @@ export default function SettingsPage() {
         )}
         {!razorpay.loading && !razorpay.data?.enabled && (
           <p style={{ color: '#7b8a82', fontSize: 12, margin: '12px 0 0', lineHeight: 1.6 }}>
-            Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in backend/.env, then restart the backend.
+            Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in the backend environment, then restart the backend.
           </p>
         )}
       </div>

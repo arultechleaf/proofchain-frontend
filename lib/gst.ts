@@ -1,6 +1,6 @@
 /**
  * GST invoice arithmetic for the live preview on the invoice form.
- * This is a mirror of backend/src/invoices/gst.ts, which is the authority: the server recalculates
+ * This is a mirror of src/invoices/gst.ts, which is the authority: the server recalculates
  * everything when the invoice is saved. Keep the two in step.
  */
 export type DiscountType = 'amount' | 'percent';
