@@ -13,6 +13,9 @@ const allowedDevOrigins = (process.env.ALLOWED_DEV_ORIGINS ?? '')
 
 const nextConfig: NextConfig = {
   allowedDevOrigins,
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   async rewrites() {
     return [
       {
