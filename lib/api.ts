@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { WalletClaimPage, WalletSummary } from '@/models';
 
 /**
  * Where API calls go. Empty (the default) means same origin: the browser calls /api/... on the
@@ -321,4 +322,19 @@ export const auditApi = {
 // ── Health ────────────────────────────────────────────────────────────────────
 export const healthApi = {
   check: () => api.get('/health'),
+};
+
+export const claimsApi = {
+  wallet: () => api.get<{ data: WalletSummary }>('/claims/wallet'),
+  list: (params?: Params) => api.get<{ data: WalletClaimPage }>('/claims', { params }),
+  create: (data: { requestId: string; amount: number; accountHolderName: string; accountNumber: string; ifsc: string }) => api.post('/claims', data),
+  retry: (claimId: Id) => api.post(`/claims/${claimId}/retry`),
+  refreshStatus: (claimId: Id) => api.post(`/claims/${claimId}/refresh`),
+};
+
+export const walletApi = {
+  adminCredit: (
+    userId: Id,
+    data: { requestId: string; amount: number; reason: string },
+  ) => api.post(`/wallet/users/${userId}/credits`, data),
 };

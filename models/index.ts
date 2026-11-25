@@ -31,6 +31,33 @@ export interface User {
   updatedAt: string;
 }
 
+export type WalletClaimStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+
+export interface WalletClaim {
+  id: number;
+  amount: string;
+  status: WalletClaimStatus;
+  referenceId: string;
+  bankAccountLastFour: string;
+  razorpayFundAccountId: string | null;
+  razorpayPayoutId: string | null;
+  utr: string | null;
+  failureReason: string | null;
+  createdAt: string;
+}
+
+export interface WalletClaimPage {
+  rows: WalletClaim[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface WalletSummary {
+  balance: number;
+  minimumClaimAmount: number;
+}
+
 export interface Company {
   id: number;
   name: string;

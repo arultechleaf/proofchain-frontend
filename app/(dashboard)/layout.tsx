@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -12,23 +12,24 @@ import { useAuth } from '@/lib/auth';
 import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { isAuthenticated, isLoading, accessLoading, screens, user, refreshScreens } = useAuth();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches,
+  );
+  const { isAuthenticated, isLoading, accessLoading, screens, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  // Pick up permission changes an administrator made since the last page: reload the screen list on every page change.
-  const lastRefresh = useRef(0);
+  // Keep the navigation closed by default on phones and tablets, including after viewport resizing.
   useEffect(() => {
-    if (!isAuthenticated || Date.now() - lastRefresh.current < 3000) return;
-    lastRefresh.current = Date.now();
-    void refreshScreens();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, isAuthenticated]);
+    const mobileViewport = window.matchMedia('(max-width: 900px)');
+    const updateSidebarForViewport = () => setSidebarCollapsed(mobileViewport.matches);
+    mobileViewport.addEventListener('change', updateSidebarForViewport);
+    return () => mobileViewport.removeEventListener('change', updateSidebarForViewport);
+  }, []);
 
-  // On phones the sidebar is a slide-over: start closed, and close it again after choosing a page.
+  // On phones and tablets the sidebar is a slide-over: close it after choosing a page.
   useEffect(() => {
-    if (window.matchMedia('(max-width: 768px)').matches) queueMicrotask(() => setSidebarCollapsed(true));
+    if (window.matchMedia('(max-width: 900px)').matches) queueMicrotask(() => setSidebarCollapsed(true));
   }, [pathname]);
 
   useEffect(() => {
@@ -59,13 +60,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'transparent' }}>
       {/* Sidebar */}
-      <Sidebar collapsed={sidebarCollapsed} />
+      <Sidebar collapsed={sidebarCollapsed} onClose={() => setSidebarCollapsed(true)} />
 
       <div className="sidebar-backdrop" data-open={!sidebarCollapsed} onClick={() => setSidebarCollapsed(true)} aria-hidden="true" />
 
       {/* Main area */}
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, overflow: 'hidden' }}>
-        <TopNav menuCollapsed={sidebarCollapsed} onMenuToggle={() => setSidebarCollapsed(!sidebarCollapsed)} />
+        <TopNav menuCollapsed={sidebarCollapsed} onMenuToggle={() => setSidebarCollapsed(collapsed => !collapsed)} />
 
         {/* Page content */}
         <main style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>

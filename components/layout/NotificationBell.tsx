@@ -27,17 +27,29 @@ export function NotificationBell({ enabled }: { enabled: boolean }) {
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const openRef = useRef(open);
   const [unread, setUnread] = useState(0);
   const [items, setItems] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
+  const countRequest = useRef<Promise<void> | null>(null);
 
-  const refreshCount = useCallback(async () => {
-    try {
-      setUnread((await notificationsApi.unreadCount()).data.data.unread ?? 0);
-    } catch {
-      /* the badge is best-effort */
-    }
+  useEffect(() => { openRef.current = open; }, [open]);
+
+  const refreshCount = useCallback(() => {
+    if (countRequest.current) return countRequest.current;
+    const request = notificationsApi.unreadCount()
+      .then((response) => {
+        setUnread(response.data.data.unread ?? 0);
+      })
+      .catch(() => {
+        /* the badge is best-effort */
+      })
+      .finally(() => {
+        if (countRequest.current === request) countRequest.current = null;
+      });
+    countRequest.current = request;
+    return request;
   }, []);
 
   const loadList = useCallback(async () => {
@@ -54,18 +66,33 @@ export function NotificationBell({ enabled }: { enabled: boolean }) {
     }
   }, []);
 
-  // Keep the badge fresh: on every page change, every minute, and when another part of the app changes notifications.
+  // Keep the badge fresh while active without reloading it on every route change.
   useEffect(() => {
     if (!enabled) return;
-    refreshCount();
-    const onChanged = () => { refreshCount(); if (open) loadList(); };
-    const timer = setInterval(refreshCount, 60000);
-    window.addEventListener('notifications:changed', onChanged);
-    return () => {
-      clearInterval(timer);
-      window.removeEventListener('notifications:changed', onChanged);
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const startPolling = () => {
+      if (timer) clearInterval(timer);
+      if (document.visibilityState !== 'visible') return;
+      void refreshCount();
+      timer = setInterval(() => { void refreshCount(); }, 60000);
     };
-  }, [enabled, pathname, open, refreshCount, loadList]);
+    const onChanged = () => {
+      void refreshCount();
+      if (openRef.current) void loadList();
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') startPolling();
+      else if (timer) clearInterval(timer);
+    };
+    startPolling();
+    window.addEventListener('notifications:changed', onChanged);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      if (timer) clearInterval(timer);
+      window.removeEventListener('notifications:changed', onChanged);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, [enabled, refreshCount, loadList]);
 
   // Close on outside click, Escape, or navigating somewhere else.
   useEffect(() => {

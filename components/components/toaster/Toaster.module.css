@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  width: min(420px, calc(100vw - 32px));
 }
 
 .toast {
@@ -147,12 +148,39 @@
 .toast_error   .toast_icon { color: var(--color-danger); }
 .toast_warning .toast_icon { color: var(--color-warning); }
 
+@media (max-width: 960px) {
+  .toast_container {
+    top: max(68px, calc(env(safe-area-inset-top) + 68px));
+    right: 16px;
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+    pointer-events: none;
+  }
+  .toast {
+    max-width: none;
+    gap: 10px;
+    padding: 14px 14px 16px;
+    pointer-events: auto;
+  }
+  .toast_title { font-size: 16px; line-height: 1.35; }
+  .toast_text { font-size: 14px; line-height: 1.45; }
+  .toast_icon { width: 20px; height: 20px; }
+  .toast_close {
+    width: 32px;
+    height: 32px;
+    margin-top: -6px;
+    margin-right: -6px;
+  }
+  .toast_close svg { width: 18px; height: 18px; }
+  .toast_compact { gap: 9px; padding: 12px 12px 14px; }
+  .toast_compact .toast_title { font-size: 15px; }
+  .toast_compact .toast_text { font-size: 13px; }
+}
+
 @media (max-width: 640px) {
-  .toast_container { top: 68px; right: 12px; left: 12px; }
-  .toast { max-width: none; gap: 14px; padding: 22px 20px 24px; }
-  .toast_title { font-size: 20px; }
-  .toast_text { font-size: 16px; }
-  .toast_compact { gap: 12px; padding: 16px; }
-  .toast_compact .toast_title { font-size: 17px; }
-  .toast_compact .toast_text { font-size: 14px; }
+  .toast_container {
+    right: 12px;
+    width: calc(100vw - 24px);
+  }
+  .toast_compact .toast_close { width: 32px; height: 32px; }
 }

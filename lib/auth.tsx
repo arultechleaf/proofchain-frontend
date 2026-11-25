@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { authApi, rolesApi, session } from './api';
 import { setScreens, type ScreenAccess } from './access';
 import type { User } from '@/models';
@@ -31,6 +31,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [access, setAccess] = useState<{ token: string; screens: ScreenAccess[] | null } | null>(null);
   const [loginNotice, setLoginNotice] = useState<{ title: string; message: string } | null>(null);
+  const screenRequests = useRef(new Map<string, Promise<ScreenAccess[]>>());
+
+  const loadScreens = useCallback((accessToken: string) => {
+    const pending = screenRequests.current.get(accessToken);
+    if (pending) return pending;
+
+    const request = rolesApi.mine().then(
+      (res) => res.data.data.screens as ScreenAccess[],
+    );
+    screenRequests.current.set(accessToken, request);
+    const clearRequest = () => {
+      if (screenRequests.current.get(accessToken) === request) {
+        screenRequests.current.delete(accessToken);
+      }
+    };
+    void request.then(clearRequest, clearRequest);
+    return request;
+  }, []);
 
   useEffect(() => {
     const storedToken = session.getToken();
@@ -46,23 +64,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
-    rolesApi.mine()
-      .then((res) => { if (!cancelled) setAccess({ token, screens: res.data.data.screens as ScreenAccess[] }); })
+    loadScreens(token)
+      .then((screens) => { if (!cancelled) setAccess({ token, screens }); })
       .catch(() => { if (!cancelled) setAccess({ token, screens: null }); });
     return () => { cancelled = true; };
-  }, [token]);
+  }, [token, loadScreens]);
 
   // Permissions can change while someone is signed in, so reload the list when the tab gets focus again.
   useEffect(() => {
     if (!token) return;
     const onFocus = () => {
-      rolesApi.mine()
-        .then((res) => setAccess({ token, screens: res.data.data.screens as ScreenAccess[] }))
+      loadScreens(token)
+        .then((screens) => {
+          if (session.getToken() === token) setAccess({ token, screens });
+        })
         .catch(() => { /* keep the list that is already loaded */ });
     };
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
-  }, [token]);
+  }, [token, loadScreens]);
 
   const screens = token && access?.token === token ? access.screens : null;
   const accessLoading = !!token && access?.token !== token;
@@ -71,8 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshScreens = async () => {
     if (!token) return;
     try {
-      const res = await rolesApi.mine();
-      setAccess({ token, screens: res.data.data.screens as ScreenAccess[] });
+      const screens = await loadScreens(token);
+      if (session.getToken() === token) setAccess({ token, screens });
     } catch { /* keep the list that is already loaded */ }
   };
 
