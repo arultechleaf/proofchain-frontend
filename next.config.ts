@@ -2,7 +2,10 @@ import type { NextConfig } from 'next';
 
 // The browser calls /api/... on the frontend's own address; Next.js forwards it to the backend.
 // BACKEND_URL is read on the server only, so it never reaches the browser.
-const BACKEND_URL = (process.env.BACKEND_URL ?? 'http://localhost:3001').replace(/\/+$/, '');
+// Local development sets it in frontend/.env (http://localhost:3002). When it is not set (e.g. on Vercel),
+// requests go to the hosted Render backend. It is read at build time: redeploy after changing it.
+const DEFAULT_BACKEND_URL = 'https://proofchain-backend-nvp1.onrender.com';
+const BACKEND_URL = (process.env.BACKEND_URL || DEFAULT_BACKEND_URL).replace(/\/+$/, '');
 
 // Next.js dev mode only serves its scripts to localhost. To open the dev server from another device
 // (e.g. http://192.168.1.14:3002), list this computer's address here, comma-separated.
