@@ -1441,31 +1441,6 @@ textarea.form-input { resize: none; }
 .forgot-link-row { text-align: right; margin-top: 6px; font-size: 12px; }
 .uppercase-input { text-transform: uppercase; }
 
-/* Development accounts (login) */
-.dev-accounts { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(40, 56, 48,0.6); }
-.dev-accounts-title {
-  font-size: 11px; color: #55655d; text-align: center; margin-bottom: 12px;
-  text-transform: uppercase; letter-spacing: 0.06em;
-}
-.dev-accounts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.dev-account-btn {
-  text-align: left; padding: 10px 12px; border-radius: 10px; cursor: pointer;
-  background: rgba(17, 24, 21,0.6); border: 1px solid rgba(40, 56, 48,0.5); transition: border-color 0.15s;
-}
-.dev-account-btn:hover { border-color: rgba(123, 138, 130,0.7); }
-.dev-account-label { display: block; font-size: 12px; font-weight: 500; color: #c5d1ca; }
-.dev-account-email {
-  display: block; font-size: 11px; color: #55655d;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-/* on the white auth card */
-.auth-card .dev-accounts { border-top-color: #e8efeb; }
-.auth-card .dev-accounts-title { color: #7b8a82; }
-.auth-card .dev-account-btn { background: #f5f8f6; border-color: #c5d1ca; }
-.auth-card .dev-account-btn:hover { border-color: #15803d; }
-.auth-card .dev-account-label { color: #18221d; }
-.auth-card .dev-account-email { color: #55655d; }
-
 /* Rows of stat cards: identical columns in every row so the cards line up */
 .stat-grid {
   display: grid;

@@ -15,13 +15,6 @@ interface LoginForm {
   password: string;
 }
 
-const DEV_CREDENTIALS = [
-  { label: 'Admin',     email: 'admin1@yopmail.com',  password: 'Admin@123456' },
-  { label: 'Company A', email: 'alice@companya.dev',    password: 'Alice@123456' },
-  { label: 'Company B', email: 'bob@companyb.dev',      password: 'Bob@123456' },
-  { label: 'Auditor',   email: 'carol@auditor.dev',     password: 'Carol@123456' },
-];
-
 function NetworkNode({ x, y, delay, size = 4 }: { x: number; y: number; delay: number; size?: number }) {
   return (
     <motion.div
@@ -52,7 +45,7 @@ export default function LoginPage() {
   const [error,  setError]    = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginForm>();
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
 
   const onSubmit = async (data: LoginForm) => {
     setError('');
@@ -181,25 +174,6 @@ export default function LoginPage() {
           <p className="auth-footnote spaced">
             New here? <Link href="/register" className="auth-link">Create an account</Link>
           </p>
-
-          {/* Dev credentials */}
-          <div className="dev-accounts">
-            <p className="dev-accounts-title">
-              Development Accounts
-            </p>
-            <div className="dev-accounts-grid">
-              {DEV_CREDENTIALS.map((c) => (
-                <button
-                  key={c.email}
-                  onClick={() => { setValue('email', c.email); setValue('password', c.password); }}
-                  className="dev-account-btn"
-                >
-                  <span className="dev-account-label">{c.label}</span>
-                  <span className="dev-account-email">{c.email}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         <p className="auth-powered">
