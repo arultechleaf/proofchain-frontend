@@ -1,0 +1,169 @@
+/* Welcome-back card, top-right corner.
+   The app's light theme inverts the whole page (html[data-theme='light'] filter), so the card is drawn in
+   its real light colours and inverted back in that theme; the dark theme gets its own dark colours. */
+
+.holder {
+  position: fixed;
+  top: 72px;
+  right: 16px;
+  z-index: 10000;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.card {
+  --wt-bg: #ffffff;
+  --wt-border: #e6e8eb;
+  --wt-text: #111418;
+  --wt-muted: #6b7280;
+  --wt-chip: #f1f2f4;
+  --wt-chip-text: #3f4650;
+  --wt-role: #ece9fb;
+  --wt-role-text: #5140b3;
+
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: min(380px, calc(100vw - 32px));
+  padding: 20px 20px 24px;
+  background: var(--wt-bg);
+  border: 1px solid var(--wt-border);
+  border-radius: 18px;
+  box-shadow: 0 14px 40px rgba(17, 20, 24, 0.14);
+  font-family: var(--font-primary, system-ui, sans-serif);
+  color: var(--wt-text);
+  animation: wt-in 0.35s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+:global(html[data-theme='light']) .card { filter: invert(1) hue-rotate(180deg); }
+
+:global(html:not([data-theme='light'])) .card {
+  --wt-bg: #141b17;
+  --wt-border: rgba(255, 255, 255, 0.1);
+  --wt-text: #eef3f0;
+  --wt-muted: #9aa9a1;
+  --wt-chip: rgba(255, 255, 255, 0.08);
+  --wt-chip-text: #c5d1ca;
+  --wt-role: rgba(124, 108, 240, 0.22);
+  --wt-role-text: #c4bbff;
+}
+
+.avatar {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: #5b45c7;
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.check {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1f7a52;
+  color: #ffffff;
+  border: 3px solid var(--wt-bg);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 15px;
+  color: var(--wt-muted);
+}
+
+.name {
+  margin: 2px 0 10px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--wt-chip);
+  color: var(--wt-chip-text);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.chipRole {
+  background: var(--wt-role);
+  color: var(--wt-role-text);
+}
+
+.close {
+  align-self: flex-start;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -6px -6px 0 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--wt-muted);
+  cursor: pointer;
+}
+.close:hover { background: var(--wt-chip); color: var(--wt-text); }
+
+.track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: transparent;
+}
+
+.bar {
+  height: 100%;
+  background: #22a06b;
+  transform-origin: left center;
+  animation: wt-countdown linear forwards;
+}
+
+@keyframes wt-countdown { to { transform: scaleX(0); } }
+@keyframes wt-in { from { opacity: 0; transform: translateY(-8px) scale(0.98); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .holder { top: 64px; right: 12px; }
+  .card { width: calc(100vw - 24px); padding: 16px 16px 20px; gap: 12px; }
+  .avatar { width: 52px; height: 52px; font-size: 18px; }
+  .name { font-size: 18px; }
+}

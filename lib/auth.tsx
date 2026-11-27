@@ -5,7 +5,7 @@ import { authApi, rolesApi, session } from './api';
 import { setScreens, type ScreenAccess } from './access';
 import { roleLabel } from './utils';
 import type { User } from '@/models';
-import Toaster from '@/components/components/toaster/Toaster';
+import { WelcomeToast } from '@/components/auth/WelcomeToast';
 
 interface AuthState {
   user: User | null;
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [access, setAccess] = useState<{ token: string; screens: ScreenAccess[] | null } | null>(null);
-  const [loginNotice, setLoginNotice] = useState<{ title: string; message: string } | null>(null);
+  const [loginNotice, setLoginNotice] = useState<{ name: string; role: string; id: number | string; at: number } | null>(null);
   const screenRequests = useRef(new Map<string, Promise<ScreenAccess[]>>());
 
   const loadScreens = useCallback((accessToken: string) => {
@@ -103,10 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     session.save(accessToken, userData);
     setToken(accessToken);
     setUser(userData);
-    setLoginNotice({
-      title: `Welcome back, ${userData.name}!`,
-      message: `${roleLabel(userData.role)} · User ID: ${userData.id}`,
-    });
+    setLoginNotice({ name: userData.name, role: roleLabel(userData.role), id: userData.id, at: Date.now() });
     return userData as User;
   };
 
@@ -131,13 +128,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     >
       {children}
       {loginNotice && (
-        <Toaster
-          key={`${loginNotice.title}:${loginNotice.message}`}
-          title={loginNotice.title}
-          message={loginNotice.message}
-          variant="success"
+        <WelcomeToast
+          key={loginNotice.at}
+          name={loginNotice.name}
+          roleLabel={loginNotice.role}
+          userId={loginNotice.id}
           duration={4000}
-          compact
           onClose={() => setLoginNotice(null)}
         />
       )}
