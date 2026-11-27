@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { authApi, rolesApi, session } from './api';
 import { setScreens, type ScreenAccess } from './access';
+import { roleLabel } from './utils';
 import type { User } from '@/models';
 import Toaster from '@/components/components/toaster/Toaster';
 
@@ -103,8 +104,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(accessToken);
     setUser(userData);
     setLoginNotice({
-      title: `Welcome, ${userData.name}!`,
-      message: 'Login successful.',
+      title: `Welcome back, ${userData.name}!`,
+      message: `${roleLabel(userData.role)} · User ID: ${userData.id}`,
     });
     return userData as User;
   };
@@ -135,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           title={loginNotice.title}
           message={loginNotice.message}
           variant="success"
-          duration={10000}
+          duration={4000}
           compact
           onClose={() => setLoginNotice(null)}
         />

@@ -9,9 +9,14 @@
   z-index: 9999;
   display: flex;
   flex-direction: column;
+  /* narrower toasts (compact, e.g. "Welcome back") sit against the right edge, in the corner */
+  align-items: flex-end;
   gap: var(--space-3);
   width: min(420px, calc(100vw - 32px));
 }
+
+.toast_container > .toast { width: 100%; }
+.toast_container > .toast_compact { width: auto; min-width: 240px; }
 
 .toast {
   position: relative;
@@ -30,9 +35,9 @@
 }
 
 .toast_compact {
-  max-width: 420px;
-  gap: 12px;
-  padding: 18px 22px;
+  max-width: 280px;
+  gap: 9px;
+  padding: 11px 12px;
 }
 
 .toast_body {
@@ -112,7 +117,7 @@
   to { transform: scaleX(0); }
 }
 
-.toast_compact .toast_body { gap: 6px; }
+.toast_compact .toast_body { gap: 2px; }
 .toast_compact .toast_title { font-size: 16px; }
 .toast_compact .toast_text { font-size: 13px; line-height: 1.45; }
 .toast_compact .toast_icon { width: 20px; height: 20px; }

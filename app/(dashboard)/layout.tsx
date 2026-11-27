@@ -61,7 +61,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'transparent' }}>
       {/* Sidebar */}
-      <Sidebar collapsed={sidebarCollapsed} />
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        // Choosing a page closes the sidebar on every screen size (desktop: back to icons;
+        // mobile: the drawer hides). A click can target the page that is already open,
+        // so pathname alone is not enough.
+        onNavigate={() => setSidebarCollapsed(true)}
+      />
 
       <div className="sidebar-backdrop" data-open={!sidebarCollapsed} onClick={() => setSidebarCollapsed(true)} aria-hidden="true" />
 

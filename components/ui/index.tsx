@@ -6,7 +6,7 @@ import { setCrumbLabel } from '@/lib/breadcrumb';
 import { createPortal } from 'react-dom';
 import { PAGE_SIZES, usePageSize } from '@/lib/usePageSize';
 import { Children, cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
-import { AlertCircle, CheckCircle2, Eye, Info, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Eye, Info, MoreVertical, Pencil, Search, Trash2 } from 'lucide-react';
 import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 import { statusColor, statusLabel } from '@/lib/utils';
 import { Select } from './Select';
@@ -545,11 +545,11 @@ export function Pager({ page, total, limit, onPage, onLimit }: {
         )}
       </div>
       <nav className="pager-buttons" aria-label="Pagination">
-        <button type="button" className="pager-btn pager-arrow" onClick={() => onPage(page - 1)} disabled={page <= 1} aria-label="Previous page">←</button>
+        <button type="button" className="pager-btn pager-arrow" onClick={() => onPage(page - 1)} disabled={page <= 1} aria-label="Previous page" title="Previous page"><ChevronLeft size={16} aria-hidden="true" /></button>
         {pageList(page, pages).map((n, i) => n === '…'
           ? <span key={`gap${i}`} className="pager-gap">…</span>
           : <button key={n} type="button" className={`pager-btn pager-num${n === page ? ' is-current' : ''}`} onClick={() => onPage(n)} aria-current={n === page ? 'page' : undefined}>{n}</button>)}
-        <button type="button" className="pager-btn pager-arrow" onClick={() => onPage(page + 1)} disabled={page >= pages} aria-label="Next page">→</button>
+        <button type="button" className="pager-btn pager-arrow" onClick={() => onPage(page + 1)} disabled={page >= pages} aria-label="Next page" title="Next page"><ChevronRight size={16} aria-hidden="true" /></button>
       </nav>
     </div>
   );

@@ -65,7 +65,9 @@ export interface UserSubscription {
 }
 
 export interface MySubscription {
-  status: 'none' | 'active' | 'expired';
+  /** exempt = this role never needs a subscription (admin, customer, shop roles). */
+  status: 'none' | 'active' | 'expired' | 'exempt';
+  exempt?: boolean;
   endAt: string | null;
   daysLeft: number;
   expiringSoon: boolean;

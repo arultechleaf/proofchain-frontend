@@ -1654,6 +1654,18 @@ html[data-theme='light'] img, html[data-theme='light'] video, html[data-theme='l
 .topnav-account-menu-user span { overflow: hidden; color: #9aa9a1; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .topnav-account-menu-user .topnav-account-menu-meta { color: #cbd5ce; }
 .topnav-account-menu-user .topnav-account-menu-id { color: #7b8a82; font-size: 11px; }
+.topnav-account-menu > .topnav-account-menu-user,
+.topnav-account-menu-actions { display: none; }
+.topnav-account-menu-summary { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid rgba(34, 197, 94, .12); }
+.topnav-account-menu-summary > span:last-child { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.topnav-account-menu-avatar { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #16a34a, #166534); color: #fff; font-size: 18px; font-weight: 700; }
+.topnav-account-menu-summary strong { color: #e8efeb; font-size: 15px; }
+.topnav-account-menu-role { color: #22c55e; font-size: 12px; font-weight: 600; }
+.topnav-account-details { padding: 14px 16px 12px; }
+.topnav-account-details > p { margin: 0 0 12px; color: #94a3b8; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.topnav-account-details > div { display: flex; align-items: center; gap: 12px; padding: 7px 0; color: #22c55e; }
+.topnav-account-details > div > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: #94a3b8; font-size: 12px; }
+.topnav-account-details strong { overflow: hidden; color: #e8efeb; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .topnav-account-menu-actions { padding: 4px 0; border-top: 1px solid rgba(255, 255, 255, .08); }
 .topnav-account-menu-link {
   display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px;
@@ -2356,11 +2368,15 @@ html[data-theme='light'] body::after { background: radial-gradient(ellipse at ce
 .pager-buttons { align-items: center; gap: 6px; }
 .pager-btn { min-width: 34px; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 13px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #c5d1ca; transition: all .15s; }
 .pager-btn:hover:not(:disabled) { border-color: rgba(61, 220, 132, 0.5); color: #fff; background: rgba(61, 220, 132, 0.08); }
+/* Previous / next: a clear chevron; on the first or last page it stays visible, only dimmed. */
+.pager-arrow { display: inline-flex; align-items: center; justify-content: center; padding: 0; color: #c5d1ca; }
+.pager-arrow svg { width: 16px; height: 16px; stroke-width: 2.4; }
+.pager-btn.pager-arrow:disabled { color: #7b8a82; opacity: 0.55; }
 .pager-btn.is-current { background: linear-gradient(135deg, #3ddc84, #16a34a); border-color: transparent; color: #04140a; font-weight: 700; }
 .pager-gap { color: #7b8a82; padding: 0 2px; }
 
 /* Keep the logo separate in the sidebar and the menu toggle in the top bar on every screen size. */
-.sidebar-brand-logo { width: 40px; height: 40px; border-radius: 10px; object-fit: contain; background: #fff; flex-shrink: 0; box-shadow: 0 0 18px rgba(34, 197, 94, 0.35); }
+.sidebar-brand-logo { width: 40px; height: 40px; object-fit: contain; background: transparent; flex-shrink: 0; box-shadow: none; }
 .only-mobile { display: none !important; }
 @media (max-width: 768px) {
   .only-desktop { display: none !important; }

@@ -14,12 +14,12 @@ const subscribe = (cb: () => void) => {
 const read = (): Theme => (document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
 
 export function ThemeToggle() {
-  const theme = useSyncExternalStore(subscribe, read, () => 'dark' as Theme);
+  const theme = useSyncExternalStore(subscribe, read, () => 'light' as Theme);
   const next: Theme = theme === 'dark' ? 'light' : 'dark';
 
   const toggle = () => {
     document.documentElement.dataset.theme = next;
-    try { localStorage.setItem('theme-v2', next); } catch { /* private mode: still switches for this visit */ }
+    try { localStorage.setItem('theme-v3', next); } catch { /* private mode: still switches for this visit */ }
     window.dispatchEvent(new Event(EVENT));
   };
 

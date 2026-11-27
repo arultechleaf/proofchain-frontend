@@ -29,6 +29,8 @@ export default function SubscriptionPage() {
 
   const s = mine.data;
   const active = s?.status === 'active';
+  // The backend says which roles need no subscription; admin is always one of them.
+  const exempt = isAdmin || s?.status === 'exempt' || !!s?.exempt;
 
   const buy = async (plan: SubscriptionPlan) => {
     setBusyPlan(plan.id);
@@ -113,10 +115,10 @@ export default function SubscriptionPage() {
                 </p>
                 {s.expiringSoon && <p>Your plan ends soon. Renew now: the new plan starts when this one ends, so you lose no days.</p>}
               </>
-            ) : isAdmin ? (
+            ) : exempt ? (
               <>
-                <strong>Administrators do not need a subscription</strong>
-                <p>Manage prices and subscribers on the Subscription Plans page.</p>
+                <strong>{isAdmin ? 'Administrators do not need a subscription' : 'Your account does not need a subscription'}</strong>
+                <p>{isAdmin ? 'Manage prices and subscribers on the Subscription Plans page.' : 'You have full access without a plan.'}</p>
               </>
             ) : (
               <>
@@ -144,7 +146,7 @@ export default function SubscriptionPage() {
               {p.discountPercentage > 0 && <s>{formatMoney(p.price)}</s>}
             </div>
             {p.description && <p className="plan-card-desc"><Check size={14} /> {p.description}</p>}
-            <Button fullWidth icon={CreditCard} loading={busyPlan === p.id} disabled={busyPlan !== null || isAdmin} onClick={() => void buy(p)}>
+            <Button fullWidth icon={CreditCard} loading={busyPlan === p.id} disabled={busyPlan !== null || exempt} onClick={() => void buy(p)}>
               {active ? 'Renew with this plan' : 'Buy now'}
             </Button>
           </div>

@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { ChevronDown, ChevronRight, KeyRound, LogOut, Settings, UserRound } from 'lucide-react';
+import { ChevronDown, ChevronRight, KeyRound, LogOut, Mail, UserRound } from 'lucide-react';
 import { MenuToggle } from './MenuToggle';
 import { LiveClock } from './LiveClock';
 import { useAuth } from '@/lib/auth';
@@ -194,35 +193,19 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
                   </span>
                   <span className="topnav-account-menu-id">User ID: {user.id}</span>
                 </div>
-                <nav className="topnav-account-menu-actions" aria-label="Account actions">
-                  <Link
-                    href="/profile"
-                    className="topnav-account-menu-link"
-                    role="menuitem"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <UserRound size={16} aria-hidden />
-                    <span>My Profile</span>
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="topnav-account-menu-link"
-                    role="menuitem"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <Settings size={16} aria-hidden />
-                    <span>Settings</span>
-                  </Link>
-                  <Link
-                    href="/change-password"
-                    className="topnav-account-menu-link"
-                    role="menuitem"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <KeyRound size={16} aria-hidden />
-                    <span>Change Password</span>
-                  </Link>
-                </nav>
+                <div className="topnav-account-menu-summary">
+                  <span className="topnav-account-menu-avatar">{user.name[0]?.toUpperCase()}</span>
+                  <span>
+                    <strong>{user.name}</strong>
+                    <span className="topnav-account-menu-role">{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</span>
+                  </span>
+                </div>
+                <section className="topnav-account-details" aria-label="Account details">
+                  <p>Account details</p>
+                  <div><UserRound size={18} aria-hidden /><span>Full Name<strong>{user.name}</strong></span></div>
+                  <div><KeyRound size={18} aria-hidden /><span>Designation<strong>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</strong></span></div>
+                  <div><Mail size={18} aria-hidden /><span>Email Address<strong>{user.email}</strong></span></div>
+                </section>
                 <button
                   type="button"
                   className="topnav-account-logout"

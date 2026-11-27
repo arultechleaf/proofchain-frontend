@@ -16,8 +16,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/svg+xml" href="/A_logo.svg" />
-        {/* Apply the saved theme before the first paint so there is no flash. */}
-        <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('theme-v2')==='light')document.documentElement.dataset.theme='light'}catch(e){}" }} />
+        {/* Apply the theme before the first paint so there is no flash: light by default,
+            dark only when the user chose it with the theme button. */}
+        <script dangerouslySetInnerHTML={{ __html: "(function(){var t='light';try{if(localStorage.getItem('theme-v3')==='dark')t='dark'}catch(e){}if(t==='light')document.documentElement.dataset.theme='light'})()" }} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#0b0f0d" />
       </head>
