@@ -54,6 +54,8 @@ export function statusColor(status: string): string {
     cancelled: 'badge-rejected',
     active: 'badge-approved',
     inactive: 'badge-rejected',
+    expired: 'badge-rejected',
+    none: 'badge-pending',
   };
   return map[status?.toLowerCase()] ?? 'badge-pending';
 }

@@ -84,6 +84,11 @@ api.interceptors.response.use(
       && window.location.pathname !== '/change-password') {
       window.location.href = '/change-password';
     }
+    // No running subscription: everything except the subscription page is closed until a plan is bought.
+    if (err.response?.status === 403 && msg.startsWith('SUBSCRIPTION_REQUIRED') && typeof window !== 'undefined'
+      && window.location.pathname !== '/subscription') {
+      window.location.href = '/subscription';
+    }
     if (err.response?.status === 401 && typeof window !== 'undefined' && !onPublicPage) {
       session.clear();
       window.location.href = '/login';
@@ -311,6 +316,29 @@ export const notificationsApi = {
   markAllRead: () => api.post('/notifications/read-all'),
   remove: (id: Id) => api.delete(`/notifications/${id}`),
   clearRead: () => api.delete('/notifications/read'),
+};
+
+// ── Subscriptions ─────────────────────────────────────────────────────────────
+export const subscriptionPlansApi = {
+  /** Plans on sale, at their latest prices. */
+  active: () => api.get('/subscription-plans'),
+  /** Admin: every plan, hidden ones included. */
+  all: () => api.get('/subscription-plans/all'),
+  create: (data: unknown) => api.post('/subscription-plans', data),
+  update: (id: Id, data: unknown) => api.patch(`/subscription-plans/${id}`, data),
+  remove: (id: Id) => api.delete(`/subscription-plans/${id}`),
+  history: (id: Id) => api.get(`/subscription-plans/${id}/history`),
+};
+
+export const subscriptionsApi = {
+  me: () => api.get('/subscriptions/me'),
+  order: (planId: number) => api.post('/subscriptions/order', { planId }),
+  verify: (data: { orderId: string; paymentId: string; signature: string }) => api.post('/subscriptions/verify', data),
+  /** Admin */
+  list: (params?: Params) => api.get('/subscriptions', { params }),
+  assign: (data: { userId: number; planId: number; amountPaid?: number; note?: string }) => api.post('/subscriptions/assign', data),
+  cancel: (id: Id) => api.patch(`/subscriptions/${id}/cancel`),
+  runChecks: () => api.post('/subscriptions/run-checks'),
 };
 
 // ── Audit ─────────────────────────────────────────────────────────────────────

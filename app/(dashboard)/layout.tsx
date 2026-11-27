@@ -7,6 +7,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { TopNav } from '@/components/layout/TopNav';
 import { AccessDenied } from '@/components/layout/AccessDenied';
 import { Footer } from '@/components/layout/Footer';
+import { SubscriptionBanner } from '@/components/layout/SubscriptionBanner';
 import { canView, matchScreen } from '@/lib/access';
 import { useAuth } from '@/lib/auth';
 import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
@@ -60,7 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: 'transparent' }}>
       {/* Sidebar */}
-      <Sidebar collapsed={sidebarCollapsed} onClose={() => setSidebarCollapsed(true)} />
+      <Sidebar collapsed={sidebarCollapsed} />
 
       <div className="sidebar-backdrop" data-open={!sidebarCollapsed} onClick={() => setSidebarCollapsed(true)} aria-hidden="true" />
 
@@ -76,6 +77,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             transition={{ duration: 0.2 }}
             style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}
           >
+            <SubscriptionBanner role={user?.role} />
             <div style={{ flex: 1 }}>{blocked ? <AccessDenied screen={screen?.label} /> : children}</div>
             <Footer />
           </motion.div>

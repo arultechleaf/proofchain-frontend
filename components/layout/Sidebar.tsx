@@ -33,7 +33,8 @@ import {
   History,
   CreditCard,
   TrendingDown,
-  X,
+  BadgeIndianRupee,
+  CalendarCheck,
 } from 'lucide-react';
 import type { ElementType } from 'react';
 import { useAuth } from '@/lib/auth';
@@ -252,6 +253,17 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['admin', 'auditor'],
   },
   {
+    href: '/subscription-plans',
+    icon: BadgeIndianRupee,
+    label: 'Subscription Plans',
+    roles: ['admin'],
+  },
+  {
+    href: '/subscription',
+    icon: CalendarCheck,
+    label: 'My Subscription',
+  },
+  {
     href: '/settings',
     icon: Settings,
     label: 'Settings',
@@ -274,10 +286,9 @@ const GROUPED_ITEMS = (() => {
 
 interface SidebarProps {
   collapsed: boolean;
-  onClose: () => void;
 }
 
-export function Sidebar({ collapsed, onClose }: SidebarProps) {
+export function Sidebar({ collapsed }: SidebarProps) {
   const pathname = usePathname();
   const { user, screens } = useAuth();
 
@@ -339,9 +350,6 @@ export function Sidebar({ collapsed, onClose }: SidebarProps) {
         }}
       >
         <Image src="/A_logo.svg" alt="Inventory Audit" width={40} height={40} className="sidebar-brand-logo" />
-        <button type="button" className="sidebar-close" onClick={onClose} aria-label="Close navigation">
-          <X size={20} aria-hidden />
-        </button>
 
         {!collapsed && (
           <div style={{ overflow: 'hidden', flex: 1, minWidth: 0 }}>
