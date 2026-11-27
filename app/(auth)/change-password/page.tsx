@@ -46,7 +46,11 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <AuthShell title="Choose a new password" subtitle={`Welcome, ${user.name}. Your account has a temporary password. Set your own to continue.`}>
+    <AuthShell
+      title="Choose a new password"
+      subtitle={`Welcome, ${user.name}. Your account has a temporary password. Set your own to continue.`}
+      side={{ heading: 'Almost there!', text: 'Set your own password once and you are ready to go.' }}
+    >
       <Form post onSubmit={handleSubmit(onSubmit)} loading={saving} submitLabel="Save and continue" error={error || undefined}>
         <Field label="Temporary password" required error={errors.currentPassword?.message}>
           <input type="password" className="form-input" autoComplete="current-password"

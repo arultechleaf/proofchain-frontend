@@ -86,7 +86,16 @@ export default function ForgotPasswordPage() {
     }, 'Could not update the password');
 
   return (
-    <AuthShell title={step === 'done' ? 'Password updated' : 'Reset your password'} subtitle={SUBTITLES[step]}>
+    <AuthShell
+      title={step === 'done' ? 'Password updated' : 'Reset your password'}
+      subtitle={SUBTITLES[step]}
+      side={{
+        heading: 'Forgot it?',
+        text: 'No problem. We will send a code to your email so you can choose a new password.',
+        actionLabel: 'Back to sign in',
+        actionHref: '/login',
+      }}
+    >
       {error && <Notice kind="error">{error}</Notice>}
       {info && !error && <Notice kind="success">{info}</Notice>}
 

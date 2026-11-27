@@ -43,7 +43,7 @@ export function WelcomeToast({ name, roleLabel, userId, duration = 4000, onClose
         <div className={styles.avatar} aria-hidden="true">
           {initialsOf(name)}
           <span className={styles.check}>
-            <Check size={12} strokeWidth={3} />
+            <Check size={10} strokeWidth={3} />
           </span>
         </div>
 
@@ -57,7 +57,7 @@ export function WelcomeToast({ name, roleLabel, userId, duration = 4000, onClose
         </div>
 
         <button type="button" className={styles.close} aria-label="Close" onClick={onClose}>
-          <X size={18} />
+          <X size={15} />
         </button>
 
         {duration > 0 && (

@@ -1,0 +1,224 @@
+/* Split sign-in / sign-up layout. Drawn in real colours: .page-center.auth-bg is inverted back in the
+   app's light theme, so these pages look the same in both themes. */
+
+.page {
+  --as-green: #1d8a5a;
+  --as-green-dark: #0f5e3c;
+  --as-green-soft: #dff2e8;
+  --as-text: #14231b;
+  --as-muted: #6a7a71;
+
+  box-sizing: border-box;
+  min-height: 100dvh;
+  padding: 24px;
+  background: #e9eeeb !important;
+  color: var(--as-text);
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  width: min(860px, 100%);
+  min-height: 500px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(15, 60, 38, 0.18);
+}
+.wide { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); width: min(980px, 100%); }
+
+/* green accent in the top-right corner of the white side */
+.shell::after {
+  content: '';
+  position: absolute;
+  top: -55px;
+  right: -55px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, var(--as-green), var(--as-green-dark));
+  pointer-events: none;
+}
+
+/* ── green welcome panel ── */
+.brand {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 44px 36px 30px;
+  color: #ffffff;
+  text-align: center;
+  background: linear-gradient(155deg, #23a06a 0%, var(--as-green) 45%, var(--as-green-dark) 100%);
+  /* the curved edge that bulges into the white side */
+  border-radius: 0 50% 50% 0 / 0 58% 58% 0;
+}
+
+.bubbleA,
+.bubbleB {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+.bubbleA { width: 420px; height: 420px; left: -160px; bottom: -180px; }
+.bubbleB { width: 260px; height: 260px; right: -60px; top: -90px; background: rgba(255, 255, 255, 0.05); }
+
+.brandInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 320px;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+.logo img { width: 46px; height: 46px; }
+
+.appName {
+  margin: 12px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.brandText { margin-top: 24px; }
+.brandText h2 { margin: 0 0 12px; font-size: 26px; font-weight: 700; line-height: 1.2; color: #ffffff; }
+.brandText p { margin: 0; font-size: 14px; line-height: 1.6; color: rgba(255, 255, 255, 0.86); }
+
+.ghostBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+  margin-top: 22px;
+  padding: 9px 24px;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.ghostBtn:hover { background: #ffffff; color: var(--as-green-dark); }
+
+/* ── white form panel ── */
+.panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 48px;
+}
+.panelInner { width: 100%; max-width: 330px; }
+.wide .panelInner { max-width: 480px; }
+
+.title {
+  margin: 0;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--as-green);
+  letter-spacing: -0.01em;
+}
+.subtitle {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--as-muted);
+}
+
+.form { margin-top: 20px; }
+
+/* the existing form controls, restyled to soft green pills */
+.form :global(.form-label) { color: #3d4f45; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.form :global(.form-input),
+.form :global(select.form-input),
+.form :global(textarea.form-input) {
+  background: var(--as-green-soft) !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 999px !important;
+  color: var(--as-text) !important;
+  min-height: 42px;
+  box-shadow: none !important;
+}
+.form :global(textarea.form-input) { border-radius: 16px !important; }
+.form :global(.form-input::placeholder) { color: #7d968a !important; }
+.form :global(.form-input:focus) {
+  border-color: var(--as-green) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(29, 138, 90, 0.14) !important;
+}
+.form :global(.form-input.is-invalid) { border-color: #dc4c4c !important; }
+.form :global(.input-with-icon > svg) { color: var(--as-green) !important; left: 18px; }
+.form :global(.input-with-icon .form-input) { padding-left: 46px !important; }
+.form :global(.input-trailing-btn) { color: #5f7a6c !important; right: 14px; }
+.form :global(.form-error) { color: #c43d3d; }
+
+.form :global(.btn-primary),
+.form :global(.auth-submit) {
+  min-height: 42px;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #23a06a, var(--as-green-dark)) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 10px 24px rgba(29, 138, 90, 0.28) !important;
+}
+.form :global(.btn-primary:hover:not(:disabled)),
+.form :global(.auth-submit:hover:not(:disabled)) { filter: brightness(1.06); }
+
+.form :global(.auth-link) { color: var(--as-green) !important; font-weight: 600; }
+.form :global(.auth-footnote) { color: var(--as-muted) !important; text-align: center; }
+.form :global(.auth-error) { border-radius: 12px; }
+
+/* ── tablets ── */
+@media (max-width: 980px) {
+  .panel { padding: 48px 36px; }
+  .brand { padding: 40px 40px 40px 28px; }
+  .brandText h2 { font-size: 26px; }
+}
+
+/* ── phones: green curved header with the logo, form below (like a mobile app) ── */
+@media (max-width: 760px) {
+  .page { padding: 16px; }
+  .shell,
+  .wide {
+    grid-template-columns: 1fr;
+    width: min(380px, 100%);
+    min-height: 0;
+    border-radius: 24px;
+  }
+  .shell::after { display: none; }
+
+  .brand {
+    padding: 28px 20px 40px;
+    border-radius: 0 0 55% 55% / 0 0 30% 30%;
+  }
+  .brandText { display: none; }
+  .logo { width: 64px; height: 64px; }
+  .logo img { width: 42px; height: 42px; }
+  .appName { font-size: 15px; margin-top: 8px; }
+
+  .panel { align-items: flex-start; padding: 20px 20px 26px; }
+  .title { font-size: 26px; }
+  .subtitle { font-size: 13px; }
+  .form { margin-top: 16px; }
+}

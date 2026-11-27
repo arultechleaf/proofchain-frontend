@@ -150,7 +150,17 @@ export default function RegisterPage() {
   };
 
   return (
-    <AuthShell wide title="Create account" subtitle="An administrator approves new accounts before they can sign in.">
+    <AuthShell
+      wide
+      title="Create account"
+      subtitle="An administrator approves new accounts before they can sign in."
+      side={{
+        heading: 'Hello, Friend!',
+        text: 'Already have an account? Sign in to pick up where you left off.',
+        actionLabel: 'Sign in',
+        actionHref: '/login',
+      }}
+    >
       <ol className="wizard-steps" aria-label="Progress">
         {STEPS.map((label, i) => (
           <li key={label} className={i === step ? 'current' : i < step ? 'done' : ''} aria-current={i === step ? 'step' : undefined}>

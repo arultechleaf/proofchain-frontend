@@ -13,17 +13,18 @@ import { useAuth } from '@/lib/auth';
 import LoadSpinner from '@/components/components/loadspinner/LoadSpinner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches,
-  );
+  // Starts closed on every screen size (after login too); the menu button in the header opens it.
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const { isAuthenticated, isLoading, accessLoading, screens, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  // Keep the navigation closed by default on phones and tablets, including after viewport resizing.
+  // Close the navigation when the window shrinks to phone/tablet size (never opens it by itself).
   useEffect(() => {
     const mobileViewport = window.matchMedia('(max-width: 900px)');
-    const updateSidebarForViewport = () => setSidebarCollapsed(mobileViewport.matches);
+    const updateSidebarForViewport = () => {
+      if (mobileViewport.matches) setSidebarCollapsed(true);
+    };
     mobileViewport.addEventListener('change', updateSidebarForViewport);
     return () => mobileViewport.removeEventListener('change', updateSidebarForViewport);
   }, []);

@@ -1646,7 +1646,7 @@ html[data-theme='light'] img, html[data-theme='light'] video, html[data-theme='l
 .topnav-account-trigger[aria-expanded='true'] .topnav-account-chevron { transform: rotate(180deg); }
 .topnav-account-menu {
   position: absolute; top: calc(100% + 8px); right: 0; z-index: 100;
-  width: 300px; padding: 6px; border: 1px solid rgba(34, 197, 94, .22); border-radius: 12px;
+  width: 248px; padding: 4px; border: 1px solid rgba(34, 197, 94, .22); border-radius: 12px;
   background: #101713; box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
 }
 .topnav-account-menu-user { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px 12px; overflow: hidden; }
@@ -1656,16 +1656,16 @@ html[data-theme='light'] img, html[data-theme='light'] video, html[data-theme='l
 .topnav-account-menu-user .topnav-account-menu-id { color: #7b8a82; font-size: 11px; }
 .topnav-account-menu > .topnav-account-menu-user,
 .topnav-account-menu-actions { display: none; }
-.topnav-account-menu-summary { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid rgba(34, 197, 94, .12); }
+.topnav-account-menu-summary { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid rgba(34, 197, 94, .12); }
 .topnav-account-menu-summary > span:last-child { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.topnav-account-menu-avatar { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #16a34a, #166534); color: #fff; font-size: 18px; font-weight: 700; }
-.topnav-account-menu-summary strong { color: #e8efeb; font-size: 15px; }
-.topnav-account-menu-role { color: #22c55e; font-size: 12px; font-weight: 600; }
-.topnav-account-details { padding: 14px 16px 12px; }
-.topnav-account-details > p { margin: 0 0 12px; color: #94a3b8; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-.topnav-account-details > div { display: flex; align-items: center; gap: 12px; padding: 7px 0; color: #22c55e; }
-.topnav-account-details > div > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: #94a3b8; font-size: 12px; }
-.topnav-account-details strong { overflow: hidden; color: #e8efeb; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.topnav-account-menu-avatar { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #16a34a, #166534); color: #fff; font-size: 15px; font-weight: 700; }
+.topnav-account-menu-summary strong { color: #e8efeb; font-size: 13.5px; }
+.topnav-account-menu-role { color: #22c55e; font-size: 11px; font-weight: 600; }
+.topnav-account-details { padding: 10px 12px 8px; }
+.topnav-account-details > p { margin: 0 0 6px; color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.topnav-account-details > div { display: flex; align-items: center; gap: 10px; padding: 5px 0; color: #22c55e; }
+.topnav-account-details > div > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; color: #94a3b8; font-size: 11px; }
+.topnav-account-details strong { overflow: hidden; color: #e8efeb; font-size: 12.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .topnav-account-menu-actions { padding: 4px 0; border-top: 1px solid rgba(255, 255, 255, .08); }
 .topnav-account-menu-link {
   display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px;
@@ -1682,7 +1682,7 @@ html[data-theme='light'] img, html[data-theme='light'] video, html[data-theme='l
 .topnav-account-menu-link:hover { background: rgba(34, 197, 94, .1); }
 .topnav-account-menu-link:focus-visible { outline: 2px solid #3ddc84; outline-offset: -2px; }
 .topnav-account-logout {
-  display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px;
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 12px;
   border: 0; border-top: 1px solid rgba(255, 255, 255, .08); border-radius: 0 0 8px 8px;
   background: transparent; color: #f87171; text-align: left; font-size: 13px; cursor: pointer;
 }

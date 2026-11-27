@@ -202,9 +202,9 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
                 </div>
                 <section className="topnav-account-details" aria-label="Account details">
                   <p>Account details</p>
-                  <div><UserRound size={18} aria-hidden /><span>Full Name<strong>{user.name}</strong></span></div>
-                  <div><KeyRound size={18} aria-hidden /><span>Designation<strong>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</strong></span></div>
-                  <div><Mail size={18} aria-hidden /><span>Email Address<strong>{user.email}</strong></span></div>
+                  <div><UserRound size={15} aria-hidden /><span>Full Name<strong>{user.name}</strong></span></div>
+                  <div><KeyRound size={15} aria-hidden /><span>Designation<strong>{ROLE_LABELS[user.role] ?? roleLabel(user.role)}</strong></span></div>
+                  <div><Mail size={15} aria-hidden /><span>Email Address<strong>{user.email}</strong></span></div>
                 </section>
                 <button
                   type="button"
@@ -212,7 +212,7 @@ export function TopNav({ onMenuToggle, menuCollapsed = false }: TopNavProps) {
                   role="menuitem"
                   onClick={() => { setUserMenuOpen(false); void logout(); }}
                 >
-                  <LogOut size={16} aria-hidden />
+                  <LogOut size={14} aria-hidden />
                   <span>Log out</span>
                 </button>
               </div>
